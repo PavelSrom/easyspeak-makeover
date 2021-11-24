@@ -1,7 +1,12 @@
-import type { NextPage } from "next"
+import type { NextPage } from 'next'
+import { Example } from 'components/example'
+import { useTypeSafeQuery } from 'hooks'
 
 const Home: NextPage = () => {
-  return <p>Hello world</p>
+  const { data: posts } = useTypeSafeQuery('getAllPosts')
+  console.log(posts)
+
+  return <Example />
 }
 
 export default Home

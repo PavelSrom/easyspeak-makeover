@@ -1,13 +1,15 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { createNewUserHandler, getAllUsersHandler } from 'backend/hello'
 
-type Data = {
-  name: string
-}
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  switch (req.method) {
+    case 'GET':
+      return getAllUsersHandler(req, res)
 
-export default function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  res.status(200).json({ name: 'John Doe' })
+    case 'POST':
+      return createNewUserHandler(req, res)
+
+    default:
+      return res.status(405).send({ message: 'Method not allowed' })
+  }
 }

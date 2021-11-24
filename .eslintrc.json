@@ -1,3 +1,33 @@
 {
-  "extends": "next/core-web-vitals"
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "plugin:react/recommended",
+    "airbnb",
+    "airbnb/hooks",
+    "airbnb-typescript",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["react", "@typescript-eslint", "prettier"],
+  "rules": {
+    "dot-notation": "off",
+    "import/prefer-default-export": "off", // allow for named exports
+    "no-case-declarations": "off", // remove later
+    "prettier/prettier": ["error", { "endOfLine": "lf" }], // necessary
+    "react/function-component-definition": "off",
+    "react/jsx-filename-extension": "off", // same?
+    "react/jsx-props-no-spreading": "off",
+    "react/react-in-jsx-scope": "off" // probably doesn't work with React v17?
+  }
 }

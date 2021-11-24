@@ -23,6 +23,7 @@
   "rules": {
     "dot-notation": "off",
     "import/prefer-default-export": "off", // allow for named exports
+    "no-case-declarations": "off", // remove later
     "prettier/prettier": ["error", { "endOfLine": "lf" }], // necessary
     "react/function-component-definition": "off",
     "react/jsx-filename-extension": "off", // same?

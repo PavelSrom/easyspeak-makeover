@@ -6,9 +6,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier -w ."
+    "format": "prettier -w .",
+    "prisma:generate": "npx prisma generate",
+    "prisma:push": "npx prisma db push",
+    "prisma:studio": "npx prisma studio",
+    "prisma:edit-db": "npm run prisma:push && npm run prisma:generate"
   },
   "dependencies": {
+    "@prisma/client": "^3.5.0",
     "axios": "^0.24.0",
     "next": "12.0.4",
     "next-pwa": "^5.4.1",
@@ -35,6 +40,7 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "postcss": "^8.3.11",
     "prettier": "^2.4.1",
+    "prisma": "^3.5.0",
     "tailwindcss": "^2.2.19",
     "typescript": "4.5.2"
   }

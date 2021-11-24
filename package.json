@@ -13,6 +13,11 @@
     "prisma:edit-db": "npm run prisma:push && npm run prisma:generate"
   },
   "dependencies": {
+    "@emotion/cache": "^11.6.0",
+    "@emotion/react": "^11.6.0",
+    "@emotion/server": "^11.4.0",
+    "@emotion/styled": "^11.6.0",
+    "@mui/material": "^5.2.0",
     "@prisma/client": "^3.5.0",
     "axios": "^0.24.0",
     "bcryptjs": "^2.4.3",

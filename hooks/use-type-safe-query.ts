@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 import { requests } from 'backend'
 import { UseQueryOptions, useQuery } from 'react-query'
 import { Unpromisify } from 'types/helpers'

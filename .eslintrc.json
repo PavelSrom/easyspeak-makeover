@@ -21,9 +21,23 @@
   },
   "plugins": ["react", "@typescript-eslint", "prettier"],
   "rules": {
+    // alphabetical order
     "dot-notation": "off",
     "import/prefer-default-export": "off", // allow for named exports
     "no-case-declarations": "off", // remove later
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react-query",
+            "importNames": ["useQuery", "useMutation", "useQueryClient"],
+            "message": "Please import its type-safe alternatives from the 'hooks' folder instead."
+          }
+        ]
+      }
+    ],
+    "no-unused-vars": "error",
     "prettier/prettier": ["error", { "endOfLine": "lf" }], // necessary
     "react/function-component-definition": "off",
     "react/jsx-filename-extension": "off", // same?

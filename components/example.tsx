@@ -1,1 +1,1 @@
-export const Example = () => null
+export const Example = () => <p>Hello world</p>

@@ -1,6 +1,4 @@
-export type Post = {
-  userId: number
-  id: number
-  title: string
-  body: string
-}
+import { getAllUsersHandler } from 'backend/hello'
+import { ApiResponse } from './helpers'
+
+export type User = ApiResponse<ReturnType<typeof getAllUsersHandler>>[number]

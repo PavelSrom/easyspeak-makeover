@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 import { requests } from 'backend'
 import { useMutation, UseMutationOptions } from 'react-query'
 import { Unpromisify } from 'types/helpers'

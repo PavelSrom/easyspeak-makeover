@@ -8,6 +8,9 @@ import { createEmotionCache } from 'utils/create-emotion-cache'
 import { CssBaseline } from '@mui/material'
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles'
 import { theme } from 'styles/theme'
+import { Provider } from 'next-auth/client'
+import { SnackbarProvider } from 'notistack'
+import { AuthProvider } from 'contexts/auth'
 
 type CustomAppProps = AppProps & {
   emotionCache: EmotionCache
@@ -26,15 +29,24 @@ const MyApp = ({
       <title>EasySpeak</title>
       <meta name="viewport" content="initial-scale=1, width=device-width" />
     </Head>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <StyledEngineProvider injectFirst>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-          <CssBaseline />
-          <Component {...pageProps} />
-        </StyledEngineProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <Provider session={pageProps.session}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <StyledEngineProvider injectFirst>
+            <SnackbarProvider
+              dense
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+              <AuthProvider>
+                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                <CssBaseline />
+                <Component {...pageProps} />
+              </AuthProvider>
+            </SnackbarProvider>
+          </StyledEngineProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </Provider>
   </CacheProvider>
 )
 

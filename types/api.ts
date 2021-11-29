@@ -1,4 +1,4 @@
-import { getAllUsersHandler } from 'backend/hello'
+import { createNewMemberHandler } from 'backend/auth'
 import { ApiResponse } from './helpers'
 
 // dummy type for json placeholder
@@ -9,4 +9,4 @@ export type Post = {
   body: string
 }
 
-export type User = ApiResponse<ReturnType<typeof getAllUsersHandler>>[number]
+export type NewUserDTO = ApiResponse<ReturnType<typeof createNewMemberHandler>>

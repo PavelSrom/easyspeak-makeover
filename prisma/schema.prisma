@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,8 +7,119 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// reason for separating User and Profile is to separate
+// auth information (password) and profile information (picture url etc.)
 model User {
-  id    String  @id @default(cuid())
-  email String  @unique
-  name  String?
+  id             String   @id @default(cuid())
+  email          String   @unique
+  password       String?
+  invitationSent Boolean  @default(false)
+  Profile        Profile?
+  // TODO: reset password things
+}
+
+// all foreign keys inside the app are linked to Profile, not User
+model Profile {
+  id            String         @id @default(cuid())
+  userId        String         @unique
+  User          User           @relation(fields: [userId], references: [id])
+  name          String
+  surname       String
+  phone         String
+  pathway       String
+  avatar        String?
+  boardRole     BoardRole?
+  // settings here
+  Notifications Notification[]
+  Posts         Post[]
+  Comments      Comment[]
+  Meetings      Meeting[] // meetings user has been to
+  MeetingRoles  MeetingRole[] // meetings user has been to
+}
+
+// this setup works for individual notifications to users
+// for a notification to the entire club, it has to be done differently
+model Notification {
+  id         String   @id @default(cuid())
+  receiverId String
+  Receiver   Profile  @relation(fields: [receiverId], references: [id])
+  title      String
+  message    String
+  createdAt  DateTime @default(now())
+}
+
+model Post {
+  id        String    @id @default(cuid())
+  authorId  String
+  author    Profile   @relation(fields: [authorId], references: [id])
+  title     String
+  body      String
+  isPinned  Boolean   @default(false)
+  likes     Int       @default(0)
+  createdAt DateTime  @default(now())
+  Comments  Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  authorId  String
+  Author    Profile  @relation(fields: [authorId], references: [id])
+  postId    String
+  Post      Post     @relation(fields: [postId], references: [id])
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model Meeting {
+  id           String            @id @default(cuid())
+  date         DateTime
+  venue        String
+  theme        String?
+  wotd         String?
+  agenda       MeetingRoleType[] // list of role enums
+  attendance   Profile[] // list of people attending the meeting
+  MeetingRoles MeetingRole[] // includes both speakers and other roles
+}
+
+model MeetingRole {
+  id        String          @id @default(cuid())
+  meetingId String
+  Meeting   Meeting         @relation(fields: [meetingId], references: [id])
+  profileId String
+  Profile   Profile         @relation(fields: [profileId], references: [id])
+  roleType  MeetingRoleType
+
+  speechTitle       String?
+  speechDescription String?
+}
+
+enum BoardRole {
+  EDUCATION
+  MEMBERSHIP
+  PRESIDENT
+  PUBLIC_RELATIONS
+  SECRETARY
+  SERGANT
+  TREASURER
+}
+
+enum MeetingRoleType {
+  SPEAKER_1
+  SPEAKER_2
+  SPEAKER_3
+  EVALUATOR_1
+  EVALUATOR_2
+  EVALUATOR_3
+  TOASTMASTER
+  TOPIC_MASTER
+  TIMER
+  AH_COUNTER
+  GRAMMARIAN
+  GENERAL_EVALUATOR
+}
+
+enum MeetingRoleStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
 }

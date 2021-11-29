@@ -8,7 +8,6 @@ import { createEmotionCache } from 'utils/create-emotion-cache'
 import { CssBaseline } from '@mui/material'
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles'
 import { theme } from 'styles/theme'
-import React from 'react'
 
 type CustomAppProps = AppProps & {
   emotionCache: EmotionCache

@@ -42,6 +42,7 @@
     "react/function-component-definition": "off",
     "react/jsx-filename-extension": "off", // same?
     "react/jsx-props-no-spreading": "off",
-    "react/react-in-jsx-scope": "off" // probably doesn't work with React v17?
+    "react/react-in-jsx-scope": "off", // probably doesn't work with React v17?
+    "react/require-default-props": "off"
   }
 }

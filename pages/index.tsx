@@ -1,5 +1,6 @@
 import type { NextPage } from 'next'
-import { Button, TextField } from '@mui/material'
+import { Formik, Form } from 'formik'
+import { Button, TextField } from 'ui'
 import { Example } from 'components/example'
 import { useTypeSafeQuery } from 'hooks'
 
@@ -8,13 +9,18 @@ const Home: NextPage = () => {
   console.log(posts)
 
   return (
-    <>
-      <Example />
-      <TextField variant="filled" label="Name" />
-      <Button variant="outlined" className="ml-4">
-        Hello
-      </Button>
-    </>
+    <Formik
+      initialValues={{ name: '' }}
+      onSubmit={values => console.log(values)}
+    >
+      <Form className="max-w-sm">
+        <Example />
+        <TextField label="First name" name="name" />
+        <Button type="submit" variant="outlined" className="ml-4">
+          Hello
+        </Button>
+      </Form>
+    </Formik>
   )
 }
 

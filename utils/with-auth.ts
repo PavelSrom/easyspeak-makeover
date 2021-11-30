@@ -20,7 +20,7 @@ export const withAuth =
     if (!session)
       return {
         redirect: {
-          destination: '/login',
+          destination: '/signin',
           permanent: false,
         },
       }

@@ -62,8 +62,13 @@ export const authCheckUserHandler = async (
   const { email } = req.body
 
   try {
-    const userExists = await prisma.user.findUnique({ where: { email } })
+    const userExists = await prisma.user.findUnique({
+      where: { email },
+      include: { Profile: { select: { id: true } } },
+    })
     if (!userExists) return res.status(400).json({ msg: 'User does not exist' })
+    if (userExists.Profile?.id)
+      return res.status(400).json({ msg: 'Sign in to access your profile' })
 
     return res.json({ id: userExists.id })
   } catch ({ message }) {
@@ -82,7 +87,9 @@ export const authSignupHandler = async (
 
   try {
     // check once again if user has been created via email beforehand
-    const userExists = await prisma.user.findUnique({ where: { id } })
+    const userExists = await prisma.user.findUnique({
+      where: { id },
+    })
     if (!userExists) return res.status(400).json({ msg: 'User does not exist' })
 
     await prisma.user.update({

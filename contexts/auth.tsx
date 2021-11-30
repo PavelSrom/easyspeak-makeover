@@ -35,6 +35,7 @@ export const AuthProvider = ({ children }: React.PropsWithChildren<{}>) => {
     try {
       const { id } = await checkEmail([email])
       setUserId(id)
+      enqueueSnackbar('Email verified, please sign up', { variant: 'success' })
     } catch (error) {
       enqueueSnackbar('Cannot fetch user data', { variant: 'error' })
     }

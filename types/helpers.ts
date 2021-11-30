@@ -5,3 +5,11 @@ export type ApiResponse<T> = T extends Promise<infer U>
     ? never
     : U
   : never
+
+export type ErrorResponse = {
+  response: {
+    data: {
+      msg: string
+    }
+  }
+}

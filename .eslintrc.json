@@ -22,6 +22,7 @@
   "plugins": ["react", "@typescript-eslint", "prettier"],
   "rules": {
     // alphabetical order
+    "consistent-return": "off",
     "dot-notation": "off",
     "import/prefer-default-export": "off", // allow for named exports
     "no-case-declarations": "off", // remove later
@@ -43,6 +44,7 @@
     "react/jsx-filename-extension": "off", // same?
     "react/jsx-props-no-spreading": "off",
     "react/react-in-jsx-scope": "off", // probably doesn't work with React v17?
-    "react/require-default-props": "off"
+    "react/require-default-props": "off",
+    "@typescript-eslint/return-await": "off"
   }
 }

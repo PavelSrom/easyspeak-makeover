@@ -12,14 +12,14 @@ type ThemeProps = {
   color?: 'primary' | 'secondary'
 }
 
-const useStyles = makeStyles<Theme, ThemeProps>(theme => ({
+const useStyles = makeStyles<Theme, ThemeProps>(() => ({
   buttonProgress: {
     position: 'absolute',
     top: '50%',
     left: '50%',
     marginTop: -12,
     marginLeft: -12,
-    color: ({ color }) => (color ? theme.palette[color].main : 'inherit'),
+    color: 'inherit',
   },
 }))
 

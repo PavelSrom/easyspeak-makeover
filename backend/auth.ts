@@ -65,8 +65,7 @@ export const authCheckUserHandler = async (
     const userExists = await prisma.user.findUnique({ where: { email } })
     if (!userExists) return res.status(400).json({ msg: 'User does not exist' })
 
-    res.json({ id: userExists.id })
-    return { id: userExists.id }
+    return res.json({ id: userExists.id })
   } catch ({ message }) {
     return res.status(500).json({ message })
   }
@@ -105,8 +104,7 @@ export const authSignupHandler = async (
       },
     })
 
-    res.status(201).json({ message: 'User created' })
-    return { message: 'User created' }
+    return res.status(201).json({ message: 'User created' })
   } catch ({ message }) {
     return res.status(500).json({ message })
   }

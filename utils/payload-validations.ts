@@ -46,3 +46,11 @@ export const authSignupSchema = Yup.object().shape({
   confirmPassword: Yup.ref('password'),
   pathway: Yup.string().oneOf(PATHWAYS).required(YUP_MSG.REQ),
 })
+
+export const authSigninSchema = Yup.object().shape({
+  email: Yup.string().email(YUP_MSG.MAIL).required(YUP_MSG.REQ),
+  password: Yup.string()
+    .min(6, YUP_MSG.CHAR_MIN(6))
+    .max(20, YUP_MSG.CHAR_MAX(20))
+    .required(YUP_MSG.REQ),
+})

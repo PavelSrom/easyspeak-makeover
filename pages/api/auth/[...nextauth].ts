@@ -15,7 +15,10 @@ export default NextAuth({
         })
         if (!user) throw new Error('Invalid credentials')
 
-        const match = await bcrypt.compare(credentials.password, user.password!)
+        const match = await bcrypt.compare(
+          credentials.password,
+          user.password ?? ''
+        )
         if (!match) throw new Error('Invalid credentials')
 
         return { id: user.id }

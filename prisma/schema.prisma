@@ -27,9 +27,9 @@ model Profile {
   surname       String
   phone         String
   pathway       String
-  avatar        String?
+  avatar        String? // public URL
   boardRole     BoardRole?
-  // settings here
+  // TODO: settings here
   Notifications Notification[]
   Posts         Post[]
   Comments      Comment[]
@@ -45,6 +45,7 @@ model Notification {
   Receiver   Profile  @relation(fields: [receiverId], references: [id])
   title      String
   message    String
+  read       Boolean  @default(false)
   createdAt  DateTime @default(now())
 }
 
@@ -55,7 +56,6 @@ model Post {
   title     String
   body      String
   isPinned  Boolean   @default(false)
-  likes     Int       @default(0)
   createdAt DateTime  @default(now())
   Comments  Comment[]
 }
@@ -72,8 +72,11 @@ model Comment {
 
 model Meeting {
   id           String            @id @default(cuid())
-  date         DateTime
+  clubId       String            @unique
+  Club         Club              @relation(fields: [clubId], references: [id])
   venue        String
+  timeStart    DateTime
+  timeEnd      DateTime
   theme        String?
   wotd         String?
   agenda       MeetingRoleType[] // list of role enums
@@ -91,6 +94,14 @@ model MeetingRole {
 
   speechTitle       String?
   speechDescription String?
+}
+
+model Club {
+  id          String   @id @default(cuid())
+  name        String
+  location    String
+  description String
+  Meetings    Meeting?
 }
 
 enum BoardRole {
@@ -116,6 +127,8 @@ enum MeetingRoleType {
   AH_COUNTER
   GRAMMARIAN
   GENERAL_EVALUATOR
+  AWARDS
+  PRESIDENT_INTRO
 }
 
 enum MeetingRoleStatus {

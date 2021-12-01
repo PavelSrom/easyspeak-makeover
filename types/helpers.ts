@@ -1,3 +1,5 @@
+import { Session } from 'next-auth'
+
 export type Unpromisify<T> = T extends Promise<infer U> ? U : T
 
 export type ApiResponse<T> = T extends Promise<infer U>
@@ -11,5 +13,12 @@ export type ErrorResponse = {
     data: {
       msg: string
     }
+  }
+}
+
+export type ApiSession = Session & {
+  user: {
+    userId: string
+    profileId?: string
   }
 }

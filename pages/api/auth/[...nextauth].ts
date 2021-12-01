@@ -12,6 +12,7 @@ export default NextAuth({
       async authorize(credentials: { email: string; password: string }) {
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
+          include: { Profile: { select: { id: true } } },
         })
         if (!user) throw new Error('Invalid credentials')
 
@@ -21,14 +22,16 @@ export default NextAuth({
         )
         if (!match) throw new Error('Invalid credentials')
 
-        return { id: user.id }
+        return { userId: user.id, profileId: user.Profile?.id }
       },
     }),
   ],
   callbacks: {
     jwt: async (token, user) => {
       // eslint-disable-next-line no-param-reassign
-      if (user?.id) token.id = user.id
+      if (user?.userId) token.userId = user.userId
+      // eslint-disable-next-line no-param-reassign
+      if (user?.profileId) token.profileId = user.profileId
 
       return token
     },

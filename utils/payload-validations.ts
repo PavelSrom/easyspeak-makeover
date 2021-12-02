@@ -54,3 +54,8 @@ export const authSigninSchema = Yup.object().shape({
     .max(20, YUP_MSG.CHAR_MAX(20))
     .required(YUP_MSG.REQ),
 })
+
+export const createNewPostSchema = Yup.object().shape({
+  title: Yup.string().required(YUP_MSG.REQ),
+  body: Yup.string().required(YUP_MSG.REQ),
+})

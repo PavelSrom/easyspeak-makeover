@@ -1,13 +1,19 @@
 import axios from 'axios'
-import { NewUserDTO, NotificationDTO, Post } from 'types/api'
-import { CreateMemberPayload } from 'types/payloads'
+import {
+  NewUserDTO,
+  NotificationDTO,
+  PostFullDTO,
+  PostSimpleDTO,
+} from 'types/api'
+import { CreateMemberPayload, CreatePostPayload } from 'types/payloads'
 
 export const requests = {
   query: {
-    getAllPosts: (): Promise<Post[]> =>
-      axios
-        .get('http://jsonplaceholder.typicode.com/posts')
-        .then(response => response.data),
+    // POSTS
+    getAllPosts: (): Promise<PostSimpleDTO[]> =>
+      axios.get('/api/posts').then(response => response.data),
+    getPostById: (id: string): Promise<PostFullDTO> =>
+      axios.get(`/api/posts/${id}`).then(response => response.data),
     // NOTIFICATIONS
     getAllNotifications: (): Promise<NotificationDTO[]> =>
       axios.get('/api/notifications').then(response => response.data),
@@ -35,5 +41,15 @@ export const requests = {
       axios.put(`/api/notifications/${id}`).then(response => response.data),
     deleteNotificationById: (id: string): Promise<{ message: string }> =>
       axios.delete(`/api/notifications/${id}`).then(response => response.data),
+    // POSTS
+    createNewPost: (payload: CreatePostPayload): Promise<PostFullDTO> =>
+      axios.post('/api/posts', payload).then(response => response.data),
+    updatePostById: (
+      id: string,
+      payload: CreatePostPayload
+    ): Promise<PostFullDTO> =>
+      axios.put(`/api/posts/${id}`, payload).then(response => response.data),
+    deletePostById: (id: string): Promise<{ message: string }> =>
+      axios.delete(`/api/posts/${id}`).then(response => response.data),
   },
 }

@@ -16,7 +16,6 @@ export type AuthSignInPayload = {
 export type CreatePostPayload = {
   title: string
   body: string
-  isPinned: boolean
 }
 
 export type CreateCommentPayload = {

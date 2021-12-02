@@ -22,7 +22,11 @@ export default NextAuth({
         )
         if (!match) throw new Error('Invalid credentials')
 
-        return { userId: user.id, profileId: user.Profile?.id }
+        return {
+          userId: user.id,
+          profileId: user.Profile?.id,
+          clubId: user.clubId,
+        }
       },
     }),
   ],
@@ -32,6 +36,8 @@ export default NextAuth({
       if (user?.userId) token.userId = user.userId
       // eslint-disable-next-line no-param-reassign
       if (user?.profileId) token.profileId = user.profileId
+      // eslint-disable-next-line no-param-reassign
+      if (user?.clubId) token.clubId = user.clubId
 
       return token
     },

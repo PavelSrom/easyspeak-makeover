@@ -7,11 +7,12 @@ import {
   validateBody,
 } from 'utils/payload-validations'
 import { prisma } from 'utils/prisma-client'
+import { ApiSession } from 'types/helpers'
 
-// TODO: only for board members
 export const createNewMemberHandler = async (
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
+  session: ApiSession
 ) => {
   const { isValid, msg } = await validateBody(createNewMemberSchema, req)
   if (!isValid) return res.status(400).json({ msg })
@@ -20,7 +21,7 @@ export const createNewMemberHandler = async (
 
   try {
     const newMember = await prisma.user.create({
-      data: { email },
+      data: { email, Club: { connect: { id: session.user.clubId } } },
       select: { id: true, email: true, invitationSent: true },
     })
 
@@ -33,10 +34,10 @@ export const createNewMemberHandler = async (
   }
 }
 
-// TODO: only for board members
 export const deleteNewMemberByIdHandler = async (
   req: NextApiRequest,
   res: NextApiResponse
+  // session: ApiSession
 ) => {
   try {
     const newMemberToDelete = await prisma.user.delete({

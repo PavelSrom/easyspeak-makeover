@@ -14,6 +14,8 @@ model User {
   email          String   @unique
   password       String?
   invitationSent Boolean  @default(false)
+  clubId         String
+  Club           Club     @relation(fields: [clubId], references: [id])
   Profile        Profile?
   // TODO: reset password things
 }
@@ -52,7 +54,9 @@ model Notification {
 model Post {
   id        String    @id @default(cuid())
   authorId  String
-  author    Profile   @relation(fields: [authorId], references: [id])
+  Author    Profile   @relation(fields: [authorId], references: [id])
+  clubId    String
+  Club      Club      @relation(fields: [clubId], references: [id])
   title     String
   body      String
   isPinned  Boolean   @default(false)
@@ -97,11 +101,13 @@ model MeetingRole {
 }
 
 model Club {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   location    String
   description String
-  Meetings    Meeting?
+  Meetings    Meeting[]
+  Posts       Post[]
+  Users       User[]
 }
 
 enum BoardRole {

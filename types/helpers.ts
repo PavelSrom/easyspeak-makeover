@@ -19,6 +19,7 @@ export type ErrorResponse = {
 export type ApiSession = Session & {
   user: {
     userId: string
+    clubId: string
     profileId?: string
   }
 }

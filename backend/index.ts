@@ -1,11 +1,17 @@
 import axios from 'axios'
+import queryString from 'query-string'
 import {
+  CommentDTO,
   NewUserDTO,
   NotificationDTO,
   PostFullDTO,
   PostSimpleDTO,
 } from 'types/api'
-import { CreateMemberPayload, CreatePostPayload } from 'types/payloads'
+import {
+  CreateCommentPayload,
+  CreateMemberPayload,
+  CreatePostPayload,
+} from 'types/payloads'
 
 export const requests = {
   query: {
@@ -17,6 +23,18 @@ export const requests = {
     // NOTIFICATIONS
     getAllNotifications: (): Promise<NotificationDTO[]> =>
       axios.get('/api/notifications').then(response => response.data),
+    // COMMENTS
+    getAllComments: (params: {
+      postId?: string
+      userId?: string
+    }): Promise<CommentDTO[]> => {
+      const query = queryString.stringify(params, {
+        skipEmptyString: true,
+        skipNull: true,
+      })
+
+      return axios.get(`/api/comments?${query}`).then(response => response.data)
+    },
   },
   mutation: {
     // AUTH
@@ -51,5 +69,10 @@ export const requests = {
       axios.put(`/api/posts/${id}`, payload).then(response => response.data),
     deletePostById: (id: string): Promise<{ message: string }> =>
       axios.delete(`/api/posts/${id}`).then(response => response.data),
+    // COMMENTS
+    createNewComment: (payload: CreateCommentPayload): Promise<CommentDTO> =>
+      axios.post('/api/comments', payload).then(response => response.data),
+    deleteCommentById: (id: string): Promise<{ message: string }> =>
+      axios.delete(`/api/comments/${id}`).then(response => response.data),
   },
 }

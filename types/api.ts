@@ -1,4 +1,5 @@
 import { createNewMemberHandler } from 'backend/auth'
+import { getAllCommentsHandler } from 'backend/comments'
 import { getAllNotificationsHandler } from 'backend/notifications'
 import { getAllPostsHandler, getPostByIdHandler } from 'backend/posts'
 import { ApiResponse } from './helpers'
@@ -14,3 +15,7 @@ export type PostSimpleDTO = ApiResponse<
 >[number]
 
 export type PostFullDTO = ApiResponse<ReturnType<typeof getPostByIdHandler>>
+
+export type CommentDTO = ApiResponse<
+  ReturnType<typeof getAllCommentsHandler>
+>[number]

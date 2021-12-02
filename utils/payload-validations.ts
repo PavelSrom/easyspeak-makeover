@@ -59,3 +59,8 @@ export const createNewPostSchema = Yup.object().shape({
   title: Yup.string().required(YUP_MSG.REQ),
   body: Yup.string().required(YUP_MSG.REQ),
 })
+
+export const createNewCommentSchema = Yup.object().shape({
+  postId: Yup.string().required(YUP_MSG.REQ),
+  message: Yup.string().required(YUP_MSG.REQ),
+})

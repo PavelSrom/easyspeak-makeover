@@ -20,7 +20,7 @@ const SignIn: NextPage = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
   useEffect(() => {
-    if (session) router.replace('/dashboard')
+    if (session) router.replace('/')
   }, [session, router])
 
   const handleSubmit = async (values: AuthSignInPayload): Promise<void> => {

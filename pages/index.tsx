@@ -1,27 +1,21 @@
-import type { NextPage } from 'next'
-import { Formik, Form } from 'formik'
-import { Button, TextField } from 'ui'
-import { Example } from 'components/example'
-import { useTypeSafeQuery } from 'hooks'
+import { useAuth } from 'contexts/auth'
+import { NextPage } from 'next'
+import { Button } from 'ui'
+import { withAuth } from 'utils/with-auth'
 
-const Home: NextPage = () => {
-  const { data: posts } = useTypeSafeQuery('getAllPosts')
-  console.log(posts)
+export const getServerSideProps = withAuth(async ({ session }) => ({
+  props: { session },
+}))
+
+const Dashboard: NextPage = () => {
+  const { logout } = useAuth()
 
   return (
-    <Formik
-      initialValues={{ name: '' }}
-      onSubmit={values => console.log(values)}
-    >
-      <Form className="max-w-sm">
-        <Example />
-        <TextField label="First name" name="name" />
-        <Button type="submit" variant="outlined" className="ml-4">
-          Hello
-        </Button>
-      </Form>
-    </Formik>
+    <div>
+      <p>Protected dashboard page</p>
+      <Button onClick={logout}>Logout</Button>
+    </div>
   )
 }
 
-export default Home
+export default Dashboard

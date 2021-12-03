@@ -1,7 +1,7 @@
 import { MenuItem } from '@mui/material'
 import { useAuth } from 'contexts/auth'
 import { Form, Formik, FormikHelpers } from 'formik'
-import { useTypeSafeMutation } from 'hooks'
+import { useTypeSafeMutation, useTypeSafeQuery } from 'hooks'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -26,6 +26,9 @@ const SignUp: NextPage = () => {
   const [emailVerified, setEmailVerified] = useState<boolean>(false)
   const { checkMemberEmail, userId } = useAuth()
   const router = useRouter()
+
+  const { data: pathways } = useTypeSafeQuery('getAllPathways')
+  console.log(pathways)
 
   const { mutateAsync: signup } = useTypeSafeMutation('authSignup', {
     onSuccess: () => {

@@ -35,6 +35,9 @@ export const requests = {
 
       return axios.get(`/api/comments?${query}`).then(response => response.data)
     },
+    // MISCELLANEOUS
+    getAllPathways: (): Promise<{ id: string; name: string }[]> =>
+      axios.get('/api/pathways').then(response => response.data),
   },
   mutation: {
     // AUTH

@@ -1,6 +1,5 @@
 import { NextApiRequest } from 'next'
 import * as Yup from 'yup'
-import { PATHWAYS } from './placeholder-data'
 
 const YUP_MSG = {
   MAIL: 'This is not a valid email',
@@ -44,7 +43,7 @@ export const authSignupSchema = Yup.object().shape({
     .max(20, YUP_MSG.CHAR_MAX(20))
     .required(YUP_MSG.REQ),
   confirmPassword: Yup.ref('password'),
-  pathway: Yup.string().oneOf(PATHWAYS).required(YUP_MSG.REQ),
+  pathway: Yup.string().required(YUP_MSG.REQ),
 })
 
 export const authSigninSchema = Yup.object().shape({

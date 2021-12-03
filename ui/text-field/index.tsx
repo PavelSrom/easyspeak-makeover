@@ -4,13 +4,16 @@ import { Field, FastField, FieldProps, FastFieldProps } from 'formik'
 import {
   TextField as MuiTextField,
   StandardTextFieldProps,
+  InputAdornment,
 } from '@mui/material'
+import { TextFieldName } from 'types/helpers'
+import { textFieldIcons } from 'utils/text-field-icons'
 
 export type TextFieldProps = Omit<
   StandardTextFieldProps,
   'name' | 'variant'
 > & {
-  name: string
+  name: TextFieldName
   fast?: boolean
   onAfterChange?: () => void | Promise<void>
 }
@@ -24,6 +27,7 @@ export const TextField: React.ForwardRefExoticComponent<TextFieldProps> =
       ref
     ) => {
       const FieldComponent = fast ? FastField : Field
+      const FieldIcon = textFieldIcons[name]
 
       return (
         <FieldComponent name={name}>
@@ -38,6 +42,13 @@ export const TextField: React.ForwardRefExoticComponent<TextFieldProps> =
               {...fieldRest}
               fullWidth={fullWidth}
               variant="standard"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FieldIcon />
+                  </InputAdornment>
+                ),
+              }}
               className={clsx('relative', {
                 [className!]: !!className,
               })}

@@ -44,3 +44,12 @@ export type CustomAppProps<P = {}> = Omit<
 }
 
 export type CustomNextPage = NextPage & PageOptions
+
+export type TextFieldName =
+  | 'confirmPassword'
+  | 'email'
+  | 'name'
+  | 'password'
+  | 'pathway'
+  | 'phone'
+  | 'surname'

@@ -25,7 +25,6 @@ export const createNewMemberHandler = async (
       return res.status(400).json({ message: 'This member is already invited' })
 
     const newMember = await prisma.user.create({
-      // @ts-ignore
       data: { email, Club: { connect: { id: session.user.clubId } } },
       select: { id: true, email: true, invitationSent: true },
     })

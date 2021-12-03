@@ -103,12 +103,8 @@ export const authSignupHandler = async (
         name,
         surname,
         phone,
-        pathway,
-        User: {
-          connect: {
-            id,
-          },
-        },
+        Pathway: { connect: { id: pathway } },
+        User: { connect: { id } },
       },
     })
 

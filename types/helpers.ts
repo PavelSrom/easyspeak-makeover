@@ -1,4 +1,7 @@
+import { EmotionCache } from '@emotion/react'
+import { NextComponentType, NextPage, NextPageContext } from 'next'
 import { Session } from 'next-auth'
+import { AppProps } from 'next/app'
 
 export type Unpromisify<T> = T extends Promise<infer U> ? U : T
 
@@ -23,3 +26,20 @@ export type ApiSession = Session & {
     profileId?: string
   }
 }
+
+type PageOptions = {
+  tabs?: string[]
+}
+
+export type CustomAppProps<P = {}> = Omit<
+  AppProps,
+  'pageProps' | 'Component'
+> & {
+  emotionCache: EmotionCache
+  Component: NextComponentType<NextPageContext, any, P> & PageOptions
+  pageProps: {
+    session?: ApiSession
+  }
+}
+
+export type CustomNextPage = NextPage & PageOptions

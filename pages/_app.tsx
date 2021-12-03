@@ -1,27 +1,24 @@
 import '../styles/globals.css'
-import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { QueryClientProvider } from 'react-query'
 import { queryClient } from 'utils/query-client'
-import { CacheProvider, EmotionCache } from '@emotion/react'
+import { CacheProvider } from '@emotion/react'
 import { createEmotionCache } from 'utils/create-emotion-cache'
 import { CssBaseline } from '@mui/material'
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles'
 import { theme } from 'styles/theme'
-import { Provider } from 'next-auth/client'
+import { Provider as NextAuthProvider } from 'next-auth/client'
 import { SnackbarProvider } from 'notistack'
 import { AuthProvider } from 'contexts/auth'
-
-type CustomAppProps = AppProps & {
-  emotionCache: EmotionCache
-}
+import { LayoutProvider } from 'contexts/page-layout'
+import { CustomAppProps } from 'types/helpers'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
 
 const MyApp = ({
   Component,
-  pageProps,
+  pageProps: { session, ...otherPageProps },
   emotionCache = clientSideEmotionCache,
 }: CustomAppProps) => (
   <CacheProvider value={emotionCache}>
@@ -29,7 +26,7 @@ const MyApp = ({
       <title>EasySpeak</title>
       <meta name="viewport" content="initial-scale=1, width=device-width" />
     </Head>
-    <Provider session={pageProps.session}>
+    <NextAuthProvider session={session}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
           <StyledEngineProvider injectFirst>
@@ -38,15 +35,17 @@ const MyApp = ({
               anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
               <AuthProvider>
-                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                <CssBaseline />
-                <Component {...pageProps} />
+                <LayoutProvider tabs={Component.tabs}>
+                  {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                  <CssBaseline />
+                  <Component {...otherPageProps} />
+                </LayoutProvider>
               </AuthProvider>
             </SnackbarProvider>
           </StyledEngineProvider>
         </ThemeProvider>
       </QueryClientProvider>
-    </Provider>
+    </NextAuthProvider>
   </CacheProvider>
 )
 

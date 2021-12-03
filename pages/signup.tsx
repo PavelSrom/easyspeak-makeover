@@ -2,9 +2,9 @@ import { MenuItem } from '@mui/material'
 import { useAuth } from 'contexts/auth'
 import { Form, Formik, FormikHelpers } from 'formik'
 import { useTypeSafeMutation, useTypeSafeQuery } from 'hooks'
-import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { CustomNextPage } from 'types/helpers'
 import { CreateMemberPayload } from 'types/payloads'
 import { Button, TextField } from 'ui'
 import {
@@ -22,7 +22,7 @@ const signupInitialValues: Omit<CreateMemberPayload, 'id'> = {
   pathway: '',
 }
 
-const SignUp: NextPage = () => {
+const SignUp: CustomNextPage = () => {
   const [emailVerified, setEmailVerified] = useState<boolean>(false)
   const { checkMemberEmail, userId } = useAuth()
   const router = useRouter()
@@ -103,5 +103,7 @@ const SignUp: NextPage = () => {
     </Formik>
   )
 }
+
+SignUp.tabs = ['One', 'two']
 
 export default SignUp

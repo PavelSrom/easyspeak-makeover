@@ -7,8 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// reason for separating User and Profile is to separate
-// auth information (password) and profile information (picture url etc.)
 model User {
   id             String   @id @default(cuid())
   email          String   @unique
@@ -20,7 +18,6 @@ model User {
   // TODO: reset password things
 }
 
-// all foreign keys inside the app are linked to Profile, not User
 model Profile {
   id            String         @id @default(cuid())
   userId        String         @unique
@@ -28,15 +25,16 @@ model Profile {
   name          String
   surname       String
   phone         String
-  pathway       String
   avatar        String? // public URL
-  boardRole     BoardRole?
+  roleTypeId    String?
+  ClubRole      ClubRole?      @relation(fields: [roleTypeId], references: [id])
+  pathwayId     String
+  Pathway       Pathway        @relation(fields: [pathwayId], references: [id])
   // TODO: settings here
   Notifications Notification[]
   Posts         Post[]
   Comments      Comment[]
-  Meetings      Meeting[] // meetings user has been to
-  MeetingRoles  MeetingRole[] // meetings user has been to
+  Meetings      Meeting[] // meetings the user has managed
 }
 
 // this setup works for individual notifications to users
@@ -75,29 +73,17 @@ model Comment {
 }
 
 model Meeting {
-  id           String            @id @default(cuid())
-  clubId       String            @unique
-  Club         Club              @relation(fields: [clubId], references: [id])
-  venue        String
-  timeStart    DateTime
-  timeEnd      DateTime
-  theme        String?
-  wotd         String?
-  agenda       MeetingRoleType[] // list of role enums
-  attendance   Profile[] // list of people attending the meeting
-  MeetingRoles MeetingRole[] // includes both speakers and other roles
-}
-
-model MeetingRole {
-  id        String          @id @default(cuid())
-  meetingId String
-  Meeting   Meeting         @relation(fields: [meetingId], references: [id])
-  profileId String
-  Profile   Profile         @relation(fields: [profileId], references: [id])
-  roleType  MeetingRoleType
-
-  speechTitle       String?
-  speechDescription String?
+  id          String   @id @default(cuid())
+  clubId      String   @unique
+  Club        Club     @relation(fields: [clubId], references: [id])
+  managerId   String   @unique
+  Manager     Profile  @relation(fields: [managerId], references: [id])
+  venue       String
+  timeStart   DateTime
+  timeEnd     DateTime
+  description String
+  theme       String?
+  wotd        String?
 }
 
 model Club {
@@ -110,14 +96,16 @@ model Club {
   Users       User[]
 }
 
-enum BoardRole {
-  EDUCATION
-  MEMBERSHIP
-  PRESIDENT
-  PUBLIC_RELATIONS
-  SECRETARY
-  SERGANT
-  TREASURER
+model ClubRole {
+  id      String    @id @default(cuid())
+  name    String
+  Profile Profile[]
+}
+
+model Pathway {
+  id      String    @id @default(cuid())
+  name    String
+  Profile Profile[]
 }
 
 enum MeetingRoleType {

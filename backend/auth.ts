@@ -58,7 +58,7 @@ export const authCheckUserHandler = async (
   res: NextApiResponse
 ) => {
   const { isValid, msg } = await validateBody(authCheckUserSchema, req)
-  if (!isValid) return res.status(400).json({ msg })
+  if (!isValid) return res.status(400).json({ message: msg })
 
   const { email } = req.body
 
@@ -67,9 +67,10 @@ export const authCheckUserHandler = async (
       where: { email },
       include: { Profile: { select: { id: true } } },
     })
-    if (!userExists) return res.status(400).json({ msg: 'User does not exist' })
+    if (!userExists)
+      return res.status(400).json({ message: 'User does not exist' })
     if (userExists.Profile?.id)
-      return res.status(400).json({ msg: 'Sign in to access your profile' })
+      return res.status(400).json({ message: 'Sign in to access your profile' })
 
     return res.json({ id: userExists.id })
   } catch ({ message }) {
@@ -82,7 +83,7 @@ export const authSignupHandler = async (
   res: NextApiResponse
 ) => {
   const { isValid, msg } = await validateBody(authSignupSchema, req)
-  if (!isValid) return res.status(400).json({ msg })
+  if (!isValid) return res.status(400).json({ message: msg })
 
   const { id, name, surname, phone, password, pathway } = req.body
 
@@ -91,7 +92,8 @@ export const authSignupHandler = async (
     const userExists = await prisma.user.findUnique({
       where: { id },
     })
-    if (!userExists) return res.status(400).json({ msg: 'User does not exist' })
+    if (!userExists)
+      return res.status(400).json({ message: 'User does not exist' })
 
     await prisma.user.update({
       where: { id },

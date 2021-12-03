@@ -37,7 +37,10 @@ export const AuthProvider = ({ children }: React.PropsWithChildren<{}>) => {
       setUserId(id)
       enqueueSnackbar('Email verified, please sign up', { variant: 'success' })
     } catch (error) {
-      enqueueSnackbar('Cannot fetch user data', { variant: 'error' })
+      // @ts-ignore
+      enqueueSnackbar(error.response.data.message ?? 'Cannot fetch user data', {
+        variant: 'error',
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

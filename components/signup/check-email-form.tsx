@@ -3,10 +3,11 @@ import { Button, TextField } from 'ui'
 import { authCheckUserSchema } from 'utils/payload-validations'
 
 type Props = {
-  onSubmit: (values: { email: string }) => void | Promise<void>
+  onSubmit: (values: { email: string }) => Promise<void>
+  isSubmitting: boolean
 }
 
-export const CheckEmailForm = ({ onSubmit }: Props) => (
+export const CheckEmailForm = ({ onSubmit, isSubmitting }: Props) => (
   <Formik
     enableReinitialize
     initialValues={{ email: '' }}
@@ -15,7 +16,13 @@ export const CheckEmailForm = ({ onSubmit }: Props) => (
   >
     <Form>
       <TextField name="email" label="Email" />
-      <Button fullWidth type="submit" color="secondary" className="mt-8">
+      <Button
+        fullWidth
+        loading={isSubmitting}
+        type="submit"
+        color="secondary"
+        className="mt-8"
+      >
         Confirm
       </Button>
     </Form>

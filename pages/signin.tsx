@@ -1,12 +1,14 @@
 import { Formik, Form } from 'formik'
 import { AuthSignInPayload } from 'types/payloads'
 import { authSigninSchema } from 'utils/payload-validations'
-import { Button, TextField } from 'ui'
+import { Button, Text, TextField } from 'ui'
 import { useEffect, useState } from 'react'
 import { signIn, useSession } from 'next-auth/client'
 import { useSnackbar } from 'notistack'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { CustomNextPage } from 'types/helpers'
+import { Container } from '@mui/material'
 
 const initialValues = {
   email: '',
@@ -43,24 +45,32 @@ const SignIn: CustomNextPage = () => {
   }
 
   return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={authSigninSchema}
-      onSubmit={handleSubmit}
-    >
-      <Form className="space-y-6">
-        <TextField name="email" label="Email" />
-        <TextField name="password" label="Password" />
-        <Button
-          type="submit"
-          fullWidth
-          color="secondary"
-          loading={isSubmitting}
-        >
-          Sign in
-        </Button>
-      </Form>
-    </Formik>
+    <Container className="py-4">
+      <Formik
+        initialValues={initialValues}
+        validationSchema={authSigninSchema}
+        onSubmit={handleSubmit}
+      >
+        <Form className="space-y-6">
+          <TextField name="email" label="Email" />
+          <TextField name="password" label="Password" />
+          <Button
+            type="submit"
+            fullWidth
+            color="secondary"
+            loading={isSubmitting}
+          >
+            Sign in
+          </Button>
+        </Form>
+      </Formik>
+      <Text variant="body2" className="text-right mt-4">
+        No account?{' '}
+        <span className="text-red-500">
+          <Link href="/signup">Sign up</Link>
+        </span>
+      </Text>
+    </Container>
   )
 }
 

@@ -1,5 +1,9 @@
-import { useTypeSafeMutation, useTypeSafeQueryClient } from 'hooks'
-import { signOut } from 'next-auth/client'
+import {
+  useTypeSafeMutation,
+  useTypeSafeQuery,
+  useTypeSafeQueryClient,
+} from 'hooks'
+import { signOut, useSession } from 'next-auth/client'
 import { useRouter } from 'next/router'
 import { useSnackbar } from 'notistack'
 import {
@@ -9,10 +13,12 @@ import {
   useMemo,
   useCallback,
 } from 'react'
+import { ProfileDTO } from 'types/api'
 import { CreateMemberPayload } from 'types/payloads'
 
 type ContextProps = {
   userId: string | undefined
+  profile: ProfileDTO | undefined
   checkMemberEmail: (email: string) => Promise<void>
   signUp: (payload: CreateMemberPayload) => Promise<void>
   logout: () => Promise<void>
@@ -25,7 +31,12 @@ export const AuthProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [userId, setUserId] = useState<string>()
   const { enqueueSnackbar } = useSnackbar()
   const queryClient = useTypeSafeQueryClient()
+  const [session] = useSession()
   const router = useRouter()
+
+  const { data: profile } = useTypeSafeQuery('getUserProfile', {
+    enabled: !!session,
+  })
 
   const { mutateAsync: checkEmail } = useTypeSafeMutation('authCheckUser')
   const { mutateAsync: memberSignup } = useTypeSafeMutation('authSignup')
@@ -83,12 +94,13 @@ export const AuthProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const value: ContextProps = useMemo(
     () => ({
       userId,
+      profile,
       checkMemberEmail,
       signUp,
       logout,
       deleteAccount,
     }),
-    [userId, checkMemberEmail, signUp, logout, deleteAccount]
+    [userId, profile, checkMemberEmail, signUp, logout, deleteAccount]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

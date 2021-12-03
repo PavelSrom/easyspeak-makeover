@@ -10,6 +10,7 @@ export const getUserProfileHandler = async (
   try {
     const fullProfile = await prisma.profile.findUnique({
       where: { id: session.user.profileId },
+      include: { User: { select: { Club: { select: { name: true } } } } },
     })
     if (!fullProfile)
       return res.status(404).json({ message: 'Profile not found' })

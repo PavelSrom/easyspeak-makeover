@@ -6,6 +6,7 @@ import {
   NotificationDTO,
   PostFullDTO,
   PostSimpleDTO,
+  ProfileDTO,
 } from 'types/api'
 import {
   CreateCommentPayload,
@@ -35,6 +36,9 @@ export const requests = {
 
       return axios.get(`/api/comments?${query}`).then(response => response.data)
     },
+    // PROFILE
+    getUserProfile: (): Promise<ProfileDTO> =>
+      axios.get('/api/profile').then(response => response.data),
     // MISCELLANEOUS
     getAllPathways: (): Promise<{ id: string; name: string }[]> =>
       axios.get('/api/pathways').then(response => response.data),

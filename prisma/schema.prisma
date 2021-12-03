@@ -14,7 +14,6 @@ model User {
   invitationSent Boolean  @default(false)
   clubId         String
   Club           Club     @relation(fields: [clubId], references: [id])
-  profileId      String?
   Profile        Profile?
   createdAt      DateTime @default(now())
   // TODO: reset password things

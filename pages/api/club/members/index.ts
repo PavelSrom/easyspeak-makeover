@@ -1,5 +1,5 @@
+import { getClubMembersHandler } from 'backend/club'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { createNewMemberHandler } from 'backend/auth'
 import { getApiSession } from 'utils/get-api-session'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -7,8 +7,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (!session) return res.status(403).json({ message: 'Access denied' })
 
   switch (req.method) {
-    case 'POST':
-      return createNewMemberHandler(req, res, session)
+    case 'GET':
+      return getClubMembersHandler(req, res, session)
 
     default:
       return res.status(405).json({ message: 'Method not allowed' })

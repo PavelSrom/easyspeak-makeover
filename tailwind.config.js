@@ -8,6 +8,7 @@ module.exports = {
         secondary: '#F0802B',
         tertiary: '#009FB2',
         error: '#EF5350',
+        'page-bg': '#F0F0F0',
       },
     },
   },

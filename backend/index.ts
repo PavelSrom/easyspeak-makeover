@@ -1,7 +1,9 @@
 import axios from 'axios'
 import queryString from 'query-string'
 import {
+  ClubInfoDTO,
   CommentDTO,
+  MemberSimpleDTO,
   NewUserDTO,
   NotificationDTO,
   PostFullDTO,
@@ -39,6 +41,11 @@ export const requests = {
     // PROFILE
     getUserProfile: (): Promise<ProfileDTO> =>
       axios.get('/api/profile').then(response => response.data),
+    // CLUB THINGS
+    getClubInfo: (): Promise<ClubInfoDTO> =>
+      axios.get('/api/club').then(response => response.data),
+    getClubMembers: (): Promise<MemberSimpleDTO[]> =>
+      axios.get('/api/club/members').then(response => response.data),
     // MISCELLANEOUS
     getAllPathways: (): Promise<{ id: string; name: string }[]> =>
       axios.get('/api/pathways').then(response => response.data),

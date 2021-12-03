@@ -1,9 +1,10 @@
 import { createNewMemberHandler } from 'backend/auth'
 import { getAllCommentsHandler } from 'backend/comments'
 import {
+  getClubInfoHandler,
   getClubMemberByIdHandler,
   getClubMembersHandler,
-} from 'backend/members'
+} from 'backend/club'
 import { getAllNotificationsHandler } from 'backend/notifications'
 import { getAllPostsHandler, getPostByIdHandler } from 'backend/posts'
 import { getUserProfileHandler } from 'backend/profile'
@@ -34,3 +35,5 @@ export type MemberSimpleDTO = ApiResponse<
 export type MemberFullDTO = ApiResponse<
   ReturnType<typeof getClubMemberByIdHandler>
 >
+
+export type ClubInfoDTO = ApiResponse<ReturnType<typeof getClubInfoHandler>>

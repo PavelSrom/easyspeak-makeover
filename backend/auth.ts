@@ -15,11 +15,15 @@ export const createNewMemberHandler = async (
   session: ApiSession
 ) => {
   const { isValid, msg } = await validateBody(createNewMemberSchema, req)
-  if (!isValid) return res.status(400).json({ msg })
+  if (!isValid) return res.status(400).json({ message: msg })
 
   const { email } = req.body
 
   try {
+    const newMemberExists = await prisma.user.findUnique({ where: { email } })
+    if (newMemberExists)
+      return res.status(400).json({ message: 'This member is already invited' })
+
     const newMember = await prisma.user.create({
       data: { email, Club: { connect: { id: session.user.clubId } } },
       select: { id: true, email: true, invitationSent: true },

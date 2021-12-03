@@ -2,6 +2,24 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiSession } from 'types/helpers'
 import { prisma } from 'utils/prisma-client'
 
+export const getClubInfoHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  try {
+    const clubInfo = await prisma.club.findUnique({
+      where: { id: session.user.clubId },
+    })
+    if (!clubInfo) return res.status(404).json({ message: 'Club not found' })
+
+    res.json(clubInfo)
+    return clubInfo
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
 export const getClubMembersHandler = async (
   req: NextApiRequest,
   res: NextApiResponse,

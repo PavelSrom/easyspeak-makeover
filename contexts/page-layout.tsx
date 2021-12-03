@@ -1,9 +1,10 @@
+/* eslint-disable jsx-a11y/interactive-supports-focus */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import clsx from 'clsx'
 import {
   AppBar,
   Avatar,
   Badge,
-  Chip,
   Divider,
   Drawer,
   IconButton,
@@ -50,16 +51,18 @@ type Props = {
 export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<number>(0)
-  const [marginTop, setMarginTop] = useState<number>(56)
+  const [paddingTop, setPaddingTop] = useState<number>(56)
   const appBarRef = useRef<HTMLDivElement>(null)
   const [session] = useSession()
   const router = useRouter()
   const { profile, logout } = useAuth()
 
-  const { data: notifications } = useTypeSafeQuery('getAllNotifications')
+  const { data: notifications } = useTypeSafeQuery('getAllNotifications', {
+    enabled: !!profile,
+  })
 
   useEffect(() => {
-    setMarginTop(appBarRef.current?.clientHeight ?? 56)
+    setPaddingTop(appBarRef.current?.clientHeight ?? 56)
   }, [tabs])
 
   const value: ContextProps = useMemo(
@@ -108,15 +111,28 @@ export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
         {tabs && (
           <div className="px-4 pb-4 flex justify-center items-center space-x-12">
             {tabs.map((tab, index) => (
-              <Chip
+              <div
                 key={tab}
-                label={tab}
-                color="primary"
-                variant={activeTab === index ? 'outlined' : 'filled'}
-                className={clsx('cursor-pointer', {
-                  'bg-white': activeTab === index,
-                })}
-              />
+                role="button"
+                onClick={() => setActiveTab(index)}
+                className={clsx(
+                  'cursor-pointer rounded-full px-2 py-1 transition-all duration-200',
+                  {
+                    'bg-white': activeTab === index,
+                    'bg-primary': activeTab !== index,
+                  }
+                )}
+              >
+                <Text
+                  variant="body2"
+                  className={clsx('font-semibold', {
+                    'text-primary': activeTab === index,
+                    'text-white': activeTab !== index,
+                  })}
+                >
+                  {tab}
+                </Text>
+              </div>
             ))}
           </div>
         )}
@@ -172,14 +188,28 @@ export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
           </List>
 
           <div className="mt-auto">
-            <Button onClick={logout} variant="text" className="text-white">
+            <Button
+              onClick={() => {
+                setDrawerOpen(false)
+                logout()
+              }}
+              variant="text"
+              className="text-white"
+            >
               Sign out
             </Button>
           </div>
         </div>
       </Drawer>
 
-      <main style={{ marginTop }}>{children}</main>
+      <main
+        className={clsx('h-full min-h-screen', {
+          'bg-page-bg': !!session,
+        })}
+        style={{ paddingTop }}
+      >
+        {children}
+      </main>
     </LayoutContext.Provider>
   )
 }

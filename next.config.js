@@ -3,12 +3,12 @@ const runtimeCaching = require('next-pwa/cache')
 
 module.exports = withPWA({
   reactStrictMode: true,
-  typescript: {
-    ignoreBuildErrors: true, // TODO
-  },
+  // typescript: {
+  //   ignoreBuildErrors: true, // TODO
+  // },
   pwa: {
     dest: 'public',
-    register: true,
+    register: process.env !== 'development',
     skipWaiting: true,
     runtimeCaching,
     buildExcludes: [/middleware-manifest.json$/],

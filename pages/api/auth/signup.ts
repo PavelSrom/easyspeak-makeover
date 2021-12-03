@@ -7,7 +7,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
     case 'POST':
       const { isValid, msg } = await validateBody(authSignupSchema, req)
-      if (!isValid) return res.status(400).json({ msg })
+      if (!isValid) return res.status(400).json({ message: msg })
 
       const { id, name, surname, phone, password, pathway } = req.body
 
@@ -15,7 +15,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         // check once again if user has been created via email beforehand
         const userExists = await prisma.user.findFirst({ where: { id } })
         if (!userExists)
-          return res.status(400).json({ msg: 'User does not exist' })
+          return res.status(400).json({ message: 'User does not exist' })
 
         await prisma.user.update({
           where: { id },
@@ -27,12 +27,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             name,
             surname,
             phone,
-            pathway,
-            User: {
-              connect: {
-                id,
-              },
-            },
+            Pathway: { connect: { id: pathway } },
+            User: { connect: { id } },
           },
         })
 

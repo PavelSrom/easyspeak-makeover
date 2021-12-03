@@ -15,6 +15,7 @@ model User {
   clubId         String
   Club           Club     @relation(fields: [clubId], references: [id])
   Profile        Profile?
+  createdAt      DateTime @default(now())
   // TODO: reset password things
 }
 

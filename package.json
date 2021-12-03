@@ -1,6 +1,9 @@
 {
   "name": "easyspeak-makeover",
   "private": true,
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,7 +13,8 @@
     "prisma:generate": "npx prisma generate",
     "prisma:push": "npx prisma db push",
     "prisma:studio": "npx prisma studio",
-    "prisma:edit-db": "npm run prisma:push && npm run prisma:generate"
+    "prisma:edit-db": "npm run prisma:push && npm run prisma:generate",
+    "prisma:seed": "npx prisma db seed"
   },
   "dependencies": {
     "@emotion/cache": "^11.6.0",
@@ -20,7 +24,7 @@
     "@mui/icons-material": "^5.2.0",
     "@mui/material": "^5.2.0",
     "@mui/styles": "^5.2.1",
-    "@prisma/client": "^3.5.0",
+    "@prisma/client": "^2.30.3",
     "axios": "^0.24.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^1.1.1",
@@ -56,8 +60,9 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "postcss": "^8.3.11",
     "prettier": "^2.4.1",
-    "prisma": "^3.5.0",
+    "prisma": "^2.30.3",
     "tailwindcss": "^2.2.19",
+    "ts-node": "^10.4.0",
     "typescript": "4.5.2"
   }
 }

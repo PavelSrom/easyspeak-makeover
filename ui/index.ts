@@ -1,4 +1,6 @@
 export { Button } from './button'
 export type { ButtonProps } from './button'
+export { Text } from './text'
+export type { TextProps } from './text'
 export { TextField } from './text-field'
 export type { TextFieldProps } from './text-field'

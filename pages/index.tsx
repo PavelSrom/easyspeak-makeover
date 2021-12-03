@@ -1,5 +1,5 @@
 import { useAuth } from 'contexts/auth'
-import { NextPage } from 'next'
+import { CustomNextPage } from 'types/helpers'
 import { Button } from 'ui'
 import { withAuth } from 'utils/with-auth'
 
@@ -7,7 +7,7 @@ export const getServerSideProps = withAuth(async ({ session }) => ({
   props: { session },
 }))
 
-const Dashboard: NextPage = () => {
+const Dashboard: CustomNextPage = () => {
   const { logout } = useAuth()
 
   return (
@@ -17,5 +17,7 @@ const Dashboard: NextPage = () => {
     </div>
   )
 }
+
+Dashboard.pageTitle = 'Dashboard'
 
 export default Dashboard

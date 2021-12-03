@@ -104,6 +104,7 @@ const SignUp: CustomNextPage = () => {
   )
 }
 
+SignUp.pageTitle = 'Sign up'
 SignUp.tabs = ['One', 'two']
 
 export default SignUp

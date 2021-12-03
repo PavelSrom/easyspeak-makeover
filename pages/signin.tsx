@@ -1,4 +1,3 @@
-import { NextPage } from 'next'
 import { Formik, Form } from 'formik'
 import { AuthSignInPayload } from 'types/payloads'
 import { authSigninSchema } from 'utils/payload-validations'
@@ -7,13 +6,14 @@ import { useEffect, useState } from 'react'
 import { signIn, useSession } from 'next-auth/client'
 import { useSnackbar } from 'notistack'
 import { useRouter } from 'next/router'
+import { CustomNextPage } from 'types/helpers'
 
 const initialValues = {
   email: '',
   password: '',
 }
 
-const SignIn: NextPage = () => {
+const SignIn: CustomNextPage = () => {
   const { enqueueSnackbar } = useSnackbar()
   const [session] = useSession()
   const router = useRouter()
@@ -63,5 +63,7 @@ const SignIn: NextPage = () => {
     </Formik>
   )
 }
+
+SignIn.pageTitle = 'Sign in'
 
 export default SignIn

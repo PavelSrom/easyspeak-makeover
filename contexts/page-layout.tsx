@@ -13,6 +13,7 @@ import {
   useState,
 } from 'react'
 import { useRouter } from 'next/router'
+import { Text } from 'ui'
 
 type ContextProps = {
   tabs: string[]
@@ -23,11 +24,12 @@ type ContextProps = {
 const LayoutContext = createContext<ContextProps>({} as ContextProps)
 
 type Props = {
-  tabs?: string[]
+  pageTitle: string
   children: React.ReactNode
+  tabs?: string[]
 }
 
-export const LayoutProvider = ({ children, tabs = [] }: Props) => {
+export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
   const [activeTab, setActiveTab] = useState<number>(0)
   const [marginTop, setMarginTop] = useState<number>(56)
   const appBarRef = useRef<HTMLDivElement>(null)
@@ -65,7 +67,7 @@ export const LayoutProvider = ({ children, tabs = [] }: Props) => {
                 <Menu className="text-white" />
               </IconButton>
             )}
-            <h1>Page title</h1>
+            <Text variant="h1">{pageTitle}</Text>
             {!isPageWithoutAuthRequired && (
               <Badge
                 color="secondary"
@@ -87,7 +89,9 @@ export const LayoutProvider = ({ children, tabs = [] }: Props) => {
                 label={tab}
                 color="primary"
                 variant={activeTab === index ? 'outlined' : 'filled'}
-                className={activeTab === index ? 'bg-white' : ''}
+                className={clsx('cursor-pointer', {
+                  'bg-white': activeTab === index,
+                })}
               />
             ))}
           </div>

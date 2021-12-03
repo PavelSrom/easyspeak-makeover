@@ -35,7 +35,10 @@ const MyApp = ({
               anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
               <AuthProvider>
-                <LayoutProvider tabs={Component.tabs}>
+                <LayoutProvider
+                  pageTitle={Component.pageTitle}
+                  tabs={Component.tabs}
+                >
                   {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                   <CssBaseline />
                   <Component {...otherPageProps} />

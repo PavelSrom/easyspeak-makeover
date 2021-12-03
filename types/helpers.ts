@@ -28,6 +28,7 @@ export type ApiSession = Session & {
 }
 
 type PageOptions = {
+  pageTitle: string
   tabs?: string[]
 }
 

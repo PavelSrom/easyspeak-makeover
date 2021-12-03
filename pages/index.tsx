@@ -1,21 +1,12 @@
-import type { NextPage } from 'next'
-import { Button, TextField } from '@mui/material'
-import { Example } from 'components/example'
-import { useTypeSafeQuery } from 'hooks'
+import { CustomNextPage } from 'types/helpers'
+import { withAuth } from 'utils/with-auth'
 
-const Home: NextPage = () => {
-  const { data: posts } = useTypeSafeQuery('getAllPosts')
-  console.log(posts)
+export const getServerSideProps = withAuth(async ({ session }) => ({
+  props: { session },
+}))
 
-  return (
-    <>
-      <Example />
-      <TextField variant="filled" label="Name" />
-      <Button variant="outlined" className="ml-4">
-        Hello
-      </Button>
-    </>
-  )
-}
+const Dashboard: CustomNextPage = () => <p>Protected dashboard page</p>
 
-export default Home
+Dashboard.pageTitle = 'Dashboard'
+
+export default Dashboard

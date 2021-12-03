@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,7 +8,125 @@ datasource db {
 }
 
 model User {
-  id    String  @id @default(cuid())
-  email String  @unique
-  name  String?
+  id             String   @id @default(cuid())
+  email          String   @unique
+  password       String?
+  invitationSent Boolean  @default(false)
+  clubId         String
+  Club           Club     @relation(fields: [clubId], references: [id])
+  Profile        Profile?
+  // TODO: reset password things
+}
+
+model Profile {
+  id            String         @id @default(cuid())
+  userId        String         @unique
+  User          User           @relation(fields: [userId], references: [id])
+  name          String
+  surname       String
+  phone         String
+  avatar        String? // public URL
+  roleTypeId    String?
+  ClubRole      ClubRole?      @relation(fields: [roleTypeId], references: [id])
+  pathwayId     String
+  Pathway       Pathway        @relation(fields: [pathwayId], references: [id])
+  // TODO: settings here
+  Notifications Notification[]
+  Posts         Post[]
+  Comments      Comment[]
+  Meetings      Meeting[] // meetings the user has managed
+}
+
+// this setup works for individual notifications to users
+// for a notification to the entire club, it has to be done differently
+model Notification {
+  id         String   @id @default(cuid())
+  receiverId String
+  Receiver   Profile  @relation(fields: [receiverId], references: [id])
+  title      String
+  message    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model Post {
+  id        String    @id @default(cuid())
+  authorId  String
+  Author    Profile   @relation(fields: [authorId], references: [id])
+  clubId    String
+  Club      Club      @relation(fields: [clubId], references: [id])
+  title     String
+  body      String
+  isPinned  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  Comments  Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  authorId  String
+  Author    Profile  @relation(fields: [authorId], references: [id])
+  postId    String
+  Post      Post     @relation(fields: [postId], references: [id])
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model Meeting {
+  id          String   @id @default(cuid())
+  clubId      String   @unique
+  Club        Club     @relation(fields: [clubId], references: [id])
+  managerId   String   @unique
+  Manager     Profile  @relation(fields: [managerId], references: [id])
+  venue       String
+  timeStart   DateTime
+  timeEnd     DateTime
+  description String
+  theme       String?
+  wotd        String?
+}
+
+model Club {
+  id          String    @id @default(cuid())
+  name        String
+  location    String
+  description String
+  Meetings    Meeting[]
+  Posts       Post[]
+  Users       User[]
+}
+
+model ClubRole {
+  id      String    @id @default(cuid())
+  name    String
+  Profile Profile[]
+}
+
+model Pathway {
+  id      String    @id @default(cuid())
+  name    String
+  Profile Profile[]
+}
+
+enum MeetingRoleType {
+  SPEAKER_1
+  SPEAKER_2
+  SPEAKER_3
+  EVALUATOR_1
+  EVALUATOR_2
+  EVALUATOR_3
+  TOASTMASTER
+  TOPIC_MASTER
+  TIMER
+  AH_COUNTER
+  GRAMMARIAN
+  GENERAL_EVALUATOR
+  AWARDS
+  PRESIDENT_INTRO
+}
+
+enum MeetingRoleStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
 }

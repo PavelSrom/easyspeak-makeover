@@ -21,6 +21,7 @@ export type CreatePostPayload = {
 }
 
 export type CreateCommentPayload = {
+  postId: string
   message: string
 }
 

@@ -49,6 +49,7 @@ export type TextFieldName =
   | 'body'
   | 'confirmPassword'
   | 'email'
+  | 'message'
   | 'name'
   | 'password'
   | 'pathway'

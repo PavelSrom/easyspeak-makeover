@@ -43,7 +43,16 @@ export const getPostByIdHandler = async (
   try {
     const post = await prisma.post.findUnique({
       where: { id: req.query.id as string },
-      include: { Author: { select: { id: true, name: true, surname: true } } },
+      include: {
+        Author: {
+          select: {
+            avatar: true,
+            name: true,
+            surname: true,
+            ClubRole: { select: { name: true } },
+          },
+        },
+      },
     })
     if (!post) return res.status(404).json({ message: 'Post not found' })
 
@@ -116,12 +125,18 @@ export const deletePostByIdHandler = async (
   session: ApiSession
 ) => {
   try {
+    const profile = await prisma.profile.findUnique({
+      where: { id: session.user.profileId },
+    })
+    if (!profile) return res.status(404).json({ message: 'Profile not found' })
+
     const postToDelete = await prisma.post.findUnique({
       where: { id: req.query.id as string },
     })
     if (!postToDelete)
       return res.status(404).json({ message: 'Post not found' })
-    if (postToDelete.authorId !== session.user.profileId)
+    // if no board member and requester is not the author of the post
+    if (!profile.roleTypeId && postToDelete.authorId !== session.user.profileId)
       return res.status(403).json({ message: 'Access denied' })
 
     const deletePostQuery = prisma.post.delete({

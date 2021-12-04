@@ -46,6 +46,7 @@ export type CustomAppProps<P = {}> = Omit<
 export type CustomNextPage = NextPage & PageOptions
 
 export type TextFieldName =
+  | 'body'
   | 'confirmPassword'
   | 'email'
   | 'name'
@@ -53,3 +54,4 @@ export type TextFieldName =
   | 'pathway'
   | 'phone'
   | 'surname'
+  | 'title'

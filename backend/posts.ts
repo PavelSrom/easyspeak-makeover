@@ -11,7 +11,22 @@ export const getAllPostsHandler = async (
   try {
     const allPosts = await prisma.post.findMany({
       where: { clubId: session.user.clubId },
-      select: { id: true, title: true, createdAt: true, isPinned: true },
+      select: {
+        id: true,
+        title: true,
+        body: true,
+        isPinned: true,
+        createdAt: true,
+        _count: { select: { Comments: true } },
+        Author: {
+          select: {
+            name: true,
+            surname: true,
+            avatar: true,
+            ClubRole: { select: { name: true } },
+          },
+        },
+      },
     })
 
     res.json(allPosts)

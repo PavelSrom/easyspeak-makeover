@@ -14,7 +14,6 @@ export const ProfileAvatarPicker = () => {
   const [newAvatar, setNewAvatar] = useState<File>()
   const queryClient = useTypeSafeQueryClient()
   const { enqueueSnackbar } = useSnackbar()
-  console.log(newAvatar)
   const { profile } = useAuth()
   const { upload, uploadFile } = useFirebaseStorage()
 

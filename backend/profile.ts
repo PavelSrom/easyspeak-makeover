@@ -27,10 +27,12 @@ export const updateUserProfileHandler = async (
   res: NextApiResponse,
   session: ApiSession
 ) => {
+  const { pathway, ...body } = req.body
+
   try {
     const updatedProfile = await prisma.profile.update({
       where: { id: session.user.profileId },
-      data: req.body,
+      data: { Pathway: { connect: { id: pathway } }, ...body },
     })
 
     return res.json(updatedProfile)

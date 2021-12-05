@@ -22,13 +22,19 @@ export const getUserProfileHandler = async (
   }
 }
 
-// export const updateUserProfileHandler = async (
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: ApiSession
-// ) => {
-//   try {
-//   } catch ({ message }) {
-//     return res.status(500).json({ message })
-//   }
-// }
+export const updateUserProfileHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  try {
+    const updatedProfile = await prisma.profile.update({
+      where: { id: session.user.profileId },
+      data: req.body,
+    })
+
+    return res.json(updatedProfile)
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}

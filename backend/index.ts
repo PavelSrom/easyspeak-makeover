@@ -71,6 +71,11 @@ export const requests = {
       axios.post('/api/auth/signup', payload).then(response => response.data),
     deleteUserAccount: (): Promise<{ message: string }> =>
       axios.delete('/api/auth/delete').then(response => response.data),
+    // PROFILE
+    updateUserProfile: (
+      payload: Partial<CreateMemberPayload> & { avatar?: string }
+    ): Promise<ProfileDTO> =>
+      axios.put('/api/profile', payload).then(response => response.data),
     // NOTIFICATIONS
     markNotificationAsRead: (id: string): Promise<NotificationDTO> =>
       axios.put(`/api/notifications/${id}`).then(response => response.data),

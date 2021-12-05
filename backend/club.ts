@@ -91,7 +91,10 @@ export const getClubMemberByIdHandler = async (
         id: req.query.id as string,
         User: { clubId: session.user.clubId },
       },
-      include: { User: { select: { email: true } } },
+      include: {
+        User: { select: { email: true, Club: { select: { name: true } } } },
+        ClubRole: { select: { name: true } },
+      },
     })
     if (!clubMember)
       return res.status(404).json({ message: 'Member not found' })

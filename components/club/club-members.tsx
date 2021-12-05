@@ -10,12 +10,16 @@ import {
 import { useSnackbar } from 'notistack'
 import { Fragment, useState } from 'react'
 import formatDistance from 'date-fns/formatDistance'
+import { useRouter } from 'next/router'
+import { useAuth } from 'contexts/auth'
 import { NewMemberDialog } from './new-member-dialog'
 
 export const ClubMembers = () => {
   const [newMemberDialogOpen, setNewMemberDialogOpen] = useState<boolean>(false)
   const queryClient = useTypeSafeQueryClient()
   const { enqueueSnackbar } = useSnackbar()
+  const { profile } = useAuth()
+  const router = useRouter()
 
   const clubMembersQuery = useTypeSafeQuery('getClubMembers')
 
@@ -50,6 +54,13 @@ export const ClubMembers = () => {
       },
     })
 
+  const handleMemberNavigate = (id: string) => {
+    // TODO: clean return under this condition
+    if (id === profile?.id) console.log('hi')
+
+    router.push(`/club/members/${id}`)
+  }
+
   return (
     <div className="space-y-8">
       <Paper className="p-4">
@@ -62,7 +73,13 @@ export const ClubMembers = () => {
           clubMembersQuery.data &&
           clubMembersQuery.data.clubMembers.map(member => (
             <Fragment key={member.id}>
-              <div key={member.id} className="flex">
+              {/* eslint-disable-next-line */}
+              <div
+                key={member.id}
+                role="listitem"
+                className="flex cursor-pointer"
+                onClick={() => handleMemberNavigate(member.id)}
+              >
                 <Avatar src={member.avatar ?? ''} className="w-10 h-10 mr-4" />
                 <div>
                   <Text className="font-semibold">{`${member.name} ${member.surname}`}</Text>

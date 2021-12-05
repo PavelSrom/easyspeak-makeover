@@ -47,6 +47,7 @@ export type CustomNextPage = NextPage & PageOptions
 
 export type TextFieldName =
   | 'body'
+  | 'clubRole'
   | 'confirmPassword'
   | 'email'
   | 'message'

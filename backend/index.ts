@@ -4,6 +4,7 @@ import {
   BoardSimpleDTO,
   ClubInfoDTO,
   CommentDTO,
+  MemberFullDTO,
   MemberSchemaDTO,
   NewUserDTO,
   NotificationDTO,
@@ -49,9 +50,13 @@ export const requests = {
       axios.get('/api/club/members').then(response => response.data),
     getClubBoard: (): Promise<BoardSimpleDTO[]> =>
       axios.get('/api/club/board').then(response => response.data),
+    getClubMemberById: (id: string): Promise<MemberFullDTO> =>
+      axios.get(`/api/club/members/${id}`).then(response => response.data),
     // MISCELLANEOUS
     getAllPathways: (): Promise<{ id: string; name: string }[]> =>
       axios.get('/api/pathways').then(response => response.data),
+    getClubRoles: (): Promise<{ id: string; name: string }[]> =>
+      axios.get('/api/club-roles').then(response => response.data),
   },
   mutation: {
     // AUTH

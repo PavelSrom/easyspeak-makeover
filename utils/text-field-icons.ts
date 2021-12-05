@@ -6,9 +6,11 @@ import PersonOutlined from '@mui/icons-material/PersonOutlined'
 import Title from '@mui/icons-material/Title'
 import Message from '@mui/icons-material/Message'
 import Timeline from '@mui/icons-material/Timeline'
+import Groups from '@mui/icons-material/Groups'
 
 export const textFieldIcons: Record<TextFieldName, React.ComponentType<any>> = {
   body: Title,
+  clubRole: Groups,
   confirmPassword: LockOutlined,
   email: EmailOutlined,
   message: Message,

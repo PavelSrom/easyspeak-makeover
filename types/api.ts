@@ -1,6 +1,7 @@
 import { createNewMemberHandler } from 'backend/auth'
 import { getAllCommentsHandler } from 'backend/comments'
 import {
+  getClubBoardHandler,
   getClubInfoHandler,
   getClubMemberByIdHandler,
   getClubMembersHandler,
@@ -28,8 +29,12 @@ export type CommentDTO = ApiResponse<
 
 export type ProfileDTO = ApiResponse<ReturnType<typeof getUserProfileHandler>>
 
-export type MemberSimpleDTO = ApiResponse<
+export type MemberSchemaDTO = ApiResponse<
   ReturnType<typeof getClubMembersHandler>
+>
+
+export type BoardSimpleDTO = ApiResponse<
+  ReturnType<typeof getClubBoardHandler>
 >[number]
 
 export type MemberFullDTO = ApiResponse<

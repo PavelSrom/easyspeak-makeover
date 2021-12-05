@@ -36,10 +36,45 @@ export const getClubMembersHandler = async (
         User: { select: { email: true } },
         ClubRole: { select: { name: true } },
       },
+      orderBy: { surname: 'asc' },
     })
 
-    res.json(clubMembers)
-    return clubMembers
+    const pendingInvites = await prisma.user.findMany({
+      where: { clubId: session.user.clubId, password: null },
+      select: { id: true, email: true, invitationSent: true, createdAt: true },
+    })
+
+    res.json({ clubMembers, pendingInvites })
+    return { clubMembers, pendingInvites }
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
+export const getClubBoardHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  try {
+    const boardMembers = await prisma.profile.findMany({
+      where: {
+        User: { clubId: session.user.clubId },
+        roleTypeId: { not: null },
+      },
+      select: {
+        ClubRole: { select: { name: true } },
+        User: { select: { email: true } },
+        id: true,
+        avatar: true,
+        name: true,
+        surname: true,
+        phone: true,
+      },
+    })
+
+    res.json(boardMembers)
+    return boardMembers
   } catch ({ message }) {
     return res.status(500).json({ message })
   }

@@ -1,5 +1,7 @@
 export { Button } from './button'
 export type { ButtonProps } from './button'
+export { StaticDatePicker } from './date-picker'
+export type { StaticDatePickerProps } from './date-picker'
 export { Text } from './text'
 export type { TextProps } from './text'
 export { TextField } from './text-field'

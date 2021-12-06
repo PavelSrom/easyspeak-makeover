@@ -4,6 +4,8 @@ import {
   BoardSimpleDTO,
   ClubInfoDTO,
   CommentDTO,
+  MeetingFullDTO,
+  MeetingSimpleDTO,
   MemberFullDTO,
   MemberSchemaDTO,
   NewUserDTO,
@@ -40,6 +42,21 @@ export const requests = {
 
       return axios.get(`/api/comments?${query}`).then(response => response.data)
     },
+    // MEETINGS
+    getAllMeetings: (params: {
+      timeStart?: string
+      timeEnd?: string
+      user?: string
+    }): Promise<MeetingSimpleDTO[]> => {
+      const query = queryString.stringify(params, {
+        skipEmptyString: true,
+        skipNull: true,
+      })
+
+      return axios.get(`/api/meetings?${query}`).then(response => response.data)
+    },
+    getMeetingById: (id: string): Promise<MeetingFullDTO> =>
+      axios.get(`/api/meetings/${id}`).then(response => response.data),
     // PROFILE
     getUserProfile: (): Promise<ProfileDTO> =>
       axios.get('/api/profile').then(response => response.data),

@@ -75,9 +75,9 @@ model Comment {
 
 model Meeting {
   id          String   @id @default(cuid())
-  clubId      String   @unique
+  clubId      String
   Club        Club     @relation(fields: [clubId], references: [id])
-  managerId   String   @unique
+  managerId   String
   Manager     Profile  @relation(fields: [managerId], references: [id])
   venue       String
   timeStart   DateTime

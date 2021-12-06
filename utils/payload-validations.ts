@@ -34,7 +34,6 @@ export const authCheckUserSchema = Yup.object().shape({
 })
 
 export const authSignupSchema = Yup.object().shape({
-  id: Yup.string().required(YUP_MSG.REQ), // use from checking email here
   name: Yup.string().required(YUP_MSG.REQ),
   surname: Yup.string().required(YUP_MSG.REQ),
   phone: Yup.string().min(8, YUP_MSG.CHAR_MIN(8)).required(YUP_MSG.REQ),

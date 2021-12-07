@@ -14,8 +14,8 @@ export const PostCard = ({ post, onNavigate }: Props) => (
     <div className="flex items-center">
       <Avatar src={post.Author.avatar ?? ''} className="w-12 h-12" />
       <div className="ml-4">
-        <Text variant="h2">{`${post.Author.name} ${post.Author.surname}`}</Text>
-        <Text variant="body2">{post.Author.ClubRole?.name ?? 'Member'}</Text>
+        <Text variant="h3">{`${post.Author.name} ${post.Author.surname}`}</Text>
+        <Text variant="small">{post.Author.ClubRole?.name ?? 'Member'}</Text>
       </div>
     </div>
 
@@ -35,7 +35,7 @@ export const PostCard = ({ post, onNavigate }: Props) => (
       )}
       <div className="flex">
         <ChatBubble className="text-primary" />
-        <Text variant="body2" className="text-primary ml-2">
+        <Text variant="small" className="text-primary ml-2">
           {post._count.Comments}
         </Text>
       </div>

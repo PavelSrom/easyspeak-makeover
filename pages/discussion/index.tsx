@@ -37,7 +37,7 @@ const Discussion: CustomNextPage = () => {
     })
 
   return (
-    <Container className="py-4">
+    <Container className="py-4 grid gap-4 grid-cols-1 md:grid-cols-2">
       {postsQuery.isLoading && /* spinner or skeletons */ <p>Loading...</p>}
       {postsQuery.isError && /* error UI */ <p>Error!</p>}
       {postsQuery.isSuccess && postsQuery.data && (
@@ -59,7 +59,7 @@ const Discussion: CustomNextPage = () => {
       <Fab
         variant="extended"
         color="secondary"
-        size="small"
+        size="medium"
         className="fixed bottom-4 right-4 text-white"
         onClick={() => setNewPostDialogOpen(true)}
       >

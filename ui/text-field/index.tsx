@@ -8,6 +8,8 @@ import {
 } from '@mui/material'
 import { TextFieldName } from 'types/helpers'
 import { textFieldIcons } from 'utils/text-field-icons'
+import {styled} from '@mui/material/styles'
+import { theme } from 'styles/theme'
 
 export type TextFieldProps = Omit<
   StandardTextFieldProps,
@@ -19,6 +21,28 @@ export type TextFieldProps = Omit<
 }
 
 // TODO: hover and focus background
+const StyledMuiTextField = styled(MuiTextField)({
+  '& .MuiSvgIcon-root': {
+    backgroundColor: theme.palette.info.light,
+    color: theme.palette.primary.main,
+    borderRadius: '0.2em',
+  },
+  '& .MuiInput-root': {
+    borderRadius: '0.5em 0.5em 0 0',
+    padding: '0.5em'
+  },
+  '& .MuiInput-root:hover': {
+    backgroundColor: theme.palette.info.light,
+  },
+  '& .MuiInputLabel-root': {
+    textTransform: 'uppercase',
+    fontSize: '0.8em'
+  },
+  '& .MuiInput-underline:after': {
+    border: '0.5px solid' + theme.palette.neutral.main,
+  }
+});
+
 // TODO: type-safe 'name' prop synced with icons?
 export const TextField: React.ForwardRefExoticComponent<TextFieldProps> =
   forwardRef<HTMLDivElement, TextFieldProps>(
@@ -36,7 +60,7 @@ export const TextField: React.ForwardRefExoticComponent<TextFieldProps> =
             meta,
             form,
           }: FieldProps | FastFieldProps) => (
-            <MuiTextField
+            <StyledMuiTextField
               ref={ref}
               {...rest}
               {...fieldRest}
@@ -61,7 +85,7 @@ export const TextField: React.ForwardRefExoticComponent<TextFieldProps> =
               helperText={meta.touched ? meta.error : ''}
               FormHelperTextProps={{
                 ...rest.FormHelperTextProps,
-                className: 'absolute -bottom-5',
+                className: '-bottom-5',
               }}
             />
           )}
@@ -71,3 +95,4 @@ export const TextField: React.ForwardRefExoticComponent<TextFieldProps> =
   )
 
 TextField.displayName = 'TextField'
+

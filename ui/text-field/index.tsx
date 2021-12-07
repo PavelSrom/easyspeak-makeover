@@ -8,7 +8,7 @@ import {
 } from '@mui/material'
 import { TextFieldName } from 'types/helpers'
 import { textFieldIcons } from 'utils/text-field-icons'
-import {styled} from '@mui/material/styles'
+import { styled } from '@mui/material/styles'
 import { theme } from 'styles/theme'
 
 export type TextFieldProps = Omit<
@@ -29,19 +29,22 @@ const StyledMuiTextField = styled(MuiTextField)({
   },
   '& .MuiInput-root': {
     borderRadius: '0.5em 0.5em 0 0',
-    padding: '0.5em'
+    padding: '0.5em',
+    '&.Mui-focused': {
+      backgroundColor: theme.palette.info.light,
+    },
   },
   '& .MuiInput-root:hover': {
     backgroundColor: theme.palette.info.light,
   },
   '& .MuiInputLabel-root': {
     textTransform: 'uppercase',
-    fontSize: '0.8em'
+    fontSize: '0.8em',
   },
   '& .MuiInput-underline:after': {
-    border: '0.5px solid' + theme.palette.neutral.main,
-  }
-});
+    border: `0.5px solid ${theme.palette.neutral.main}`,
+  },
+})
 
 // TODO: type-safe 'name' prop synced with icons?
 export const TextField: React.ForwardRefExoticComponent<TextFieldProps> =
@@ -95,4 +98,3 @@ export const TextField: React.ForwardRefExoticComponent<TextFieldProps> =
   )
 
 TextField.displayName = 'TextField'
-

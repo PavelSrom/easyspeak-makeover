@@ -1,4 +1,3 @@
-import { NextApiRequest } from 'next'
 import * as Yup from 'yup'
 
 const YUP_MSG = {
@@ -8,15 +7,15 @@ const YUP_MSG = {
   CHAR_MAX: (amount: number) => `At most ${amount} characters`,
 } as const
 
-export const validateBody = async (
+export const validateBody = async <T extends {}>(
   schema: Yup.AnySchema,
-  req: NextApiRequest
+  body: T
 ): Promise<{ isValid: boolean; msg: any[] | null }> => {
   let isValid = false
   let msg: any[] | null = null
 
   try {
-    await schema.validate(req.body, { abortEarly: false })
+    await schema.validate(body, { abortEarly: false })
     isValid = true
   } catch ({ errors }) {
     msg = errors as any[]

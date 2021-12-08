@@ -6,7 +6,7 @@ import { validateBody, authSignupSchema } from 'utils/payload-validations'
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
     case 'POST':
-      const { isValid, msg } = await validateBody(authSignupSchema, req)
+      const { isValid, msg } = await validateBody(authSignupSchema, req.body)
       if (!isValid) return res.status(400).json({ message: msg })
 
       const { id, name, surname, phone, password, pathway } = req.body

@@ -18,9 +18,9 @@ import { Button, Text, TextField, TimePicker } from 'ui'
 import { useSnackbar } from 'notistack'
 import { CreateMeetingPayload } from 'types/payloads'
 import {
-  // createNewMeetingSchema,
+  createNewMeetingSchema,
   createNewMeetingSchemaPartial,
-  // validateBody,
+  validateBody,
 } from 'utils/payload-validations'
 
 const AddMeeting: CustomNextPage = () => {
@@ -87,10 +87,13 @@ const AddMeeting: CustomNextPage = () => {
       speakersSorted.slice(0, numOfSpeakers)
     )
 
-    // const { isValid } = await validateBody(createNewMeetingSchema, payload)
-    // if (!isValid) return
+    const { isValid } = await validateBody(createNewMeetingSchema, payload)
+    if (!isValid) {
+      enqueueSnackbar('Form is not valid', { variant: 'error' })
+      return
+    }
 
-    console.log('form is valid')
+    console.log(payload)
   }
 
   return (

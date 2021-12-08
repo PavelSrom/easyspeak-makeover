@@ -68,7 +68,7 @@ export const createNewPostHandler = async (
   res: NextApiResponse,
   session: ApiSession
 ) => {
-  const { isValid, msg } = await validateBody(createNewPostSchema, req)
+  const { isValid, msg } = await validateBody(createNewPostSchema, req.body)
   if (!isValid) return res.status(400).json({ message: msg })
 
   const { title, body } = req.body
@@ -94,7 +94,7 @@ export const updatePostByIdHandler = async (
   res: NextApiResponse,
   session: ApiSession
 ) => {
-  const { isValid, msg } = await validateBody(createNewPostSchema, req)
+  const { isValid, msg } = await validateBody(createNewPostSchema, req.body)
   if (!isValid) return res.status(400).json({ message: msg })
 
   const { title, body } = req.body

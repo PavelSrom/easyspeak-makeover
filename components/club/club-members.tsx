@@ -55,8 +55,7 @@ export const ClubMembers = () => {
     })
 
   const handleMemberNavigate = (id: string) => {
-    // TODO: clean return under this condition
-    if (id === profile?.id) console.log('hi')
+    if (id === profile?.id) return
 
     router.push(`/club/members/${id}`)
   }

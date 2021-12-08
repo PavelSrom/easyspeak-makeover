@@ -20,7 +20,6 @@ export type TextFieldProps = Omit<
   onAfterChange?: () => void | Promise<void>
 }
 
-// TODO: hover and focus background
 const StyledMuiTextField = styled(MuiTextField)({
   '& .MuiSvgIcon-root': {
     backgroundColor: theme.palette.info.light,
@@ -46,7 +45,6 @@ const StyledMuiTextField = styled(MuiTextField)({
   },
 })
 
-// TODO: type-safe 'name' prop synced with icons?
 export const TextField: React.ForwardRefExoticComponent<TextFieldProps> =
   forwardRef<HTMLDivElement, TextFieldProps>(
     (

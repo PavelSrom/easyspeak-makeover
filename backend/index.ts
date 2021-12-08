@@ -16,6 +16,7 @@ import {
 } from 'types/api'
 import {
   CreateCommentPayload,
+  CreateMeetingPayload,
   CreateMemberPayload,
   CreatePostPayload,
 } from 'types/payloads'
@@ -43,6 +44,8 @@ export const requests = {
       return axios.get(`/api/comments?${query}`).then(response => response.data)
     },
     // MEETINGS
+    getMeetingRoles: (): Promise<{ id: string; name: string }[]> =>
+      axios.get('/api/meeting-roles').then(response => response.data),
     getAllMeetings: (params: {
       timeStart?: string
       timeEnd?: string
@@ -118,5 +121,10 @@ export const requests = {
       axios.post('/api/comments', payload).then(response => response.data),
     deleteCommentById: (id: string): Promise<{ message: string }> =>
       axios.delete(`/api/comments/${id}`).then(response => response.data),
+    // MEETINGS
+    createNewMeeting: (
+      payload: CreateMeetingPayload
+    ): Promise<MeetingFullDTO> =>
+      axios.post('/api/meetings', payload).then(response => response.data),
   },
 }

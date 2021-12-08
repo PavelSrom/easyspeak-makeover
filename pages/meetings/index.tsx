@@ -1,4 +1,5 @@
-import { Badge, Container, Paper } from '@mui/material'
+import { Badge, Container, Fab, Paper } from '@mui/material'
+import AddOutlined from '@mui/icons-material/AddOutlined'
 import { PickersDay } from '@mui/lab'
 import startOfDay from 'date-fns/startOfDay'
 import startOfMonth from 'date-fns/startOfMonth'
@@ -7,13 +8,18 @@ import { useState } from 'react'
 import { CustomNextPage } from 'types/helpers'
 import { StaticDatePicker, Text } from 'ui'
 import { useTypeSafeQuery } from 'hooks'
+import { useRouter } from 'next/router'
+import { useAuth } from 'contexts/auth'
 
 const Meetings: CustomNextPage = () => {
+  const [dayIsClicked, setDayIsClicked] = useState<boolean>(false)
   const [dateRange, setDateRange] = useState({
     start: startOfMonth(new Date()).toISOString(),
     end: endOfMonth(new Date()).toISOString(),
   })
   const [value, setValue] = useState<Date>(new Date())
+  const router = useRouter()
+  const { profile } = useAuth()
 
   const meetingsInMonthQuery = useTypeSafeQuery(
     ['getAllMeetings', dateRange.start, dateRange.end],
@@ -30,7 +36,7 @@ const Meetings: CustomNextPage = () => {
         value={value}
         onChange={newDate => {
           setValue(newDate as Date)
-          // console.log(newDate)
+          setDayIsClicked(true)
         }}
         onMonthChange={newDate => {
           setDateRange({
@@ -62,6 +68,21 @@ const Meetings: CustomNextPage = () => {
       <Paper className="mt-4 p-4">
         <Text variant="h1_light">Next meetings</Text>
       </Paper>
+
+      {dayIsClicked && profile?.roleTypeId && (
+        <Fab
+          variant="extended"
+          color="secondary"
+          size="medium"
+          className="fixed bottom-4 right-4 text-white"
+          onClick={() =>
+            router.push(`/meetings/add?day=${value.toLocaleDateString()}`)
+          }
+        >
+          <AddOutlined />
+          Create meeting
+        </Fab>
+      )}
     </Container>
   )
 }

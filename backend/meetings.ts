@@ -3,6 +3,19 @@ import { ApiSession } from 'types/helpers'
 import { prisma } from 'utils/prisma-client'
 import { Prisma } from '.prisma/client'
 
+export const getMeetingRolesHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => {
+  try {
+    const meetingRoles = await prisma.meetingRoleType.findMany()
+
+    return res.json(meetingRoles)
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
 export const getAllMeetingsHandler = async (
   req: NextApiRequest,
   res: NextApiResponse,
@@ -38,7 +51,7 @@ export const getMeetingByIdHandler = async (
   session: ApiSession
 ) => {
   try {
-    const meeting = await prisma.meeting.findUnique({
+    const meeting = await prisma.meeting.findFirst({
       where: { id: req.query.id as string, clubId: session.user.clubId },
     })
     if (!meeting) return res.status(404).json({ message: 'Meeting not found' })

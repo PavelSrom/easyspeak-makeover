@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiSession } from 'types/helpers'
 import { prisma } from 'utils/prisma-client'
+import { createNewMeetingSchema, validateBody } from 'utils/payload-validations'
 import { Prisma } from '.prisma/client'
 
 export const getMeetingRolesHandler = async (
@@ -63,27 +64,45 @@ export const getMeetingByIdHandler = async (
   }
 }
 
-// TODO, this is just placeholder stuff for now
 export const createNewMeetingHandler = async (
   req: NextApiRequest,
   res: NextApiResponse,
   session: ApiSession
 ) => {
-  // TODO: check if meeting in this timeframe already exists
+  const { isValid, msg } = await validateBody(createNewMeetingSchema, req.body)
+  if (!isValid) return res.status(400).json({ message: msg })
+
+  const { description, venue, start, end, agenda } = req.body
   try {
+    const profile = await prisma.profile.findUnique({
+      where: { id: session.user.profileId },
+    })
+    if (!profile)
+      return res.status(404).json({ message: 'Cannot create meeting' })
+    if (!profile.roleTypeId)
+      return res.status(403).json({ message: 'Access denied' })
+
+    // TODO: check if meeting in this timeframe already exists
+
+    const attendances: Prisma.Enumerable<Prisma.AttendanceCreateManyMeetingInput> =
+      agenda.map((role: { id: string; name: string }) => ({
+        roleTypeId: role.id,
+        roleStatus: 'PENDING',
+      }))
+
     const newMeeting = await prisma.meeting.create({
       data: {
         Club: { connect: { id: session.user.clubId } },
         Manager: { connect: { id: session.user.profileId } },
-        description: 'Placeholder meeting',
-        venue: 'Vesterbro Bibliotek',
-        timeStart: new Date(req.body.timeStart),
-        timeEnd: new Date(req.body.timeEnd),
+        description,
+        venue,
+        timeStart: new Date(start),
+        timeEnd: new Date(end),
+        Attendance: { createMany: { data: attendances } },
       },
     })
-    if (!newMeeting) return res.status(400).json({ message: 'Meeting failed' })
 
-    return res.json(newMeeting)
+    return res.status(201).json(newMeeting)
   } catch ({ message }) {
     return res.status(500).json({ message })
   }

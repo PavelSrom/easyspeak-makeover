@@ -10,7 +10,7 @@ import {
 import AddOutlined from '@mui/icons-material/AddOutlined'
 import Delete from '@mui/icons-material/Delete'
 import { Form, Formik } from 'formik'
-import { useTypeSafeQuery } from 'hooks'
+import { useTypeSafeMutation, useTypeSafeQuery } from 'hooks'
 import { useRouter } from 'next/router'
 import { Fragment, useMemo, useState } from 'react'
 import { CustomNextPage } from 'types/helpers'
@@ -34,6 +34,20 @@ const AddMeeting: CustomNextPage = () => {
   const meetingRolesQuery = useTypeSafeQuery('getMeetingRoles', {
     staleTime: Infinity,
   })
+
+  const { mutateAsync: createNewMeeting, isLoading: isCreatingMeeting } =
+    useTypeSafeMutation('createNewMeeting', {
+      onSuccess: () => {
+        enqueueSnackbar('Meeting created', { variant: 'success' })
+        router.replace('/meetings')
+      },
+      onError: err => {
+        enqueueSnackbar(err.response.data.message ?? 'Cannot create meeting', {
+          variant: 'error',
+        })
+      },
+      onSettled: () => {},
+    })
 
   const allHelperRoles = useMemo(
     () =>
@@ -93,7 +107,7 @@ const AddMeeting: CustomNextPage = () => {
       return
     }
 
-    console.log(payload)
+    createNewMeeting([payload])
   }
 
   return (
@@ -195,7 +209,12 @@ const AddMeeting: CustomNextPage = () => {
               </Fragment>
             ))}
 
-            <Button type="submit" color="secondary" fullWidth>
+            <Button
+              loading={isCreatingMeeting}
+              type="submit"
+              color="secondary"
+              fullWidth
+            >
               Create meeting
             </Button>
           </Form>

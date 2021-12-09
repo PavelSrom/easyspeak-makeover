@@ -4,6 +4,7 @@ import { PickersDay } from '@mui/lab'
 import startOfDay from 'date-fns/startOfDay'
 import startOfMonth from 'date-fns/startOfMonth'
 import endOfMonth from 'date-fns/endOfMonth'
+import format from 'date-fns/format'
 import { useState } from 'react'
 import { CustomNextPage } from 'types/helpers'
 import { StaticDatePicker, Text } from 'ui'
@@ -66,7 +67,33 @@ const Meetings: CustomNextPage = () => {
       />
 
       <Paper className="mt-4 p-4">
-        <Text variant="h1_light">Next meetings</Text>
+        <Text variant="h1_light" className="mb-4">
+          Next meetings
+        </Text>
+        {(meetingsInMonthQuery.data ?? []).map(meeting => (
+          <div key={meeting.id} className="flex mb-4">
+            <div className="bg-tertiary rounded-xl w-16 h-16 text-white flex flex-col justify-center items-center">
+              <Text variant="h1">
+                {format(new Date(meeting.timeStart), 'dd')}
+              </Text>
+              <Text variant="h2">
+                {format(new Date(meeting.timeStart), 'LLL')}
+              </Text>
+            </div>
+
+            <div className="ml-4">
+              <Text variant="h4">{meeting.Club.name}</Text>
+              <div className="flex items-center">
+                <Text variant="body2">{meeting.venue}</Text>
+              </div>
+              <div className="flex items-center">
+                <Text variant="body2">
+                  {format(new Date(meeting.timeStart), 'p')}
+                </Text>
+              </div>
+            </div>
+          </div>
+        ))}
       </Paper>
 
       {dayIsClicked && profile?.roleTypeId && (

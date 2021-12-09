@@ -64,21 +64,20 @@ export const NotificationPopper = () => {
 
   return (
     <>
-      <Badge
-        color="secondary"
-        showZero={false}
-        badgeContent={numOfUnread ?? 0}
-        classes={{ badge: 'text-white' }}
+      <IconButton
+        size="small"
+        edge="end"
+        onClick={e => setAnchorEl(e.currentTarget)}
       >
-        <IconButton
-          size="small"
-          edge="end"
-          onClick={e => setAnchorEl(e.currentTarget)}
+        <Badge
+          color="secondary"
+          showZero={false}
+          badgeContent={numOfUnread ?? 0}
+          classes={{ badge: 'text-white' }}
         >
           <Notifications className="text-white" />
-        </IconButton>
-      </Badge>
-
+        </Badge>
+      </IconButton>
       <Popover
         anchorEl={anchorEl}
         open={!!anchorEl}
@@ -110,7 +109,7 @@ export const NotificationPopper = () => {
                       <Delete className="text-xl" />
                     </IconButton>
                   </div>
-                  <Text variant="body2">{notif.message}</Text>
+                  <Text variant="body">{notif.message}</Text>
                   <Text variant="caption" className="mt-2">
                     {formatDistanceToNow(new Date(notif.createdAt))} ago
                   </Text>

@@ -14,7 +14,7 @@ export const createNewMemberHandler = async (
   res: NextApiResponse,
   session: ApiSession
 ) => {
-  const { isValid, msg } = await validateBody(createNewMemberSchema, req)
+  const { isValid, msg } = await validateBody(createNewMemberSchema, req.body)
   if (!isValid) return res.status(400).json({ message: msg })
 
   const { email } = req.body
@@ -61,7 +61,7 @@ export const authCheckUserHandler = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  const { isValid, msg } = await validateBody(authCheckUserSchema, req)
+  const { isValid, msg } = await validateBody(authCheckUserSchema, req.body)
   if (!isValid) return res.status(400).json({ message: msg })
 
   const { email } = req.body
@@ -86,7 +86,7 @@ export const authSignupHandler = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-  const { isValid, msg } = await validateBody(authSignupSchema, req)
+  const { isValid, msg } = await validateBody(authSignupSchema, req.body)
   if (!isValid) return res.status(400).json({ message: msg })
 
   const { id, name, surname, phone, password, pathway } = req.body

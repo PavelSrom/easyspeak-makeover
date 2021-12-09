@@ -1,4 +1,3 @@
-import { NextApiRequest } from 'next'
 import * as Yup from 'yup'
 
 const YUP_MSG = {
@@ -8,15 +7,15 @@ const YUP_MSG = {
   CHAR_MAX: (amount: number) => `At most ${amount} characters`,
 } as const
 
-export const validateBody = async (
+export const validateBody = async <T extends {}>(
   schema: Yup.AnySchema,
-  req: NextApiRequest
+  body: T
 ): Promise<{ isValid: boolean; msg: any[] | null }> => {
   let isValid = false
   let msg: any[] | null = null
 
   try {
-    await schema.validate(req.body, { abortEarly: false })
+    await schema.validate(body, { abortEarly: false })
     isValid = true
   } catch ({ errors }) {
     msg = errors as any[]
@@ -61,4 +60,23 @@ export const createNewPostSchema = Yup.object().shape({
 export const createNewCommentSchema = Yup.object().shape({
   postId: Yup.string().required(YUP_MSG.REQ),
   message: Yup.string().required(YUP_MSG.REQ),
+})
+
+export const createNewMeetingSchemaPartial = Yup.object().shape({
+  description: Yup.string().required(YUP_MSG.REQ),
+  venue: Yup.string().required(YUP_MSG.REQ),
+  numOfSpeakers: Yup.number().required(YUP_MSG.REQ),
+})
+
+export const createNewMeetingSchema = Yup.object().shape({
+  description: Yup.string().required(YUP_MSG.REQ),
+  venue: Yup.string().required(YUP_MSG.REQ),
+  start: Yup.string().required(YUP_MSG.REQ),
+  end: Yup.string().required(YUP_MSG.REQ),
+  agenda: Yup.array().of(
+    Yup.object().shape({
+      id: Yup.string().required(YUP_MSG.REQ),
+      name: Yup.string().required(YUP_MSG.REQ),
+    })
+  ),
 })

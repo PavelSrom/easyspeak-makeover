@@ -33,7 +33,7 @@ export const createNewCommentHandler = async (
   res: NextApiResponse,
   session: ApiSession
 ) => {
-  const { isValid, msg } = await validateBody(createNewCommentSchema, req)
+  const { isValid, msg } = await validateBody(createNewCommentSchema, req.body)
   if (!isValid) return res.status(400).json({ message: msg })
 
   const { postId, message: commentMessage } = req.body

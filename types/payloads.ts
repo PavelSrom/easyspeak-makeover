@@ -26,3 +26,11 @@ export type CreateCommentPayload = {
 }
 
 export type UpdateProfilePayload = Partial<ProfileDTO>
+
+export type CreateMeetingPayload = {
+  description: string
+  venue: string
+  start: string
+  end: string
+  agenda: { id: string; name: string }[]
+}

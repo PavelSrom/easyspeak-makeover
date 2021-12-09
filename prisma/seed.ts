@@ -25,6 +25,27 @@ const BOARD_ROLES = [
   { name: 'Treasurer' },
 ]
 
+const MEETING_ROLES = [
+  { name: 'Coming' },
+  { name: 'Not coming' },
+  { name: 'Speaker 1' },
+  { name: 'Speaker 2' },
+  { name: 'Speaker 3' },
+  { name: 'Speaker 4' },
+  { name: 'Evaluator 1' },
+  { name: 'Evaluator 2' },
+  { name: 'Evaluator 3' },
+  { name: 'Evaluator 4' },
+  { name: 'Toastmaster' },
+  { name: 'Table topic master' },
+  { name: 'Timer' },
+  { name: 'Ah counter' },
+  { name: 'Grammarian' },
+  { name: 'General evaluator' },
+  { name: 'Club business & awards' },
+  { name: "President's introduction" },
+]
+
 const CLUB = {
   name: 'Frederiksberg Toastmasters',
   description: 'This is the Frederiksberg Toastmasters club in Copenhagen',
@@ -37,6 +58,7 @@ const main = async () => {
   try {
     await prisma.pathway.createMany({ data: PATHWAYS })
     await prisma.clubRole.createMany({ data: BOARD_ROLES })
+    await prisma.meetingRoleType.createMany({ data: MEETING_ROLES })
     const club = await prisma.club.create({ data: CLUB })
 
     const firstBoardRole = await prisma.clubRole.findFirst()

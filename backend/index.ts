@@ -126,5 +126,15 @@ export const requests = {
       payload: CreateMeetingPayload
     ): Promise<MeetingFullDTO> =>
       axios.post('/api/meetings', payload).then(response => response.data),
+    toggleMeetingAttendance: ({
+      meetingId,
+      attending,
+    }: {
+      meetingId: string
+      attending: boolean
+    }): Promise<{ message: string }> =>
+      axios
+        .post(`/api/meetings/${meetingId}/attendance?attending=${attending}`)
+        .then(response => response.data),
   },
 }

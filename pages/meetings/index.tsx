@@ -71,7 +71,12 @@ const Meetings: CustomNextPage = () => {
           Next meetings
         </Text>
         {(meetingsInMonthQuery.data ?? []).map(meeting => (
-          <div key={meeting.id} className="flex mb-4">
+          // eslint-disable-next-line
+          <div
+            key={meeting.id}
+            className="flex mb-4"
+            onClick={() => router.push(`/meetings/${meeting.id}`)}
+          >
             <div className="bg-tertiary rounded-xl w-16 h-16 text-white flex flex-col justify-center items-center">
               <Text variant="h1">
                 {format(new Date(meeting.timeStart), 'dd')}

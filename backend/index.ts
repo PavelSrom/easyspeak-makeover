@@ -1,6 +1,7 @@
 import axios from 'axios'
 import queryString from 'query-string'
 import {
+  AgendaFullDTO,
   BoardSimpleDTO,
   ClubInfoDTO,
   CommentDTO,
@@ -60,6 +61,8 @@ export const requests = {
     },
     getMeetingById: (id: string): Promise<MeetingFullDTO> =>
       axios.get(`/api/meetings/${id}`).then(response => response.data),
+    getFullAgenda: (id: string): Promise<AgendaFullDTO[]> =>
+      axios.get(`/api/meetings/${id}/agenda`).then(response => response.data),
     // PROFILE
     getUserProfile: (): Promise<ProfileDTO> =>
       axios.get('/api/profile').then(response => response.data),

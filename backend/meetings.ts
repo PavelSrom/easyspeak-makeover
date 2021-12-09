@@ -84,7 +84,7 @@ export const createNewMeetingHandler = async (
   const { isValid, msg } = await validateBody(createNewMeetingSchema, req.body)
   if (!isValid) return res.status(400).json({ message: msg })
 
-  const { description, venue, start, end, agenda } = req.body
+  const { title, description, venue, start, end, agenda } = req.body
   try {
     const profile = await prisma.profile.findUnique({
       where: { id: session.user.profileId },
@@ -106,6 +106,7 @@ export const createNewMeetingHandler = async (
       data: {
         Club: { connect: { id: session.user.clubId } },
         Manager: { connect: { id: session.user.profileId } },
+        title,
         description,
         venue,
         timeStart: new Date(start),
@@ -191,6 +192,55 @@ export const toggleMeetingAttendanceHandler = async (
     }
 
     return res.json({ message: 'You are not attending' })
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
+export const getFullAgendaHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => {
+  try {
+    const speakersQuery = prisma.attendance.findMany({
+      where: {
+        meetingId: req.query.id as string,
+        RoleType: { name: { startsWith: 'Speaker' } },
+      },
+      orderBy: { RoleType: { name: 'asc' } },
+      include: { RoleType: true, Speech: true },
+    })
+
+    const evaluatorsQuery = prisma.attendance.findMany({
+      where: {
+        meetingId: req.query.id as string,
+        RoleType: { name: { startsWith: 'Evaluator' } },
+      },
+      orderBy: { RoleType: { name: 'asc' } },
+      include: { RoleType: true },
+    })
+
+    const helpersQuery = prisma.attendance.findMany({
+      where: {
+        meetingId: req.query.id as string,
+        NOT: [
+          { RoleType: { name: { contains: 'ing' } } }, // coming or not coming
+          { RoleType: { name: { startsWith: 'Speaker' } } },
+          { RoleType: { name: { startsWith: 'Evaluator' } } },
+        ],
+      },
+      orderBy: { RoleType: { name: 'asc' } },
+      include: { RoleType: true },
+    })
+
+    const [speakers, evaluators, helpers] = await Promise.all([
+      speakersQuery,
+      evaluatorsQuery,
+      helpersQuery,
+    ])
+
+    res.json({ speakers, evaluators, helpers })
+    return { speakers, evaluators, helpers }
   } catch ({ message }) {
     return res.status(500).json({ message })
   }

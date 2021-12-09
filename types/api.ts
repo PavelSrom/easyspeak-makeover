@@ -9,7 +9,11 @@ import {
 import { getAllNotificationsHandler } from 'backend/notifications'
 import { getAllPostsHandler, getPostByIdHandler } from 'backend/posts'
 import { getUserProfileHandler } from 'backend/profile'
-import { getAllMeetingsHandler, getMeetingByIdHandler } from 'backend/meetings'
+import {
+  getAllMeetingsHandler,
+  getFullAgendaHandler,
+  getMeetingByIdHandler,
+} from 'backend/meetings'
 import { ApiResponse } from './helpers'
 
 export type NewUserDTO = ApiResponse<ReturnType<typeof createNewMemberHandler>>
@@ -51,3 +55,7 @@ export type MeetingSimpleDTO = ApiResponse<
 export type MeetingFullDTO = ApiResponse<
   ReturnType<typeof getMeetingByIdHandler>
 >
+
+export type AgendaFullDTO = ApiResponse<
+  ReturnType<typeof getFullAgendaHandler>
+>[number]

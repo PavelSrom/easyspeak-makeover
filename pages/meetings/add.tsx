@@ -70,6 +70,13 @@ const AddMeeting: CustomNextPage = () => {
         .sort((a, b) => a.name.localeCompare(b.name)),
     [meetingRolesQuery.data]
   )
+  const evalsSorted = useMemo(
+    () =>
+      (meetingRolesQuery.data ?? [])
+        .filter(role => role.name.toLowerCase().startsWith('evaluator'))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [meetingRolesQuery.data]
+  )
 
   const initialValues = {
     description: '',
@@ -100,6 +107,9 @@ const AddMeeting: CustomNextPage = () => {
     payload.agenda = [...helperRoles].concat(
       speakersSorted.slice(0, numOfSpeakers)
     )
+    payload.agenda = [...payload.agenda].concat(
+      evalsSorted.slice(0, numOfSpeakers)
+    )
 
     const { isValid } = await validateBody(createNewMeetingSchema, payload)
     if (!isValid) {
@@ -121,6 +131,7 @@ const AddMeeting: CustomNextPage = () => {
           <Form>
             <div className="space-y-4">
               <Text variant="h1_light">Meeting details</Text>
+              <TextField name="title" label="Title" />
               <TextField name="description" label="Description" />
               <TextField name="venue" label="Location" />
 

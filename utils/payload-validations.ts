@@ -63,12 +63,14 @@ export const createNewCommentSchema = Yup.object().shape({
 })
 
 export const createNewMeetingSchemaPartial = Yup.object().shape({
+  title: Yup.string().required(YUP_MSG.REQ),
   description: Yup.string().required(YUP_MSG.REQ),
   venue: Yup.string().required(YUP_MSG.REQ),
   numOfSpeakers: Yup.number().required(YUP_MSG.REQ),
 })
 
 export const createNewMeetingSchema = Yup.object().shape({
+  title: Yup.string().required(YUP_MSG.REQ),
   description: Yup.string().required(YUP_MSG.REQ),
   venue: Yup.string().required(YUP_MSG.REQ),
   start: Yup.string().required(YUP_MSG.REQ),

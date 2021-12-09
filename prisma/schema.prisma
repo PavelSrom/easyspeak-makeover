@@ -83,6 +83,7 @@ model Meeting {
   venue       String
   timeStart   DateTime
   timeEnd     DateTime
+  title       String
   description String
   theme       String?
   wotd        String?

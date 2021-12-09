@@ -11,6 +11,7 @@ import { Text } from 'ui'
 import { useAuth } from 'contexts/auth'
 import { ChangeRoleDialog } from 'components/change-role-dialog'
 import { useState } from 'react'
+import { theme } from '../../../styles/theme'
 
 const ClubMember: CustomNextPage = () => {
   const [roleDialogOpen, setRoleDialogOpen] = useState<boolean>(false)
@@ -39,20 +40,20 @@ const ClubMember: CustomNextPage = () => {
         <Text variant="h1_light" className="mb-2">{`${name} ${surname}`}</Text>
         <div className="space-y-3">
           <div className="flex items-center">
-            <LocationOn className="mr-2" />
-            <Text variant="body2">{User.Club.name}</Text>
+            <LocationOn className="mr-2" sx={{ color: theme.palette.neutral.main }} />
+            <Text variant="body">{User.Club.name}</Text>
           </div>
           <div className="flex items-center">
-            <AccountCircle className="mr-2" />
-            <Text variant="body2">{ClubRole?.name ?? 'Member'}</Text>
+            <AccountCircle className="mr-2" sx={{ color: theme.palette.neutral.main }}/>
+            <Text variant="body">{ClubRole?.name ?? 'Member'}</Text>
           </div>
           <div className="flex items-center">
-            <Phone className="mr-2" />
-            <Text variant="body2">{phone}</Text>
+            <Phone className="mr-2" sx={{ color: theme.palette.neutral.main }}/>
+            <Text variant="body">{phone}</Text>
           </div>
           <div className="flex items-center">
-            <Email className="mr-2" />
-            <Text variant="body2">{User.email}</Text>
+            <Email className="mr-2" sx={{ color: theme.palette.neutral.main }}/>
+            <Text variant="body">{User.email}</Text>
           </div>
         </div>
 

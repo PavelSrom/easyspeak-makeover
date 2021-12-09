@@ -38,7 +38,7 @@ export const NewPostDialog = ({
     >
       <Form className="space-y-4 mt-4">
         <TextField name="title" label="Post title" />
-        <TextField name="body" label="Post description" />
+        <TextField multiline name="body" label="Post description" />
         <DialogActions className="px-0 pt-6 pb-0">
           <Button variant="outlined" onClick={onClose}>
             Cancel

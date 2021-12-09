@@ -166,6 +166,15 @@ export const toggleMeetingAttendanceHandler = async (
         },
       })
 
+      // TODO: remove this once testing of notifs is completed
+      await prisma.notification.create({
+        data: {
+          Receiver: { connect: { id: session.user.profileId } },
+          title: 'Meeting attendance',
+          message: 'You are coming to a meeting',
+        },
+      })
+
       return res.json({ message: 'You are attending' })
     }
     if (alreadyAttending?.RoleType.name !== 'Coming') {

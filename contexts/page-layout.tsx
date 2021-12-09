@@ -4,7 +4,6 @@ import clsx from 'clsx'
 import {
   AppBar,
   Avatar,
-  Badge,
   Divider,
   Drawer,
   IconButton,
@@ -16,7 +15,6 @@ import {
   Toolbar,
 } from '@mui/material'
 import Menu from '@mui/icons-material/Menu'
-import Notifications from '@mui/icons-material/Notifications'
 import {
   createContext,
   Dispatch,
@@ -29,9 +27,9 @@ import {
 } from 'react'
 import { Button, Text } from 'ui'
 import { useSession } from 'next-auth/client'
-import { useTypeSafeQuery } from 'hooks'
 import { sideNavigation } from 'utils/side-navigation'
 import { useRouter } from 'next/router'
+import { NotificationPopper } from 'components/notification-popper'
 import { useAuth } from './auth'
 
 type ContextProps = {
@@ -56,10 +54,6 @@ export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
   const [session] = useSession()
   const router = useRouter()
   const { profile, logout } = useAuth()
-
-  const { data: notifications } = useTypeSafeQuery('getAllNotifications', {
-    enabled: !!profile,
-  })
 
   useEffect(() => {
     setPaddingTop(appBarRef.current?.clientHeight ?? 56)
@@ -94,18 +88,7 @@ export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
               </IconButton>
             )}
             <Text variant="h1">{pageTitle}</Text>
-            {!!session && (
-              <Badge
-                color="secondary"
-                showZero={false}
-                badgeContent={notifications?.length ?? 0}
-                classes={{ badge: 'text-white' }}
-              >
-                <IconButton size="small" edge="end">
-                  <Notifications className="text-white" />
-                </IconButton>
-              </Badge>
-            )}
+            {!!session && <NotificationPopper />}
           </div>
         </Toolbar>
         {tabs && (

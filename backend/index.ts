@@ -102,8 +102,8 @@ export const requests = {
     ): Promise<ProfileDTO> =>
       axios.put('/api/profile', payload).then(response => response.data),
     // NOTIFICATIONS
-    markNotificationAsRead: (id: string): Promise<NotificationDTO> =>
-      axios.put(`/api/notifications/${id}`).then(response => response.data),
+    markNotificationsAsRead: (): Promise<NotificationDTO[]> =>
+      axios.put('/api/notifications').then(response => response.data),
     deleteNotificationById: (id: string): Promise<{ message: string }> =>
       axios.delete(`/api/notifications/${id}`).then(response => response.data),
     // POSTS

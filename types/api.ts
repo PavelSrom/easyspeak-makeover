@@ -8,7 +8,7 @@ import {
 } from 'backend/club'
 import { getAllNotificationsHandler } from 'backend/notifications'
 import { getAllPostsHandler, getPostByIdHandler } from 'backend/posts'
-import { getUserProfileHandler } from 'backend/profile'
+import { getUserActivityHandler, getUserProfileHandler } from 'backend/profile'
 import {
   getAllMeetingsHandler,
   getFullAgendaHandler,
@@ -34,6 +34,10 @@ export type CommentDTO = ApiResponse<
 
 export type ProfileDTO = ApiResponse<ReturnType<typeof getUserProfileHandler>>
 
+export type ProfileActivityDTO = ApiResponse<
+  ReturnType<typeof getUserActivityHandler>
+>
+
 export type MemberSchemaDTO = ApiResponse<
   ReturnType<typeof getClubMembersHandler>
 >
@@ -56,6 +60,4 @@ export type MeetingFullDTO = ApiResponse<
   ReturnType<typeof getMeetingByIdHandler>
 >
 
-export type AgendaFullDTO = ApiResponse<
-  ReturnType<typeof getFullAgendaHandler>
->[number]
+export type AgendaFullDTO = ApiResponse<ReturnType<typeof getFullAgendaHandler>>

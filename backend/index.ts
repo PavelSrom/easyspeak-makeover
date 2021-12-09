@@ -13,6 +13,7 @@ import {
   NotificationDTO,
   PostFullDTO,
   PostSimpleDTO,
+  ProfileActivityDTO,
   ProfileDTO,
 } from 'types/api'
 import {
@@ -20,6 +21,7 @@ import {
   CreateMeetingPayload,
   CreateMemberPayload,
   CreatePostPayload,
+  UpdateProfilePayload,
 } from 'types/payloads'
 
 export const requests = {
@@ -66,6 +68,8 @@ export const requests = {
     // PROFILE
     getUserProfile: (): Promise<ProfileDTO> =>
       axios.get('/api/profile').then(response => response.data),
+    getUserActivity: (): Promise<ProfileActivityDTO> =>
+      axios.get('/api/profile/activity').then(response => response.data),
     // CLUB THINGS
     getClubInfo: (): Promise<ClubInfoDTO> =>
       axios.get('/api/club').then(response => response.data),
@@ -100,9 +104,7 @@ export const requests = {
     deleteUserAccount: (): Promise<{ message: string }> =>
       axios.delete('/api/auth/delete').then(response => response.data),
     // PROFILE
-    updateUserProfile: (
-      payload: Partial<CreateMemberPayload> & { avatar?: string }
-    ): Promise<ProfileDTO> =>
+    updateUserProfile: (payload: UpdateProfilePayload): Promise<ProfileDTO> =>
       axios.put('/api/profile', payload).then(response => response.data),
     // NOTIFICATIONS
     markNotificationsAsRead: (): Promise<NotificationDTO[]> =>

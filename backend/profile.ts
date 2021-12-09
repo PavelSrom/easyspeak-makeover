@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiSession } from 'types/helpers'
 import { prisma } from 'utils/prisma-client'
@@ -29,13 +30,54 @@ export const updateUserProfileHandler = async (
 ) => {
   const { pathway, ...body } = req.body
 
+  const payload: Prisma.ProfileUpdateInput = body
+  if (pathway) payload.Pathway = { connect: { id: pathway } }
+
   try {
     const updatedProfile = await prisma.profile.update({
       where: { id: session.user.profileId },
-      data: { Pathway: { connect: { id: pathway } }, ...body },
+      data: payload,
+      include: { User: { select: { Club: { select: { name: true } } } } },
     })
 
     return res.json(updatedProfile)
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
+export const getUserActivityHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  try {
+    const meetingsQuery = prisma.meeting.findMany({
+      where: { clubId: session.user.clubId },
+      orderBy: { timeStart: 'asc' },
+      take: 3,
+      select: {
+        id: true,
+        venue: true,
+        timeStart: true,
+        Club: { select: { name: true } },
+      },
+    })
+
+    const postsQuery = prisma.post.findMany({
+      where: { clubId: session.user.clubId, authorId: session.user.profileId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        body: true,
+      },
+    })
+
+    const [meetings, posts] = await Promise.all([meetingsQuery, postsQuery])
+
+    res.json({ meetings, posts })
+    return { meetings, posts }
   } catch ({ message }) {
     return res.status(500).json({ message })
   }

@@ -57,6 +57,7 @@ export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
 
   useEffect(() => {
     setPaddingTop(appBarRef.current?.clientHeight ?? 56)
+    setActiveTab(0)
   }, [tabs])
 
   const value: ContextProps = useMemo(

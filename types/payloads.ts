@@ -1,5 +1,3 @@
-import { ProfileDTO } from './api'
-
 export type CreateMemberPayload = {
   id: string
   name: string
@@ -9,6 +7,18 @@ export type CreateMemberPayload = {
   confirmPassword: string
   pathway: string
 }
+
+export type UpdateProfilePayload = Partial<{
+  avatar: string
+  name: string
+  surname: string
+  phone: string
+  pathway: string
+  password: string
+  confirmPassword: string
+  receiveEmail: boolean
+  receiveNotifs: boolean
+}>
 
 export type AuthSignInPayload = {
   email: string
@@ -24,8 +34,6 @@ export type CreateCommentPayload = {
   postId: string
   message: string
 }
-
-export type UpdateProfilePayload = Partial<ProfileDTO>
 
 export type CreateMeetingPayload = {
   description: string

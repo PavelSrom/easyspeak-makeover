@@ -79,14 +79,14 @@ const Meetings: CustomNextPage = () => {
         ))}
       </Paper>
 
-      {dayIsClicked && profile?.roleTypeId && (
+      {profile?.roleTypeId && (
         <Fab
           variant="extended"
           color="secondary"
           size="medium"
           className="fixed bottom-4 right-4 text-white"
           onClick={() =>
-            router.push(`/meetings/add?day=${value.toLocaleDateString()}`)
+            router.push(`/meetings/add`)
           }
         >
           <AddOutlined />

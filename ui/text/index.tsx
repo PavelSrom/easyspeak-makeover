@@ -1,7 +1,16 @@
 import clsx from 'clsx'
 
-type Variant = 'h1' | 'h1_light' | 'h2' | 'h3' | 'h4' | 'body' | 'body2' | 'small' | 'caption'
-type ReturnElement = 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'small' | 'span'
+type Variant =
+  | 'h1'
+  | 'h1_light'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'body'
+  | 'body2'
+  | 'small'
+  | 'caption'
+type ReturnElement = 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'small' | 'label'
 
 const elements: Record<Variant, ReturnElement> = {
   h1: 'h1',
@@ -12,7 +21,7 @@ const elements: Record<Variant, ReturnElement> = {
   body: 'p',
   body2: 'p',
   small: 'small',
-  caption: 'span',
+  caption: 'label',
 }
 
 const classes: Record<Variant, string> = {
@@ -23,8 +32,8 @@ const classes: Record<Variant, string> = {
   h4: 'text-l font-medium',
   body: 'text-base font-light body',
   body2: 'text-sm font-light body',
-  small: 'text-s font-light body',
-  caption: 'text-xs font-light',
+  small: 'text-xs font-light body',
+  caption: 'text-xs font-regular uppercase',
 }
 
 export type TextProps = {

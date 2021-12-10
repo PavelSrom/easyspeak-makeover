@@ -18,9 +18,9 @@ const elements: Record<Variant, ReturnElement> = {
 const classes: Record<Variant, string> = {
   h1: 'text-2xl font-regular',
   h1_light: 'text-2xl font-light',
-  h2: 'text-xl font-semibold',
+  h2: 'text-xl font-medium',
   h3: 'text-xl font-regular',
-  h4: 'text-l font-semibold',
+  h4: 'text-l font-medium',
   body: 'text-base font-light body',
   body2: 'text-sm font-light body',
   small: 'text-s font-light body',

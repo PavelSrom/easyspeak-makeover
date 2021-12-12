@@ -37,6 +37,7 @@ export const getAllMeetingsHandler = async (
         timeStart: true,
         Club: { select: { name: true } },
       },
+      orderBy: { timeStart: 'asc' },
     })
 
     res.json(allMeetings)
@@ -208,7 +209,11 @@ export const getFullAgendaHandler = async (
         RoleType: { name: { startsWith: 'Speaker' } },
       },
       orderBy: { RoleType: { name: 'asc' } },
-      include: { RoleType: true, Speech: true },
+      include: {
+        RoleType: true,
+        Speech: true,
+        Member: { select: { avatar: true, name: true, surname: true } },
+      },
     })
 
     const evaluatorsQuery = prisma.attendance.findMany({
@@ -217,7 +222,10 @@ export const getFullAgendaHandler = async (
         RoleType: { name: { startsWith: 'Evaluator' } },
       },
       orderBy: { RoleType: { name: 'asc' } },
-      include: { RoleType: true },
+      include: {
+        RoleType: true,
+        Member: { select: { avatar: true, name: true, surname: true } },
+      },
     })
 
     const helpersQuery = prisma.attendance.findMany({
@@ -230,7 +238,10 @@ export const getFullAgendaHandler = async (
         ],
       },
       orderBy: { RoleType: { name: 'asc' } },
-      include: { RoleType: true },
+      include: {
+        RoleType: true,
+        Member: { select: { avatar: true, name: true, surname: true } },
+      },
     })
 
     const [speakers, evaluators, helpers] = await Promise.all([

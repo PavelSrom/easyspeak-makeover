@@ -17,6 +17,7 @@ import {
   ProfileDTO,
 } from 'types/api'
 import {
+  AdminRoleAssignPayload,
   CreateCommentPayload,
   CreateMeetingPayload,
   CreateMemberPayload,
@@ -158,6 +159,14 @@ export const requests = {
     }> =>
       axios
         .delete(`/api/meetings/${meetingId}/assign/${roleId}`)
+        .then(response => response.data),
+    adminAssignRole: ({
+      meetingId,
+      roleId,
+      memberId,
+    }: AdminRoleAssignPayload): Promise<{ message: string }> =>
+      axios
+        .post(`/api/meetings/${meetingId}/admin-assign/${roleId}`, { memberId })
         .then(response => response.data),
   },
 }

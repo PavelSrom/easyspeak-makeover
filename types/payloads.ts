@@ -49,3 +49,9 @@ export type MemberRoleAssignPayload = {
   title?: string // signing up for speech
   description?: string // signing up for speech
 }
+
+export type AdminRoleAssignPayload = {
+  meetingId: string
+  roleId: string
+  memberId: string
+}

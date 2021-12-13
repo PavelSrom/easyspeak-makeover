@@ -19,6 +19,7 @@ export const textFieldIcons: Record<TextFieldName, React.ComponentType<any>> = {
   description: ShortText,
   email: EmailOutlined,
   end: AccessTime,
+  memberId: PersonOutlined,
   message: Message,
   name: PersonOutlined,
   numOfSpeakers: ChatBubble,

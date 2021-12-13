@@ -1,9 +1,19 @@
 import Delete from '@mui/icons-material/Delete'
 import AddOutlined from '@mui/icons-material/AddOutlined'
-import { Avatar, Divider, Fab, IconButton } from '@mui/material'
+import {
+  Avatar,
+  Dialog,
+  DialogActions,
+  Divider,
+  Fab,
+  IconButton,
+  MenuItem,
+} from '@mui/material'
 import { AgendaFullDTO } from 'types/api'
-import { Text } from 'ui'
+import { Button, Text, TextField } from 'ui'
 import { useMeetingAgenda } from 'contexts/meeting-agenda'
+import { useState } from 'react'
+import { Form, Formik } from 'formik'
 
 type Props = {
   helper: AgendaFullDTO['helpers'][number]
@@ -85,9 +95,13 @@ export const MeetingRoleHelper = ({
 }
 
 export const AgendaHelpers = () => {
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+
   const {
     agenda: { helpers },
+    members,
     meetingId,
+    isBoardMember,
     isAssigningRole,
     memberAssignRole,
     memberUnassignRole,
@@ -108,16 +122,57 @@ export const AgendaHelpers = () => {
           helper={helper}
           isLoading={isAssigningRole}
           onAssign={() =>
-            memberAssignRole({
-              meetingId,
-              roleId: helper.roleTypeId,
-            })
+            isBoardMember
+              ? setDialogOpen(true)
+              : memberAssignRole({
+                  meetingId,
+                  roleId: helper.roleTypeId,
+                })
           }
           onUnassign={() =>
             memberUnassignRole({ meetingId, roleId: helper.roleTypeId })
           }
         />
       ))}
+
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        PaperProps={{ className: 'p-4' }}
+      >
+        <Text variant="h1_light">Assign member</Text>
+
+        <Formik
+          initialValues={{ memberId: '' }}
+          onSubmit={values => console.log(values)}
+        >
+          <Form>
+            <TextField
+              name="memberId"
+              label="Club role"
+              select
+              disabled={members.length === 0}
+            >
+              <MenuItem value="Member">Member</MenuItem>
+              {members.map(member => (
+                <MenuItem key={member.id} value={member.id}>
+                  {`${member.name} ${member.surname}`}
+                </MenuItem>
+              ))}
+            </TextField>
+            <DialogActions className="px-0 pt-6 pb-0">
+              <Button variant="outlined" onClick={() => setDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" color="secondary">
+                Assign
+              </Button>
+            </DialogActions>
+          </Form>
+        </Formik>
+      </Dialog>
     </>
   )
 }

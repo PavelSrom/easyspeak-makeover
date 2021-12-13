@@ -52,6 +52,7 @@ export type TextFieldName =
   | 'description'
   | 'email'
   | 'end'
+  | 'memberId'
   | 'message'
   | 'name'
   | 'numOfSpeakers'

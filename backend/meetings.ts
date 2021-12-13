@@ -281,6 +281,7 @@ export const memberAssignRoleHandler = async (
       },
       include: { RoleType: true },
     })
+
     if (!targetRole) return res.status(404).json({ message: 'Role not found' })
     if (targetRole.memberId)
       return res.status(400).json({ message: 'This role is already taken' })
@@ -370,6 +371,58 @@ export const memberUnassignRoleHandler = async (
     })
 
     return res.json({ message: 'Role unassigned' })
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
+export const adminAssignRoleHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  try {
+    const profile = await prisma.profile.findUnique({
+      where: { id: session.user.profileId },
+    })
+    if (!profile)
+      return res.status(404).json({ message: 'Cannot assign member' })
+    if (!profile.roleTypeId)
+      return res.status(403).json({ message: 'Access denied' })
+
+    const { memberId } = req.body
+    if (!memberId)
+      return res.status(400).json({ message: 'Choose a member to assign' })
+
+    const targetRole = await prisma.attendance.findFirst({
+      where: {
+        meetingId: req.query.id as string,
+        roleTypeId: req.query.roleId as string,
+      },
+    })
+
+    if (!targetRole) return res.status(404).json({ message: 'Role not found' })
+    if (targetRole.memberId)
+      return res.status(400).json({ message: 'This role is already taken' })
+
+    // remove any coming/not coming roles for that meeting and that member
+    await prisma.attendance.deleteMany({
+      where: {
+        meetingId: req.query.id as string,
+        memberId: session.user.profileId,
+        RoleType: { name: { contains: 'ing' } },
+      },
+    })
+
+    await prisma.attendance.update({
+      where: { id: targetRole.id },
+      data: {
+        Member: { connect: { id: memberId } },
+        roleStatus: 'PENDING',
+      },
+    })
+
+    return res.json({ message: 'Role assigned' })
   } catch ({ message }) {
     return res.status(500).json({ message })
   }

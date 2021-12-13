@@ -6,7 +6,7 @@ import {
 } from 'hooks'
 import { useRouter } from 'next/router'
 import { createContext, useContext, useMemo } from 'react'
-import { AgendaFullDTO } from 'types/api'
+import { AgendaFullDTO, MemberSchemaDTO } from 'types/api'
 import { useAuth } from './auth'
 
 type ContextProps = {
@@ -14,6 +14,7 @@ type ContextProps = {
   isBoardMember: boolean
   isAssigningRole: boolean
   agenda: AgendaFullDTO
+  members: MemberSchemaDTO['clubMembers']
   memberAssignRole: typeof requests['mutation']['memberAssignRole']
   memberUnassignRole: typeof requests['mutation']['memberUnassignRole']
 }
@@ -29,6 +30,7 @@ export const MeetingAgendaProvider = ({
   const { profile } = useAuth()
   const queryClient = useTypeSafeQueryClient()
 
+  const membersQuery = useTypeSafeQuery('getClubMembers')
   const agendaQuery = useTypeSafeQuery(
     ['getFullAgenda', router.query.id as string],
     { enabled: !!router.query.id },
@@ -58,6 +60,7 @@ export const MeetingAgendaProvider = ({
       isBoardMember: !!profile?.roleTypeId ?? false,
       isAssigningRole: isAssigningMemberRole || isUnassigningMemberRole,
       agenda: agendaQuery.data!,
+      members: membersQuery.data?.clubMembers ?? [],
       memberAssignRole: values => memberAssignRoleMutation([values]),
       memberUnassignRole: values => memberUnassignRoleMutation([values]),
     }),
@@ -67,13 +70,15 @@ export const MeetingAgendaProvider = ({
       isAssigningMemberRole,
       isUnassigningMemberRole,
       agendaQuery.data,
+      membersQuery.data,
       memberAssignRoleMutation,
       memberUnassignRoleMutation,
     ]
   )
 
   if (agendaQuery.isLoading) return <p>Loading...</p>
-  if (agendaQuery.isError || !agendaQuery.data) return <p>Error!</p>
+  if (agendaQuery.isError || !agendaQuery.data || !membersQuery.data)
+    return <p>Error!</p>
 
   return (
     <MeetingAgendaContext.Provider value={value}>

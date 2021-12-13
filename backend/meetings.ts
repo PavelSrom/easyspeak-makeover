@@ -59,6 +59,7 @@ export const getMeetingByIdHandler = async (
         Manager: { select: { avatar: true, name: true, surname: true } },
         Attendance: {
           where: { memberId: { not: null } },
+          distinct: ['memberId'],
           orderBy: { Member: { surname: 'asc' } },
           select: {
             Member: {
@@ -100,7 +101,7 @@ export const createNewMeetingHandler = async (
     const attendances: Prisma.Enumerable<Prisma.AttendanceCreateManyMeetingInput> =
       agenda.map((role: { id: string; name: string }) => ({
         roleTypeId: role.id,
-        roleStatus: 'PENDING',
+        roleStatus: 'UNASSIGNED',
       }))
 
     const newMeeting = await prisma.meeting.create({
@@ -252,6 +253,95 @@ export const getFullAgendaHandler = async (
 
     res.json({ speakers, evaluators, helpers })
     return { speakers, evaluators, helpers }
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
+/**
+ * ROLE SIGNUPS AND ALLOCATIONS
+ *
+ * CONFIRMED = that role for that meeting is confirmed by member
+ * PENDING = when member asks for a speech or admin assigns someone to that role
+ * UNASSIGNED = whenever there's nobody taking that role
+ */
+
+export const memberAssignRoleHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  try {
+    const targetRole = await prisma.attendance.findFirst({
+      where: {
+        meetingId: req.query.id as string,
+        roleTypeId: req.query.roleId as string,
+      },
+      include: { RoleType: true },
+    })
+    if (!targetRole) return res.status(404).json({ message: 'Role not found' })
+    if (targetRole.memberId)
+      return res.status(400).json({ message: 'This role is already taken' })
+
+    // remove any coming/not coming roles for that meeting and that member
+    await prisma.attendance.deleteMany({
+      where: {
+        meetingId: req.query.id as string,
+        memberId: session.user.profileId,
+        RoleType: { name: { contains: 'ing' } },
+      },
+    })
+
+    if (targetRole.RoleType.name.toLowerCase().startsWith('speaker')) {
+      // TODO: it's a signup for a speech => admin needs to approve it
+      const { title, description } = req.body
+      if (!title || !description)
+        return res.status(400).json({ message: 'Missing data for speech' })
+    }
+
+    await prisma.attendance.update({
+      where: { id: targetRole.id },
+      data: {
+        Member: { connect: { id: session.user.profileId } },
+        roleStatus: 'CONFIRMED',
+      },
+    })
+
+    return res.json({ message: 'Role assigned' })
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
+export const memberUnassignRoleHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  try {
+    const targetRole = await prisma.attendance.findFirst({
+      where: {
+        meetingId: req.query.id as string,
+        roleTypeId: req.query.roleId as string,
+      },
+      include: { RoleType: true },
+    })
+    if (!targetRole) return res.status(404).json({ message: 'Role not found' })
+    if (targetRole.memberId !== session.user.profileId)
+      return res.status(403).json({ message: 'Access denied' })
+
+    if (targetRole.RoleType.name.toLowerCase().includes('speaker')) {
+      // TODO: member is cancelling their speaker role => remove speech too
+    }
+
+    // unassign person - remove memberId and set status back to UNASSIGNED
+    // this logic assumes when you unassign, you're not coming to the meeting
+    await prisma.attendance.update({
+      where: { id: targetRole.id },
+      data: { memberId: null, roleStatus: 'UNASSIGNED' },
+    })
+
+    return res.json({ message: 'Role unassigned' })
   } catch ({ message }) {
     return res.status(500).json({ message })
   }

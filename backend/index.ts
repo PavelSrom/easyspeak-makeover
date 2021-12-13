@@ -21,6 +21,7 @@ import {
   CreateMeetingPayload,
   CreateMemberPayload,
   CreatePostPayload,
+  MemberRoleAssignPayload,
   UpdateProfilePayload,
 } from 'types/payloads'
 
@@ -140,6 +141,23 @@ export const requests = {
     }): Promise<{ message: string }> =>
       axios
         .post(`/api/meetings/${meetingId}/attendance?attending=${attending}`)
+        .then(response => response.data),
+    memberAssignRole: ({
+      meetingId,
+      roleId,
+      ...payload
+    }: MemberRoleAssignPayload): Promise<{ message: string }> =>
+      axios
+        .post(`/api/meetings/${meetingId}/assign/${roleId}`, payload)
+        .then(response => response.data),
+    memberUnassignRole: ({
+      meetingId,
+      roleId,
+    }: Pick<MemberRoleAssignPayload, 'meetingId' | 'roleId'>): Promise<{
+      message: string
+    }> =>
+      axios
+        .delete(`/api/meetings/${meetingId}/assign/${roleId}`)
         .then(response => response.data),
   },
 }

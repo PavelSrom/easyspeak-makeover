@@ -1,20 +1,42 @@
-import { Avatar, Divider, IconButton, Paper } from '@mui/material'
-import Delete from '@mui/icons-material/Delete'
-import { useTypeSafeQuery } from 'hooks'
+import { Paper } from '@mui/material'
+import {
+  useTypeSafeMutation,
+  useTypeSafeQuery,
+  useTypeSafeQueryClient,
+} from 'hooks'
 import { Text } from 'ui'
-import { Fragment } from 'react'
+import { MeetingRoleSpeaker } from 'components/meeting-roles/speaker'
+import { MeetingRoleEvaluator } from 'components/meeting-roles/evaluator'
+import { MeetingRoleHelper } from 'components/meeting-roles/helper'
 
 type Props = {
   meetingId: string
 }
 
 export const MeetingAgenda = ({ meetingId }: Props) => {
+  const queryClient = useTypeSafeQueryClient()
+
   const agendaQuery = useTypeSafeQuery(
     ['getFullAgenda', meetingId],
     { enabled: !!meetingId },
     meetingId
   )
   console.log(agendaQuery.data)
+
+  const { mutateAsync: memberAssignRole, isLoading: isAssigningMemberRole } =
+    useTypeSafeMutation('memberAssignRole', {
+      onSettled: () => {
+        queryClient.invalidateQueries('getFullAgenda')
+      },
+    })
+  const {
+    mutateAsync: memberUnassignRole,
+    isLoading: isUnassigningMemberRole,
+  } = useTypeSafeMutation('memberUnassignRole', {
+    onSettled: () => {
+      queryClient.invalidateQueries('getFullAgenda')
+    },
+  })
 
   if (agendaQuery.isLoading) return <p>Loading...</p>
   if (agendaQuery.isError || !agendaQuery.data) return <p>Error!</p>
@@ -26,93 +48,41 @@ export const MeetingAgenda = ({ meetingId }: Props) => {
           Speakers
         </Text>
         {agendaQuery.data.speakers.map(speaker => (
-          <Fragment key={speaker.id}>
-            <div className="flex items-start">
-              <Avatar
-                src={speaker.Member?.avatar ?? ''}
-                className="w-10 h-10 mr-4"
-              />
-              <div className="flex-1">
-                <Text variant="h4">{speaker.RoleType.name}</Text>
-                <Text variant="caption">
-                  {speaker.Member
-                    ? `${speaker.Member?.name} ${speaker.Member?.surname}`
-                    : 'Click to sign up'}
-                </Text>
-
-                <div className="mt-2">
-                  <Text variant="body2" className="font-semibold">
-                    {speaker.Speech?.title ?? '(No speech title)'}
-                  </Text>
-                  <Text variant="small">
-                    {speaker.Speech?.description ?? '(No speech description)'}
-                  </Text>
-                </div>
-              </div>
-              {/* TODO: delete icons only for admins or how we handle this? */}
-              <IconButton size="small" edge="end">
-                <Delete />
-              </IconButton>
-            </div>
-
-            <Divider className="my-2" />
-          </Fragment>
+          <MeetingRoleSpeaker key={speaker.id} speaker={speaker} />
         ))}
 
         <Text variant="h1_light" className="my-4">
           Evaluators
         </Text>
         {agendaQuery.data.evaluators.map(evaluator => (
-          <Fragment key={evaluator.id}>
-            <div className="flex items-start">
-              <Avatar
-                src={evaluator.Member?.avatar ?? ''}
-                className="w-10 h-10 mr-4"
-              />
-              <div className="flex-1">
-                <Text variant="h4">{evaluator.RoleType.name}</Text>
-                <Text variant="caption">
-                  {' '}
-                  {evaluator.Member
-                    ? `${evaluator.Member?.name} ${evaluator.Member?.surname}`
-                    : 'Click to sign up'}
-                </Text>
-              </div>
-              <IconButton size="small" edge="end">
-                <Delete />
-              </IconButton>
-            </div>
-
-            <Divider className="my-2" />
-          </Fragment>
+          <MeetingRoleEvaluator
+            key={evaluator.id}
+            evaluator={evaluator}
+            isLoading={isAssigningMemberRole || isUnassigningMemberRole}
+            onAssign={() =>
+              memberAssignRole([{ meetingId, roleId: evaluator.roleTypeId }])
+            }
+            onUnassign={() =>
+              memberUnassignRole([{ meetingId, roleId: evaluator.roleTypeId }])
+            }
+          />
         ))}
 
         <Text variant="h1_light" className="my-4">
           Helpers
         </Text>
         {agendaQuery.data.helpers.map(helper => (
-          <Fragment key={helper.id}>
-            <div className="flex items-start">
-              <Avatar
-                src={helper.Member?.avatar ?? ''}
-                className="w-10 h-10 mr-4"
-              />
-              <div className="flex-1">
-                <Text variant="h4">{helper.RoleType.name}</Text>
-                <Text variant="caption">
-                  {' '}
-                  {helper.Member
-                    ? `${helper.Member?.name} ${helper.Member?.surname}`
-                    : 'Click to sign up'}
-                </Text>
-              </div>
-              <IconButton size="small" edge="end">
-                <Delete />
-              </IconButton>
-            </div>
-
-            <Divider className="my-2" />
-          </Fragment>
+          <MeetingRoleHelper
+            key={helper.id}
+            helper={helper}
+            isLoading={isAssigningMemberRole || isUnassigningMemberRole}
+            onAssign={() =>
+              memberAssignRole([{ meetingId, roleId: helper.roleTypeId }])
+            }
+            onUnassign={() =>
+              memberUnassignRole([{ meetingId, roleId: helper.roleTypeId }])
+            }
+          />
         ))}
       </Paper>
     </>

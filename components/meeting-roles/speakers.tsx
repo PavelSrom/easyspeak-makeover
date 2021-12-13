@@ -2,6 +2,7 @@ import AddOutlined from '@mui/icons-material/AddOutlined'
 import Delete from '@mui/icons-material/Delete'
 import { Avatar, Divider, Fab, IconButton } from '@mui/material'
 import { RequestSpeechDialog } from 'components/request-speech-dialog'
+import { useMeetingAgenda } from 'contexts/meeting-agenda'
 import { useState } from 'react'
 import { AgendaFullDTO } from 'types/api'
 import { Text } from 'ui'
@@ -13,7 +14,7 @@ type Props = {
   isLoading: boolean
 }
 
-export const MeetingRoleSpeaker = ({
+const MeetingRoleSpeaker = ({
   speaker,
   onAssign,
   onUnassign,
@@ -103,6 +104,45 @@ export const MeetingRoleSpeaker = ({
       </div>
 
       <Divider className="my-2" />
+    </>
+  )
+}
+
+export const AgendaSpeakers = () => {
+  const {
+    agenda: { speakers },
+    meetingId,
+    isAssigningRole,
+    memberAssignRole,
+    memberUnassignRole,
+  } = useMeetingAgenda()
+
+  if (speakers.length === 0)
+    return (
+      <Text variant="body2" className="text-center">
+        (No speakers this meeting)
+      </Text>
+    )
+
+  return (
+    <>
+      {speakers.map(speaker => (
+        <MeetingRoleSpeaker
+          key={speaker.id}
+          speaker={speaker}
+          isLoading={isAssigningRole}
+          onAssign={values =>
+            memberAssignRole({
+              meetingId,
+              roleId: speaker.roleTypeId,
+              ...values,
+            })
+          }
+          onUnassign={() =>
+            memberUnassignRole({ meetingId, roleId: speaker.roleTypeId })
+          }
+        />
+      ))}
     </>
   )
 }

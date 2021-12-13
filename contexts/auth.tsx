@@ -27,7 +27,7 @@ type ContextProps = {
 
 const AuthContext = createContext<ContextProps>({} as ContextProps)
 
-export const AuthProvider = ({ children }: React.PropsWithChildren<{}>) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userId, setUserId] = useState<string>()
   const { enqueueSnackbar } = useSnackbar()
   const queryClient = useTypeSafeQueryClient()

@@ -3,6 +3,7 @@ import AddOutlined from '@mui/icons-material/AddOutlined'
 import { Avatar, Divider, Fab, IconButton } from '@mui/material'
 import { AgendaFullDTO } from 'types/api'
 import { Text } from 'ui'
+import { useMeetingAgenda } from 'contexts/meeting-agenda'
 
 type Props = {
   helper: AgendaFullDTO['helpers'][number]
@@ -79,6 +80,44 @@ export const MeetingRoleHelper = ({
       </div>
 
       <Divider className="my-2" />
+    </>
+  )
+}
+
+export const AgendaHelpers = () => {
+  const {
+    agenda: { helpers },
+    meetingId,
+    isAssigningRole,
+    memberAssignRole,
+    memberUnassignRole,
+  } = useMeetingAgenda()
+
+  if (helpers.length === 0)
+    return (
+      <Text variant="body2" className="text-center">
+        (No helpers this meeting)
+      </Text>
+    )
+
+  return (
+    <>
+      {helpers.map(helper => (
+        <MeetingRoleHelper
+          key={helper.id}
+          helper={helper}
+          isLoading={isAssigningRole}
+          onAssign={() =>
+            memberAssignRole({
+              meetingId,
+              roleId: helper.roleTypeId,
+            })
+          }
+          onUnassign={() =>
+            memberUnassignRole({ meetingId, roleId: helper.roleTypeId })
+          }
+        />
+      ))}
     </>
   )
 }

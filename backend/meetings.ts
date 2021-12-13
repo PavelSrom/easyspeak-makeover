@@ -186,6 +186,8 @@ export const toggleMeetingAttendanceHandler = async (
         where: { id: alreadyAttending!.id },
         data: { memberId: null, roleStatus: 'PENDING' },
       })
+
+      // TODO: remove speeches if there are any
     } else {
       // if they don't wanna attend and don't have a role
       await prisma.attendance.delete({

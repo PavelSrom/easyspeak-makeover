@@ -3,6 +3,7 @@ import AddOutlined from '@mui/icons-material/AddOutlined'
 import { Avatar, Divider, Fab, IconButton } from '@mui/material'
 import { AgendaFullDTO } from 'types/api'
 import { Text } from 'ui'
+import { useMeetingAgenda } from 'contexts/meeting-agenda'
 
 type Props = {
   evaluator: AgendaFullDTO['evaluators'][number]
@@ -11,7 +12,7 @@ type Props = {
   isLoading: boolean
 }
 
-export const MeetingRoleEvaluator = ({
+const MeetingRoleEvaluator = ({
   evaluator,
   onAssign,
   onUnassign,
@@ -79,6 +80,44 @@ export const MeetingRoleEvaluator = ({
       </div>
 
       <Divider className="my-2" />
+    </>
+  )
+}
+
+export const AgendaEvaluators = () => {
+  const {
+    agenda: { evaluators },
+    meetingId,
+    isAssigningRole,
+    memberAssignRole,
+    memberUnassignRole,
+  } = useMeetingAgenda()
+
+  if (evaluators.length === 0)
+    return (
+      <Text variant="body2" className="text-center">
+        (No evaluators this meeting)
+      </Text>
+    )
+
+  return (
+    <>
+      {evaluators.map(evaluator => (
+        <MeetingRoleEvaluator
+          key={evaluator.id}
+          evaluator={evaluator}
+          isLoading={isAssigningRole}
+          onAssign={() =>
+            memberAssignRole({
+              meetingId,
+              roleId: evaluator.roleTypeId,
+            })
+          }
+          onUnassign={() =>
+            memberUnassignRole({ meetingId, roleId: evaluator.roleTypeId })
+          }
+        />
+      ))}
     </>
   )
 }

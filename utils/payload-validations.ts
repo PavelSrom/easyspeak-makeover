@@ -82,3 +82,8 @@ export const createNewMeetingSchema = Yup.object().shape({
     })
   ),
 })
+
+export const requestSpeechSchema = Yup.object().shape({
+  title: Yup.string().required(YUP_MSG.REQ),
+  description: Yup.string().max(80, YUP_MSG.CHAR_MAX(80)).required(YUP_MSG.REQ),
+})

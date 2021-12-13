@@ -283,6 +283,10 @@ export const memberAssignRoleHandler = async (
     if (targetRole.memberId)
       return res.status(400).json({ message: 'This role is already taken' })
 
+    const isRequestForSpeech = targetRole.RoleType.name
+      .toLowerCase()
+      .startsWith('speaker')
+
     // remove any coming/not coming roles for that meeting and that member
     await prisma.attendance.deleteMany({
       where: {
@@ -292,18 +296,29 @@ export const memberAssignRoleHandler = async (
       },
     })
 
-    if (targetRole.RoleType.name.toLowerCase().startsWith('speaker')) {
-      // TODO: it's a signup for a speech => admin needs to approve it
+    if (isRequestForSpeech) {
+      // it's a signup for a speech => admin needs to approve it
       const { title, description } = req.body
       if (!title || !description)
         return res.status(400).json({ message: 'Missing data for speech' })
+
+      // create new speech
+      await prisma.speech.create({
+        data: {
+          Attendance: { connect: { id: targetRole.id } },
+          title,
+          description,
+        },
+      })
+
+      // TODO: send notification to meeting manager to approve it
     }
 
     await prisma.attendance.update({
       where: { id: targetRole.id },
       data: {
         Member: { connect: { id: session.user.profileId } },
-        roleStatus: 'CONFIRMED',
+        roleStatus: isRequestForSpeech ? 'PENDING' : 'CONFIRMED',
       },
     })
 
@@ -330,8 +345,19 @@ export const memberUnassignRoleHandler = async (
     if (targetRole.memberId !== session.user.profileId)
       return res.status(403).json({ message: 'Access denied' })
 
-    if (targetRole.RoleType.name.toLowerCase().includes('speaker')) {
-      // TODO: member is cancelling their speaker role => remove speech too
+    const isRequestForSpeech = targetRole.RoleType.name
+      .toLowerCase()
+      .includes('speaker')
+
+    if (isRequestForSpeech) {
+      // member is cancelling their speaker role => remove speech too
+      const targetSpeech = await prisma.speech.findUnique({
+        where: { attendanceId: targetRole.id },
+      })
+      if (!targetSpeech)
+        return res.status(404).json({ message: 'Speech not found' })
+
+      await prisma.speech.delete({ where: { id: targetSpeech.id } })
     }
 
     // unassign person - remove memberId and set status back to UNASSIGNED

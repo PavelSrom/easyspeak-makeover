@@ -48,7 +48,19 @@ export const MeetingAgenda = ({ meetingId }: Props) => {
           Speakers
         </Text>
         {agendaQuery.data.speakers.map(speaker => (
-          <MeetingRoleSpeaker key={speaker.id} speaker={speaker} />
+          <MeetingRoleSpeaker
+            key={speaker.id}
+            speaker={speaker}
+            isLoading={isAssigningMemberRole || isUnassigningMemberRole}
+            onAssign={speechData =>
+              memberAssignRole([
+                { meetingId, roleId: speaker.roleTypeId, ...speechData },
+              ])
+            }
+            onUnassign={() =>
+              memberUnassignRole([{ meetingId, roleId: speaker.roleTypeId }])
+            }
+          />
         ))}
 
         <Text variant="h1_light" className="my-4">

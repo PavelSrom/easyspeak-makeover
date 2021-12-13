@@ -17,6 +17,7 @@ type ContextProps = {
   members: MemberSchemaDTO['clubMembers']
   memberAssignRole: typeof requests['mutation']['memberAssignRole']
   memberUnassignRole: typeof requests['mutation']['memberUnassignRole']
+  adminAssignRole: typeof requests['mutation']['adminAssignRole']
 }
 
 const MeetingAgendaContext = createContext<ContextProps>({} as ContextProps)
@@ -53,26 +54,40 @@ export const MeetingAgendaProvider = ({
       queryClient.invalidateQueries('getFullAgenda')
     },
   })
+  const {
+    mutateAsync: adminAssignRoleMutation,
+    isLoading: isAssigningAdminRole,
+  } = useTypeSafeMutation('adminAssignRole', {
+    onSettled: () => {
+      queryClient.invalidateQueries('getFullAgenda')
+    },
+  })
 
   const value: ContextProps = useMemo(
     () => ({
       meetingId: router.query.id as string,
       isBoardMember: !!profile?.roleTypeId ?? false,
-      isAssigningRole: isAssigningMemberRole || isUnassigningMemberRole,
+      isAssigningRole:
+        isAssigningMemberRole ||
+        isUnassigningMemberRole ||
+        isAssigningAdminRole,
       agenda: agendaQuery.data!,
       members: membersQuery.data?.clubMembers ?? [],
       memberAssignRole: values => memberAssignRoleMutation([values]),
       memberUnassignRole: values => memberUnassignRoleMutation([values]),
+      adminAssignRole: values => adminAssignRoleMutation([values]),
     }),
     [
       router.query.id,
       profile?.roleTypeId,
       isAssigningMemberRole,
       isUnassigningMemberRole,
+      isAssigningAdminRole,
       agendaQuery.data,
       membersQuery.data,
       memberAssignRoleMutation,
       memberUnassignRoleMutation,
+      adminAssignRoleMutation,
     ]
   )
 

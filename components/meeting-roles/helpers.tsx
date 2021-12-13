@@ -14,6 +14,7 @@ import { Button, Text, TextField } from 'ui'
 import { useMeetingAgenda } from 'contexts/meeting-agenda'
 import { useState } from 'react'
 import { Form, Formik } from 'formik'
+import { useAuth } from 'contexts/auth'
 
 type Props = {
   helper: AgendaFullDTO['helpers'][number]
@@ -95,7 +96,8 @@ export const MeetingRoleHelper = ({
 }
 
 export const AgendaHelpers = () => {
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+  const [roleIdToAssign, setRoleIdToAssign] = useState<string>('')
+  const { profile } = useAuth()
 
   const {
     agenda: { helpers },
@@ -103,6 +105,7 @@ export const AgendaHelpers = () => {
     meetingId,
     isBoardMember,
     isAssigningRole,
+    adminAssignRole,
     memberAssignRole,
     memberUnassignRole,
   } = useMeetingAgenda()
@@ -123,7 +126,7 @@ export const AgendaHelpers = () => {
           isLoading={isAssigningRole}
           onAssign={() =>
             isBoardMember
-              ? setDialogOpen(true)
+              ? setRoleIdToAssign(helper.roleTypeId)
               : memberAssignRole({
                   meetingId,
                   roleId: helper.roleTypeId,
@@ -138,15 +141,21 @@ export const AgendaHelpers = () => {
       <Dialog
         fullWidth
         maxWidth="sm"
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        open={!!roleIdToAssign}
+        onClose={() => setRoleIdToAssign('')}
         PaperProps={{ className: 'p-4' }}
       >
         <Text variant="h1_light">Assign member</Text>
 
         <Formik
-          initialValues={{ memberId: '' }}
-          onSubmit={values => console.log(values)}
+          initialValues={{ memberId: profile?.id ?? '' }}
+          onSubmit={values =>
+            adminAssignRole({
+              meetingId,
+              roleId: roleIdToAssign,
+              memberId: values.memberId,
+            }).finally(() => setRoleIdToAssign(''))
+          }
         >
           <Form>
             <TextField
@@ -155,7 +164,6 @@ export const AgendaHelpers = () => {
               select
               disabled={members.length === 0}
             >
-              <MenuItem value="Member">Member</MenuItem>
               {members.map(member => (
                 <MenuItem key={member.id} value={member.id}>
                   {`${member.name} ${member.surname}`}
@@ -163,7 +171,7 @@ export const AgendaHelpers = () => {
               ))}
             </TextField>
             <DialogActions className="px-0 pt-6 pb-0">
-              <Button variant="outlined" onClick={() => setDialogOpen(false)}>
+              <Button variant="outlined" onClick={() => setRoleIdToAssign('')}>
                 Cancel
               </Button>
               <Button type="submit" color="secondary">

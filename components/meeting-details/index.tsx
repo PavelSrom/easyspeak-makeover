@@ -60,7 +60,7 @@ export const MeetingDetails = ({ meetingId }: Props) => {
   return (
     <>
       <Paper className="p-4 mb-8 space-y-2">
-        <Text variant="h1_light">Title of the meeting</Text>
+        <Text variant="h1_light">{meetingDetailsQuery.data.title}</Text>
         <div className="flex items-center">
           <LocationOn className="mr-2" />
           <Text variant="body2">{meetingDetailsQuery.data.venue}</Text>

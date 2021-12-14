@@ -1,7 +1,7 @@
 import { Divider } from '@mui/material'
 import { useMeetingAgenda } from 'contexts/meeting-agenda'
 import { Text } from 'ui'
-import { SpeakerItemBase } from './speaker-components'
+import { SpeakerBase } from './speaker-components'
 
 export const AgendaSpeakers = () => {
   const {
@@ -18,19 +18,19 @@ export const AgendaSpeakers = () => {
   return (
     <>
       {speakers.map(speaker => (
-        <SpeakerItemBase speaker={speaker}>
+        <SpeakerBase key={speaker.id} speaker={speaker}>
           <div className="flex items-start">
             <div className="mr-4">
-              <SpeakerItemBase.AddButtonOrAvatar />
+              <SpeakerBase.AddButtonOrAvatar />
             </div>
             <div className="flex-1">
-              <SpeakerItemBase.Information />
+              <SpeakerBase.Information />
             </div>
-            <SpeakerItemBase.DeleteIcon />
+            <SpeakerBase.DeleteIcon />
           </div>
 
           <Divider className="my-2" />
-        </SpeakerItemBase>
+        </SpeakerBase>
       ))}
     </>
   )

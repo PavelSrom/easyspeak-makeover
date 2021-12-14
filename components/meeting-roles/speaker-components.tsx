@@ -8,11 +8,11 @@ import { createContext, useContext, useMemo, useState } from 'react'
 import { AgendaFullDTO } from 'types/api'
 import { Text } from 'ui'
 
-type SpeakerItemBaseProps = {
+type SpeakerBaseProps = {
   speaker: AgendaFullDTO['speakers'][number]
 }
 
-type SpeakerItemStaticComponents = {
+type SpeakerStaticComponents = {
   AddButtonOrAvatar: React.FC
   Information: React.FC
   DeleteIcon: React.FC
@@ -20,26 +20,26 @@ type SpeakerItemStaticComponents = {
   AcceptOrDecline: React.FC
 }
 
-const SpeakerItemContext = createContext<SpeakerItemBaseProps['speaker']>(
-  {} as SpeakerItemBaseProps['speaker']
+const SpeakerContext = createContext<SpeakerBaseProps['speaker']>(
+  {} as SpeakerBaseProps['speaker']
 )
 
-export const SpeakerItemBase: React.FC<SpeakerItemBaseProps> &
-  SpeakerItemStaticComponents = ({ speaker, children }) => {
-  const value: SpeakerItemBaseProps['speaker'] = useMemo(
-    () => ({ ...speaker }),
-    [speaker]
-  )
+export const SpeakerBase: React.FC<SpeakerBaseProps> & SpeakerStaticComponents =
+  ({ speaker, children }) => {
+    const value: SpeakerBaseProps['speaker'] = useMemo(
+      () => ({ ...speaker }),
+      [speaker]
+    )
 
-  return (
-    <SpeakerItemContext.Provider value={value}>
-      {children}
-    </SpeakerItemContext.Provider>
-  )
-}
+    return (
+      <SpeakerContext.Provider value={value}>
+        {children}
+      </SpeakerContext.Provider>
+    )
+  }
 
-const useSpeakerItem = (): SpeakerItemBaseProps['speaker'] => {
-  const context = useContext(SpeakerItemContext)
+const useSpeaker = (): SpeakerBaseProps['speaker'] => {
+  const context = useContext(SpeakerContext)
   if (!context)
     throw new Error('useSpeakerItem must be used within SpeakerItemBase')
 
@@ -53,7 +53,7 @@ const useSpeakerItem = (): SpeakerItemBaseProps['speaker'] => {
 const AddButtonOrAvatar: React.FC = () => {
   const [speechDialogOpen, setSpeechDialogOpen] = useState<boolean>(false)
   const { isAssigningRole, meetingId, memberAssignRole } = useMeetingAgenda()
-  const { roleStatus, roleTypeId, Member } = useSpeakerItem()
+  const { roleStatus, roleTypeId, Member } = useSpeaker()
 
   return (
     <>
@@ -89,24 +89,20 @@ const AddButtonOrAvatar: React.FC = () => {
   )
 }
 
-SpeakerItemBase.AddButtonOrAvatar = AddButtonOrAvatar
-SpeakerItemBase.AddButtonOrAvatar.displayName =
-  'SpeakerItemBase.AddButtonOrAvatar'
+SpeakerBase.AddButtonOrAvatar = AddButtonOrAvatar
+SpeakerBase.AddButtonOrAvatar.displayName = 'SpeakerBase.AddButtonOrAvatar'
 
 const Information: React.FC = () => {
-  const { roleStatus, RoleType, Member, Speech } = useSpeakerItem()
+  const { roleStatus, RoleType, Member, Speech } = useSpeaker()
 
   return (
     <>
+      <Text variant="h4">{RoleType.name}</Text>
       {roleStatus === 'UNASSIGNED' && (
-        <>
-          <Text variant="h4">{RoleType.name}</Text>
-          <Text variant="caption">Click to sign up</Text>
-        </>
+        <Text variant="caption">Click to sign up</Text>
       )}
       {roleStatus === 'PENDING' && (
         <>
-          <Text variant="h4">{RoleType.name}</Text>
           <Text variant="caption">
             {`${Member?.name} ${Member?.surname}`} (pending)
           </Text>
@@ -121,7 +117,6 @@ const Information: React.FC = () => {
       )}
       {roleStatus === 'CONFIRMED' && (
         <>
-          <Text variant="h4">{RoleType.name}</Text>
           <Text variant="caption">{`${Member?.name} ${Member?.surname}`}</Text>
 
           <div className="mt-2">
@@ -138,16 +133,17 @@ const Information: React.FC = () => {
   )
 }
 
-SpeakerItemBase.Information = Information
-SpeakerItemBase.Information.displayName = 'SpeakerItemBase.Information'
+SpeakerBase.Information = Information
+SpeakerBase.Information.displayName = 'SpeakerBase.Information'
 
 const DeleteIcon: React.FC = () => {
   const { isBoardMember, memberUnassignRole, meetingId } = useMeetingAgenda()
-  const { memberId, roleTypeId } = useSpeakerItem()
+  const { memberId, roleTypeId, roleStatus } = useSpeaker()
   const { profile } = useAuth()
 
   // do not show anything if not a board member or not their speech
-  if (!isBoardMember && memberId !== profile?.id) return null
+  if (!isBoardMember || memberId !== profile?.id || roleStatus === 'UNASSIGNED')
+    return null
 
   return (
     <IconButton
@@ -160,13 +156,13 @@ const DeleteIcon: React.FC = () => {
   )
 }
 
-SpeakerItemBase.DeleteIcon = DeleteIcon
-SpeakerItemBase.DeleteIcon.displayName = 'SpeakerItemBase.DeleteIcon'
+SpeakerBase.DeleteIcon = DeleteIcon
+SpeakerBase.DeleteIcon.displayName = 'SpeakerBase.DeleteIcon'
 
 // TODO
 const ApproveOrReject: React.FC = () => {
   const { isBoardMember } = useMeetingAgenda()
-  const { memberId } = useSpeakerItem()
+  const { memberId } = useSpeaker()
   const { profile } = useAuth()
 
   if (!isBoardMember && memberId !== profile?.id) return null
@@ -178,13 +174,13 @@ const ApproveOrReject: React.FC = () => {
   )
 }
 
-SpeakerItemBase.ApproveOrReject = ApproveOrReject
-SpeakerItemBase.ApproveOrReject.displayName = 'SpeakerItemBase.ApproveOrReject'
+SpeakerBase.ApproveOrReject = ApproveOrReject
+SpeakerBase.ApproveOrReject.displayName = 'SpeakerBase.ApproveOrReject'
 
 // TODO
 const AcceptOrDecline: React.FC = () => {
   const { isBoardMember } = useMeetingAgenda()
-  const { memberId } = useSpeakerItem()
+  const { memberId } = useSpeaker()
   const { profile } = useAuth()
 
   if (!isBoardMember && memberId !== profile?.id) return null
@@ -196,5 +192,5 @@ const AcceptOrDecline: React.FC = () => {
   )
 }
 
-SpeakerItemBase.AcceptOrDecline = AcceptOrDecline
-SpeakerItemBase.AcceptOrDecline.displayName = 'SpeakerItemBase.AcceptOrDecline'
+SpeakerBase.AcceptOrDecline = AcceptOrDecline
+SpeakerBase.AcceptOrDecline.displayName = 'SpeakerBase.AcceptOrDecline'

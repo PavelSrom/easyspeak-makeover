@@ -1,9 +1,10 @@
 import AddOutlined from '@mui/icons-material/AddOutlined'
 import Delete from '@mui/icons-material/Delete'
 import { Avatar, Fab, IconButton } from '@mui/material'
+import { AssignRoleDialog } from 'components/assign-role-dialog'
 import { useAuth } from 'contexts/auth'
 import { useMeetingAgenda } from 'contexts/meeting-agenda'
-import { createContext, useContext, useMemo } from 'react'
+import { createContext, useContext, useMemo, useState } from 'react'
 import { AgendaFullDTO } from 'types/api'
 import { Text } from 'ui'
 
@@ -50,8 +51,29 @@ const useHelper = (): HelperBaseProps['helper'] => {
  */
 
 const AddButtonOrAvatar: React.FC = () => {
-  const { isAssigningRole, meetingId, memberAssignRole } = useMeetingAgenda()
   const { roleStatus, roleTypeId, Member } = useHelper()
+  const [assignRoleDialogOpen, setAssignRoleDialogOpen] =
+    useState<boolean>(false)
+  const { profile } = useAuth()
+  const {
+    isBoardMember,
+    isAssigningRole,
+    meetingId,
+    memberAssignRole,
+    adminAssignRole,
+    members,
+  } = useMeetingAgenda()
+
+  const handleButtonClick = () => {
+    if (isBoardMember) {
+      setAssignRoleDialogOpen(true)
+    } else {
+      memberAssignRole({
+        meetingId,
+        roleId: roleTypeId,
+      })
+    }
+  }
 
   return (
     <>
@@ -63,16 +85,22 @@ const AddButtonOrAvatar: React.FC = () => {
           size="small"
           className="text-white"
           disabled={isAssigningRole}
-          onClick={() =>
-            memberAssignRole({
-              meetingId,
-              roleId: roleTypeId,
-            })
-          }
+          onClick={handleButtonClick}
         >
           <AddOutlined />
         </Fab>
       )}
+
+      <AssignRoleDialog
+        open={assignRoleDialogOpen}
+        defaultValue={profile?.id ?? ''}
+        members={members}
+        onClose={() => setAssignRoleDialogOpen(false)}
+        onAssign={async ({ memberId }) => {
+          await adminAssignRole({ memberId, meetingId, roleId: roleTypeId })
+          setAssignRoleDialogOpen(false)
+        }}
+      />
     </>
   )
 }
@@ -128,19 +156,7 @@ HelperBase.DeleteIcon = DeleteIcon
 HelperBase.DeleteIcon.displayName = 'HelperBase.DeleteIcon'
 
 // TODO
-const AcceptOrDecline: React.FC = () => {
-  const { isBoardMember } = useMeetingAgenda()
-  const { memberId } = useHelper()
-  const { profile } = useAuth()
-
-  if (!isBoardMember && memberId !== profile?.id) return null
-
-  return (
-    <IconButton size="small" edge="end" onClick={() => {}}>
-      <Delete />
-    </IconButton>
-  )
-}
+const AcceptOrDecline: React.FC = () => null
 
 HelperBase.AcceptOrDecline = AcceptOrDecline
 HelperBase.AcceptOrDecline.displayName = 'HelperBase.AcceptOrDecline'

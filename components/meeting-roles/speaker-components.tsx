@@ -1,6 +1,7 @@
 import AddOutlined from '@mui/icons-material/AddOutlined'
 import Delete from '@mui/icons-material/Delete'
 import { Avatar, Fab, IconButton } from '@mui/material'
+import { AssignRoleDialog } from 'components/assign-role-dialog'
 import { RequestSpeechDialog } from 'components/request-speech-dialog'
 import { useAuth } from 'contexts/auth'
 import { useMeetingAgenda } from 'contexts/meeting-agenda'
@@ -52,8 +53,26 @@ const useSpeaker = (): SpeakerBaseProps['speaker'] => {
 
 const AddButtonOrAvatar: React.FC = () => {
   const [speechDialogOpen, setSpeechDialogOpen] = useState<boolean>(false)
-  const { isAssigningRole, meetingId, memberAssignRole } = useMeetingAgenda()
+  const [assignRoleDialogOpen, setAssignRoleDialogOpen] =
+    useState<boolean>(false)
+  const { profile } = useAuth()
+  const {
+    isBoardMember,
+    isAssigningRole,
+    meetingId,
+    members,
+    memberAssignRole,
+    adminAssignRole,
+  } = useMeetingAgenda()
   const { roleStatus, roleTypeId, Member } = useSpeaker()
+
+  const handleButtonClick = () => {
+    if (isBoardMember) {
+      setAssignRoleDialogOpen(true)
+    } else {
+      setSpeechDialogOpen(true)
+    }
+  }
 
   return (
     <>
@@ -66,7 +85,7 @@ const AddButtonOrAvatar: React.FC = () => {
             size="small"
             className="text-white"
             disabled={isAssigningRole}
-            onClick={() => setSpeechDialogOpen(true)}
+            onClick={handleButtonClick}
           >
             <AddOutlined />
           </Fab>
@@ -82,6 +101,17 @@ const AddButtonOrAvatar: React.FC = () => {
                 ...values,
               })
             }
+          />
+
+          <AssignRoleDialog
+            open={assignRoleDialogOpen}
+            defaultValue={profile?.id ?? ''}
+            members={members}
+            onClose={() => setAssignRoleDialogOpen(false)}
+            onAssign={async ({ memberId }) => {
+              await adminAssignRole({ memberId, meetingId, roleId: roleTypeId })
+              setAssignRoleDialogOpen(false)
+            }}
           />
         </>
       )}
@@ -160,37 +190,13 @@ SpeakerBase.DeleteIcon = DeleteIcon
 SpeakerBase.DeleteIcon.displayName = 'SpeakerBase.DeleteIcon'
 
 // TODO
-const ApproveOrReject: React.FC = () => {
-  const { isBoardMember } = useMeetingAgenda()
-  const { memberId } = useSpeaker()
-  const { profile } = useAuth()
-
-  if (!isBoardMember && memberId !== profile?.id) return null
-
-  return (
-    <IconButton size="small" edge="end" onClick={() => {}}>
-      <Delete />
-    </IconButton>
-  )
-}
+const ApproveOrReject: React.FC = () => null
 
 SpeakerBase.ApproveOrReject = ApproveOrReject
 SpeakerBase.ApproveOrReject.displayName = 'SpeakerBase.ApproveOrReject'
 
 // TODO
-const AcceptOrDecline: React.FC = () => {
-  const { isBoardMember } = useMeetingAgenda()
-  const { memberId } = useSpeaker()
-  const { profile } = useAuth()
-
-  if (!isBoardMember && memberId !== profile?.id) return null
-
-  return (
-    <IconButton size="small" edge="end" onClick={() => {}}>
-      <Delete />
-    </IconButton>
-  )
-}
+const AcceptOrDecline: React.FC = () => null
 
 SpeakerBase.AcceptOrDecline = AcceptOrDecline
 SpeakerBase.AcceptOrDecline.displayName = 'SpeakerBase.AcceptOrDecline'

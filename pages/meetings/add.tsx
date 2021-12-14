@@ -148,9 +148,11 @@ const AddMeeting: CustomNextPage = () => {
                   <TimePicker
                     label="Start time"
                     value={values.start}
-                    onChange={newValue => {
+                    onChange={(newValue: any) => {
                       setFieldValue('start', newValue)
-                      newValue > values.end && setFieldValue('end', newValue)
+                      if (newValue > values.end) {
+                        setFieldValue('end', newValue)
+                      }
                     }}
                   />
                   <TimePicker
@@ -162,13 +164,9 @@ const AddMeeting: CustomNextPage = () => {
                 </div>
               </div>
               <div className="space-y-4 mt-8">
-                <div className={'flex justify-between'}>
+                <div className="flex justify-between">
                   <Text variant="h3">Agenda</Text>
-                  <Tooltip
-                    title={
-                      'Select the number of speekers/evatualor and add additional roles to the meeting'
-                    }
-                  >
+                  <Tooltip title="Select the number of speekers/evatualors and add additional roles to the meeting">
                     <Help
                       className="text-xl mr-2"
                       sx={{ color: theme.palette.neutral.main }}

@@ -43,7 +43,7 @@ export const ChangeRoleDialog = ({
           select
           disabled={clubRoles.length === 0}
         >
-          <MenuItem value="Member">Member</MenuItem>
+          <MenuItem value="member">Member</MenuItem>
           {clubRoles.map(role => (
             <MenuItem key={role.id} value={role.id}>
               {role.name}

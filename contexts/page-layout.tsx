@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import {
   AppBar,
   Avatar,
+  Box,
   Divider,
   Drawer,
   IconButton,
@@ -31,7 +32,6 @@ import { sideNavigation } from 'utils/side-navigation'
 import { useRouter } from 'next/router'
 import { NotificationPopper } from 'components/notification-popper'
 import { useAuth } from './auth'
-import { Box } from '@mui/system'
 
 type ContextProps = {
   tabs: string[]
@@ -193,39 +193,39 @@ export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
           )}
         </AppBar>
         {!!session && (
-        <Box
-          component="nav"
-          sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-          aria-label="Page navigation"
-        >
-          <Drawer
-            variant="temporary"
-            open={drawerOpen}
-            anchor="left"
-            onClose={() => setDrawerOpen(false)}
-            className={'p-4'}
-            sx={{
-              display: { xs: 'block', md: 'none' },
-              '& .MuiDrawer-paper': { boxSizing: 'border-box' },
-            }}
+          <Box
+            component="nav"
+            sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
+            aria-label="Page navigation"
           >
-            {drawer}
-          </Drawer>
-          <Drawer
-            variant="permanent"
-            className={'p-4'}
-            sx={{
-              display: { xs: 'none', md: 'block' },
-              '& .MuiDrawer-paper': {
-                boxSizing: 'border-box',
-                width: drawerWidth,
-              },
-            }}
-            open
-          >
-            {drawer}
-          </Drawer>
-        </Box>
+            <Drawer
+              variant="temporary"
+              open={drawerOpen}
+              anchor="left"
+              onClose={() => setDrawerOpen(false)}
+              className={'p-4'}
+              sx={{
+                display: { xs: 'block', md: 'none' },
+                '& .MuiDrawer-paper': { boxSizing: 'border-box' },
+              }}
+            >
+              {drawer}
+            </Drawer>
+            <Drawer
+              variant="permanent"
+              className={'p-4'}
+              sx={{
+                display: { xs: 'none', md: 'block' },
+                '& .MuiDrawer-paper': {
+                  boxSizing: 'border-box',
+                  width: drawerWidth,
+                },
+              }}
+              open
+            >
+              {drawer}
+            </Drawer>
+          </Box>
         )}
         <Box
           className={clsx('h-full min-h-screen w-full md:p-4', {

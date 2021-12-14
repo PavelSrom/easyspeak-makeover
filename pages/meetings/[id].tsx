@@ -14,9 +14,7 @@ const Meeting: CustomNextPage = () => {
       {activeTab === 0 && (
         <MeetingDetails meetingId={router.query.id as string} />
       )}
-      {activeTab === 1 && (
-        <MeetingAgenda meetingId={router.query.id as string} />
-      )}
+      {activeTab === 1 && <MeetingAgenda />}
     </Container>
   )
 }

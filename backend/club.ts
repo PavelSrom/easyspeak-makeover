@@ -105,3 +105,47 @@ export const getClubMemberByIdHandler = async (
     return res.status(500).json({ message })
   }
 }
+
+export const changeMemberRoleHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  // clubRole = 'member'
+  const { clubRole } = req.body
+
+  try {
+    // 1. check if user making a request is admin, if not, kick them out
+    const profile = await prisma.profile.findUnique({
+      where: { id: session.user.profileId },
+    })
+    if (!profile) return res.status(404).json({ message: 'Profile not found' })
+    if (!profile.roleTypeId)
+      return res.status(403).json({ message: 'Access denied' })
+
+    // 2. check if there already is a person with that role, if there are, return 400
+    const targetClubRole = await prisma.profile.findFirst({
+      where: { roleTypeId: clubRole, User: { clubId: session.user.clubId } },
+    })
+    if (targetClubRole)
+      return res.status(400).json({ message: 'This role is already taken' })
+
+    if (clubRole === 'member') {
+      // if changing to a regular member
+      await prisma.profile.update({
+        where: { id: req.query.id as string },
+        data: { roleTypeId: null },
+      })
+    } else {
+      // changing to a board member
+      await prisma.profile.update({
+        where: { id: req.query.id as string },
+        data: { ClubRole: { connect: { id: clubRole } } },
+      })
+    }
+
+    return res.json({ message: 'Role has been changed' })
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}

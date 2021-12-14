@@ -42,3 +42,16 @@ export type CreateMeetingPayload = {
   end: string
   agenda: { id: string; name: string }[]
 }
+
+export type MemberRoleAssignPayload = {
+  meetingId: string
+  roleId: string
+  title?: string // signing up for speech
+  description?: string // signing up for speech
+}
+
+export type AdminRoleAssignPayload = {
+  meetingId: string
+  roleId: string
+  memberId: string
+}

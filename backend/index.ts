@@ -17,10 +17,12 @@ import {
   ProfileDTO,
 } from 'types/api'
 import {
+  AdminRoleAssignPayload,
   CreateCommentPayload,
   CreateMeetingPayload,
   CreateMemberPayload,
   CreatePostPayload,
+  MemberRoleAssignPayload,
   UpdateProfilePayload,
 } from 'types/payloads'
 
@@ -63,7 +65,7 @@ export const requests = {
     },
     getMeetingById: (id: string): Promise<MeetingFullDTO> =>
       axios.get(`/api/meetings/${id}`).then(response => response.data),
-    getFullAgenda: (id: string): Promise<AgendaFullDTO[]> =>
+    getFullAgenda: (id: string): Promise<AgendaFullDTO> =>
       axios.get(`/api/meetings/${id}/agenda`).then(response => response.data),
     // PROFILE
     getUserProfile: (): Promise<ProfileDTO> =>
@@ -126,6 +128,17 @@ export const requests = {
       axios.post('/api/comments', payload).then(response => response.data),
     deleteCommentById: (id: string): Promise<{ message: string }> =>
       axios.delete(`/api/comments/${id}`).then(response => response.data),
+    // CLUB
+    changeMemberRole: ({
+      memberId,
+      clubRole,
+    }: {
+      memberId: string
+      clubRole: string
+    }): Promise<{ message: string }> =>
+      axios
+        .post(`/api/club/members/${memberId}/change-role`, { clubRole })
+        .then(response => response.data),
     // MEETINGS
     createNewMeeting: (
       payload: CreateMeetingPayload
@@ -140,6 +153,31 @@ export const requests = {
     }): Promise<{ message: string }> =>
       axios
         .post(`/api/meetings/${meetingId}/attendance?attending=${attending}`)
+        .then(response => response.data),
+    memberAssignRole: ({
+      meetingId,
+      roleId,
+      ...payload
+    }: MemberRoleAssignPayload): Promise<{ message: string }> =>
+      axios
+        .post(`/api/meetings/${meetingId}/assign/${roleId}`, payload)
+        .then(response => response.data),
+    memberUnassignRole: ({
+      meetingId,
+      roleId,
+    }: Pick<MemberRoleAssignPayload, 'meetingId' | 'roleId'>): Promise<{
+      message: string
+    }> =>
+      axios
+        .delete(`/api/meetings/${meetingId}/assign/${roleId}`)
+        .then(response => response.data),
+    adminAssignRole: ({
+      meetingId,
+      roleId,
+      memberId,
+    }: AdminRoleAssignPayload): Promise<{ message: string }> =>
+      axios
+        .post(`/api/meetings/${meetingId}/admin-assign/${roleId}`, { memberId })
         .then(response => response.data),
   },
 }

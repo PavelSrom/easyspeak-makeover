@@ -99,12 +99,12 @@ model Attendance {
   memberId   String?
   Member     Profile?          @relation(fields: [memberId], references: [id])
   roleStatus MeetingRoleStatus
-  Speech     Speech[]
+  Speech     Speech?
 }
 
 model Speech {
   id           String     @id @default(cuid())
-  attendanceId String
+  attendanceId String     @unique
   Attendance   Attendance @relation(fields: [attendanceId], references: [id])
   title        String
   description  String

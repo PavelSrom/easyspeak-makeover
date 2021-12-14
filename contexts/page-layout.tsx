@@ -228,14 +228,13 @@ export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
         </Box>
         )}
         <Box
-          className={clsx('h-full min-h-screen', {
+          className={clsx('h-full min-h-screen w-full md:p-4', {
             'bg-page-bg': !!session,
           })}
           style={{ paddingTop }}
           sx={{
             flexGrow: 1,
-            p: 3,
-            width: { md: `calc(100% - ${drawerWidth}px)` },
+            width: { md: `calc(100% - ${drawerWidth}px)`, sm: '100%' },
           }}
         >
           {children}

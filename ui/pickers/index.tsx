@@ -2,11 +2,13 @@ import {
   LocalizationProvider,
   StaticDatePicker as MuiStaticDatePicker,
   StaticDatePickerProps as MuiStaticDatePickerProps,
-  TimePicker as MuiTimePicker,
-  TimePickerProps as MuiTimePickerProps,
+  DateTimePicker,
+  MobileDateTimePicker,
+  DateTimePickerProps as MuiDateTimePickerProps,
 } from '@mui/lab'
 import AdapterDateFns from '@mui/lab/AdapterDateFns'
 import { TextField } from '@mui/material'
+import { useEffect, useState } from 'react'
 
 export type StaticDatePickerProps = Omit<
   MuiStaticDatePickerProps,
@@ -22,15 +24,29 @@ export const StaticDatePicker = (props: StaticDatePickerProps) => (
   </LocalizationProvider>
 )
 
-export type TimePickerProps = Omit<MuiTimePickerProps, 'renderInput'>
+export type DateTimePickerProps = Omit<MuiDateTimePickerProps, 'renderInput'>
 
-export const TimePicker = (props: TimePickerProps) => (
-  <LocalizationProvider dateAdapter={AdapterDateFns}>
-    <MuiTimePicker
-      {...props}
-      minutesStep={5}
-      views={['hours', 'minutes']}
-      renderInput={params => <TextField {...params} variant="standard" />}
-    />
-  </LocalizationProvider>
-)
+export const TimePicker = (props: DateTimePickerProps) => {
+  const [isMobile, setIsMobile] = useState<boolean>(false)
+  useEffect(() => {
+    setIsMobile(!!('ontouchstart' in window || navigator.maxTouchPoints))
+  }, [isMobile])
+
+  return (
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      {isMobile ? (
+        <MobileDateTimePicker
+          {...props}
+          minutesStep={5}
+          renderInput={params => <TextField {...params} variant="standard" />}
+        />
+      ) : (
+        <DateTimePicker
+          {...props}
+          minutesStep={5}
+          renderInput={params => <TextField {...params} variant="standard" />}
+        />
+      )}
+    </LocalizationProvider>
+  )
+}

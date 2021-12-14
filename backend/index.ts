@@ -128,6 +128,17 @@ export const requests = {
       axios.post('/api/comments', payload).then(response => response.data),
     deleteCommentById: (id: string): Promise<{ message: string }> =>
       axios.delete(`/api/comments/${id}`).then(response => response.data),
+    // CLUB
+    changeMemberRole: ({
+      memberId,
+      clubRole,
+    }: {
+      memberId: string
+      clubRole: string
+    }): Promise<{ message: string }> =>
+      axios
+        .post(`/api/club/members/${memberId}/change-role`, { clubRole })
+        .then(response => response.data),
     // MEETINGS
     createNewMeeting: (
       payload: CreateMeetingPayload

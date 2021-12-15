@@ -15,6 +15,7 @@ import {
   PostSimpleDTO,
   ProfileActivityDTO,
   ProfileDTO,
+  DashboardDTO,
 } from 'types/api'
 import {
   AdminRoleAssignPayload,
@@ -86,6 +87,9 @@ export const requests = {
       axios.get('/api/pathways').then(response => response.data),
     getClubRoles: (): Promise<{ id: string; name: string }[]> =>
       axios.get('/api/club-roles').then(response => response.data),
+    // DASHBOARD
+    getDashboard: (): Promise<DashboardDTO> =>
+      axios.get('/api/dashboard').then(response => response.data),
   },
   mutation: {
     // AUTH

@@ -18,6 +18,8 @@ type ContextProps = {
   memberAssignRole: typeof requests['mutation']['memberAssignRole']
   memberUnassignRole: typeof requests['mutation']['memberUnassignRole']
   adminAssignRole: typeof requests['mutation']['adminAssignRole']
+  acceptAssignedRole: typeof requests['mutation']['acceptAssignedRole']
+  approveSpeech: typeof requests['mutation']['toggleSpeechApproval']
 }
 
 const MeetingAgendaContext = createContext<ContextProps>({} as ContextProps)
@@ -46,6 +48,7 @@ export const MeetingAgendaProvider = ({
       queryClient.invalidateQueries('getFullAgenda')
     },
   })
+
   const {
     mutateAsync: memberUnassignRoleMutation,
     isLoading: isUnassigningMemberRole,
@@ -54,6 +57,7 @@ export const MeetingAgendaProvider = ({
       queryClient.invalidateQueries('getFullAgenda')
     },
   })
+
   const {
     mutateAsync: adminAssignRoleMutation,
     isLoading: isAssigningAdminRole,
@@ -62,6 +66,24 @@ export const MeetingAgendaProvider = ({
       queryClient.invalidateQueries('getFullAgenda')
     },
   })
+
+  const { mutateAsync: acceptAssignedRoleMutation } = useTypeSafeMutation(
+    'acceptAssignedRole',
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries('getFullAgenda')
+      },
+    }
+  )
+
+  const { mutateAsync: toggleSpeechApproval } = useTypeSafeMutation(
+    'toggleSpeechApproval',
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries('getFullAgenda')
+      },
+    }
+  )
 
   const value: ContextProps = useMemo(
     () => ({
@@ -76,6 +98,8 @@ export const MeetingAgendaProvider = ({
       memberAssignRole: values => memberAssignRoleMutation([values]),
       memberUnassignRole: values => memberUnassignRoleMutation([values]),
       adminAssignRole: values => adminAssignRoleMutation([values]),
+      acceptAssignedRole: values => acceptAssignedRoleMutation([values]),
+      approveSpeech: values => toggleSpeechApproval([values]),
     }),
     [
       router.query.id,
@@ -88,6 +112,8 @@ export const MeetingAgendaProvider = ({
       memberAssignRoleMutation,
       memberUnassignRoleMutation,
       adminAssignRoleMutation,
+      acceptAssignedRoleMutation,
+      toggleSpeechApproval,
     ]
   )
 

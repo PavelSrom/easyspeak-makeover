@@ -6,7 +6,7 @@ import { useAuth } from 'contexts/auth'
 import { useMeetingAgenda } from 'contexts/meeting-agenda'
 import { createContext, useContext, useMemo, useState } from 'react'
 import { AgendaFullDTO } from 'types/api'
-import { Text } from 'ui'
+import { Button, Text } from 'ui'
 
 type HelperBaseProps = {
   helper: AgendaFullDTO['helpers'][number]
@@ -138,7 +138,7 @@ const DeleteIcon: React.FC = () => {
   const { profile } = useAuth()
 
   // do not show anything if not a board member or not their role
-  if (!isBoardMember || memberId !== profile?.id || roleStatus === 'UNASSIGNED')
+  if (!isBoardMember || memberId !== profile?.id || roleStatus !== 'CONFIRMED')
     return null
 
   return (
@@ -155,8 +155,48 @@ const DeleteIcon: React.FC = () => {
 HelperBase.DeleteIcon = DeleteIcon
 HelperBase.DeleteIcon.displayName = 'HelperBase.DeleteIcon'
 
-// TODO
-const AcceptOrDecline: React.FC = () => null
+const AcceptOrDecline: React.FC = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { acceptAssignedRole, meetingId } = useMeetingAgenda()
+  const { id, memberId, roleStatus } = useHelper()
+  const { profile } = useAuth()
+
+  const handleAccept = (accepted: boolean): void => {
+    setIsLoading(true)
+
+    acceptAssignedRole({
+      meetingId,
+      roleId: id,
+      accepted,
+    }).finally(() => setIsLoading(false))
+  }
+
+  const isMyRole = profile?.id === memberId
+  const isPending = roleStatus === 'PENDING'
+
+  if (!isMyRole) return null
+  if (!isPending) return null
+
+  return (
+    <div className="flex space-x-4 mt-4">
+      <Button
+        color="secondary"
+        loading={isLoading}
+        onClick={() => handleAccept(true)}
+      >
+        Accept
+      </Button>
+      <Button
+        variant="outlined"
+        color="secondary"
+        loading={isLoading}
+        onClick={() => handleAccept(false)}
+      >
+        Decline
+      </Button>
+    </div>
+  )
+}
 
 HelperBase.AcceptOrDecline = AcceptOrDecline
 HelperBase.AcceptOrDecline.displayName = 'HelperBase.AcceptOrDecline'

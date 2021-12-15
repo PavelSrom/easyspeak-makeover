@@ -179,5 +179,36 @@ export const requests = {
       axios
         .post(`/api/meetings/${meetingId}/admin-assign/${roleId}`, { memberId })
         .then(response => response.data),
+    acceptAssignedRole: ({
+      meetingId,
+      roleId,
+      accepted,
+      speech,
+    }: {
+      meetingId: string
+      roleId: string
+      accepted: boolean
+      speech?: { title: string; description: string }
+    }): Promise<{ message: string }> =>
+      axios
+        .post(
+          `/api/meetings/${meetingId}/accept-role/${roleId}?accepted=${accepted}`,
+          { speech }
+        )
+        .then(response => response.data),
+    toggleSpeechApproval: ({
+      meetingId,
+      speechId,
+      approved,
+    }: {
+      meetingId: string
+      speechId: string
+      approved: boolean
+    }): Promise<{ message: string }> =>
+      axios
+        .post(
+          `/api/meetings/${meetingId}/speech-approval/${speechId}?approved=${approved}`
+        )
+        .then(response => response.data),
   },
 }

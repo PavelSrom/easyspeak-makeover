@@ -1,3 +1,4 @@
+import format from 'date-fns/format'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiSession } from 'types/helpers'
 import { prisma } from 'utils/prisma-client'
@@ -423,6 +424,124 @@ export const adminAssignRoleHandler = async (
     })
 
     return res.json({ message: 'Role assigned' })
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
+export const acceptAssignedRoleHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  const { roleId, accepted } = req.query
+  // if accepting a non-speaker role, 'speech' is undefined
+  const { speech } = req.body
+
+  try {
+    const targetRole = await prisma.attendance.findUnique({
+      where: { id: roleId as string },
+      include: { RoleType: { select: { name: true } } },
+    })
+    if (!targetRole) return res.status(404).json({ message: 'Role not found' })
+
+    const roleToEditIsSpeaker = targetRole?.RoleType.name
+      .toLowerCase()
+      .includes('speaker')
+
+    if (roleToEditIsSpeaker) {
+      // if accepting speech, set status to CONFIRMED and create speech
+      if (accepted === 'true') {
+        await prisma.attendance.update({
+          where: { id: targetRole.id },
+          data: {
+            roleStatus: 'CONFIRMED',
+            Speech: {
+              create: { title: speech.title, description: speech.description },
+            },
+          },
+        })
+      } else {
+        // if rejecting a speech, set status to UNASSIGNED and unlink person
+        await prisma.attendance.update({
+          where: { id: targetRole.id },
+          data: { roleStatus: 'UNASSIGNED', memberId: null },
+        })
+      }
+    }
+
+    await prisma.attendance.update({
+      where: { id: targetRole.id },
+      data: {
+        roleStatus: accepted === 'true' ? 'CONFIRMED' : 'UNASSIGNED',
+        memberId: accepted === 'true' ? session.user.profileId : null,
+      },
+    })
+
+    return res.json({ message: `Role ${accepted ? 'accepted' : 'rejected'}` })
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
+export const toggleSpeechApprovalHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  try {
+    const profile = await prisma.profile.findUnique({
+      where: { id: session.user.profileId },
+    })
+    if (!profile)
+      return res.status(404).json({ message: 'Cannot toggle speech approval' })
+    if (!profile.roleTypeId)
+      return res.status(403).json({ message: 'Access denied' })
+
+    const { approved } = req.query
+    // if 'approved' is not provided
+    if (approved === undefined)
+      return res.status(400).json({ message: 'Cannot toggle speech approval' })
+
+    const targetSpeech = await prisma.speech.findUnique({
+      where: { id: req.query.speechId as string },
+      include: {
+        Attendance: { include: { Meeting: { select: { timeStart: true } } } },
+      },
+    })
+    if (!targetSpeech)
+      return res.status(404).json({ message: 'Speech not found' })
+
+    // if speech should be approved, it's just a simple Attendance update
+    if (approved === 'true') {
+      await prisma.attendance.update({
+        where: { id: targetSpeech.attendanceId },
+        data: { roleStatus: 'CONFIRMED' },
+      })
+
+      return res.json({ message: 'Speech approved' })
+    }
+
+    // update Attendance, send notification to user and remove the speech
+    const attendanceQuery = prisma.attendance.update({
+      where: { id: targetSpeech.attendanceId },
+      data: { roleStatus: 'UNASSIGNED', memberId: null },
+    })
+    const speechQuery = prisma.speech.delete({ where: { id: targetSpeech.id } })
+    const notificationQuery = await prisma.notification.create({
+      data: {
+        title: 'Speech rejected',
+        message: `Your speech on ${format(
+          new Date(targetSpeech.Attendance.Meeting.timeStart),
+          'DD.MM.yyyy'
+        )} has been rejected by a board member`,
+        Receiver: { connect: { id: targetSpeech.Attendance.memberId! } },
+      },
+    })
+
+    await Promise.all([attendanceQuery, speechQuery, notificationQuery])
+
+    return res.json({ message: 'Speech rejected' })
   } catch ({ message }) {
     return res.status(500).json({ message })
   }

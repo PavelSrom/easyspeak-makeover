@@ -11,6 +11,7 @@ import { useTypeSafeQuery } from 'hooks'
 import { useRouter } from 'next/router'
 import { useAuth } from 'contexts/auth'
 import { MeetingCard } from 'components/meeting-card'
+import { useOnboarding } from 'contexts/onboarding'
 
 const Meetings: CustomNextPage = () => {
   const [dayIsClicked, setDayIsClicked] = useState<boolean>(false)
@@ -27,47 +28,50 @@ const Meetings: CustomNextPage = () => {
     null,
     { timeStart: dateRange.start, timeEnd: dateRange.end }
   )
+  useOnboarding({ shown: !!meetingsInMonthQuery.data })
 
   return (
     <Container className="py-4">
-      <StaticDatePicker
-        displayStaticWrapperAs="desktop"
-        openTo="month"
-        views={['day']}
-        value={value}
-        onChange={newDate => {
-          setValue(newDate as Date)
-          setDayIsClicked(true)
-        }}
-        onMonthChange={newDate => {
-          setDateRange({
-            start: startOfMonth(new Date(newDate as Date)).toISOString(),
-            end: endOfMonth(new Date(newDate as Date)).toISOString(),
-          })
-        }}
-        // @ts-ignore
-        renderDay={(day: Date, _value, DayComponentProps) => {
-          const dayHasMeeting = meetingsInMonthQuery.data?.some(
-            meeting =>
-              startOfDay(new Date(meeting.timeStart)).getTime() ===
-              startOfDay(new Date(day)).getTime()
-          )
+      <div className="onboarding-6">
+        <StaticDatePicker
+          displayStaticWrapperAs="desktop"
+          openTo="month"
+          views={['day']}
+          value={value}
+          onChange={newDate => {
+            setValue(newDate as Date)
+            setDayIsClicked(true)
+          }}
+          onMonthChange={newDate => {
+            setDateRange({
+              start: startOfMonth(new Date(newDate as Date)).toISOString(),
+              end: endOfMonth(new Date(newDate as Date)).toISOString(),
+            })
+          }}
+          // @ts-ignore
+          renderDay={(day: Date, _value, DayComponentProps) => {
+            const dayHasMeeting = meetingsInMonthQuery.data?.some(
+              meeting =>
+                startOfDay(new Date(meeting.timeStart)).getTime() ===
+                startOfDay(new Date(day)).getTime()
+            )
 
-          return (
-            <Badge
-              classes={{ badge: 'top-7 left-3 w-2' }}
-              color="secondary"
-              variant="dot"
-              invisible={!dayHasMeeting}
-            >
-              <PickersDay {...DayComponentProps} />
-            </Badge>
-          )
-        }}
-      />
+            return (
+              <Badge
+                classes={{ badge: 'top-7 left-3 w-2' }}
+                color="secondary"
+                variant="dot"
+                invisible={!dayHasMeeting}
+              >
+                <PickersDay {...DayComponentProps} />
+              </Badge>
+            )
+          }}
+        />
+      </div>
 
       <Paper className="mt-4 p-4">
-        <Text variant="h1_light" className="mb-4">
+        <Text variant="h1_light" className="mb-4 onboarding-7">
           Next meetings
         </Text>
         {(meetingsInMonthQuery.data ?? []).map(meeting => (
@@ -85,9 +89,7 @@ const Meetings: CustomNextPage = () => {
           color="secondary"
           size="medium"
           className="fixed bottom-4 right-4 text-white"
-          onClick={() =>
-            router.push(`/meetings/add`)
-          }
+          onClick={() => router.push(`/meetings/add`)}
         >
           <AddOutlined />
           Create meeting

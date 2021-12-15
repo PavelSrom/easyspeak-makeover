@@ -13,6 +13,7 @@ import {
 import { Button, Text } from 'ui'
 import { useAuth } from 'contexts/auth'
 import { useSnackbar } from 'notistack'
+import { useOnboarding } from 'contexts/onboarding'
 
 type Props = {
   meetingId: string
@@ -28,6 +29,7 @@ export const MeetingDetails = ({ meetingId }: Props) => {
     { enabled: !!meetingId },
     meetingId
   )
+  useOnboarding({ shown: !!meetingDetailsQuery.data })
 
   const { mutateAsync: toggleAttendance, isLoading: isTogglingAttendance } =
     useTypeSafeMutation('toggleMeetingAttendance', {
@@ -59,7 +61,7 @@ export const MeetingDetails = ({ meetingId }: Props) => {
 
   return (
     <>
-      <Paper className="p-4 mb-8 space-y-2">
+      <Paper className="p-4 mb-8 space-y-2 onboarding-8">
         <Text variant="h1_light">{meetingDetailsQuery.data.title}</Text>
         <div className="flex items-center">
           <LocationOn className="mr-2" />

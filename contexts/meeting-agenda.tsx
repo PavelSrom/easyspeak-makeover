@@ -8,6 +8,7 @@ import { useRouter } from 'next/router'
 import { createContext, useContext, useMemo } from 'react'
 import { AgendaFullDTO, MemberSchemaDTO } from 'types/api'
 import { useAuth } from './auth'
+import { useOnboarding } from './onboarding'
 
 type ContextProps = {
   meetingId: string
@@ -39,6 +40,7 @@ export const MeetingAgendaProvider = ({
     { enabled: !!router.query.id },
     router.query.id as string
   )
+  useOnboarding({ shown: !!membersQuery.data && !!agendaQuery.data })
 
   const {
     mutateAsync: memberAssignRoleMutation,

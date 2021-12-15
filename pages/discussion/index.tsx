@@ -2,6 +2,7 @@ import { AddOutlined } from '@mui/icons-material'
 import { Container, Fab } from '@mui/material'
 import { NewPostDialog } from 'components/new-post-dialog'
 import { PostCard } from 'components/post-card'
+import { useOnboarding } from 'contexts/onboarding'
 import {
   useTypeSafeMutation,
   useTypeSafeQuery,
@@ -19,6 +20,7 @@ const Discussion: CustomNextPage = () => {
   const router = useRouter()
 
   const postsQuery = useTypeSafeQuery('getAllPosts')
+  useOnboarding({ shown: !!postsQuery.data && postsQuery.isSuccess })
 
   const { mutateAsync: createNewPost, isLoading: isCreatingNewPost } =
     useTypeSafeMutation('createNewPost', {
@@ -60,7 +62,7 @@ const Discussion: CustomNextPage = () => {
         variant="extended"
         color="secondary"
         size="medium"
-        className="fixed bottom-4 right-4 text-white"
+        className="fixed bottom-4 right-4 text-white onboarding-4"
         onClick={() => setNewPostDialogOpen(true)}
       >
         <AddOutlined />

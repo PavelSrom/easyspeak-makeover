@@ -5,7 +5,11 @@ export const getServerSideProps = withAuth(async ({ session }) => ({
   props: { session },
 }))
 
-const Dashboard: CustomNextPage = () => <p>Protected dashboard page</p>
+const Dashboard: CustomNextPage = () => (
+  <>
+    <p className="onboarding-1">Protected dashboard page</p>
+  </>
+)
 
 Dashboard.pageTitle = 'Dashboard'
 

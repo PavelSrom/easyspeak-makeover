@@ -171,15 +171,6 @@ export const toggleMeetingAttendanceHandler = async (
         },
       })
 
-      // TODO: remove this once testing of notifs is completed
-      await prisma.notification.create({
-        data: {
-          Receiver: { connect: { id: session.user.profileId } },
-          title: 'Meeting attendance',
-          message: 'You are coming to a meeting',
-        },
-      })
-
       return res.json({ message: 'You are attending' })
     }
     if (alreadyAttending?.RoleType.name !== 'Coming') {
@@ -281,7 +272,11 @@ export const memberAssignRoleHandler = async (
         meetingId: req.query.id as string,
         roleTypeId: req.query.roleId as string,
       },
-      include: { RoleType: true },
+      include: {
+        RoleType: true,
+        Meeting: { select: { managerId: true, timeStart: true } },
+        Member: { select: { name: true, surname: true } },
+      },
     })
 
     if (!targetRole) return res.status(404).json({ message: 'Role not found' })
@@ -316,7 +311,19 @@ export const memberAssignRoleHandler = async (
         },
       })
 
-      // TODO: send notification to meeting manager to approve it
+      // send notification to meeting manager to approve it
+      await prisma.notification.create({
+        data: {
+          Receiver: { connect: { id: targetRole.Meeting.managerId } },
+          title: 'Request for a speech',
+          message: `${targetRole.Member?.name} ${
+            targetRole.Member?.surname
+          } has requested a speech on ${format(
+            new Date(targetRole.Meeting.timeStart),
+            'DD.MM.yyyy'
+          )}`,
+        },
+      })
     }
 
     await prisma.attendance.update({
@@ -401,6 +408,10 @@ export const adminAssignRoleHandler = async (
         meetingId: req.query.id as string,
         roleTypeId: req.query.roleId as string,
       },
+      include: {
+        RoleType: { select: { name: true } },
+        Meeting: { select: { timeStart: true } },
+      },
     })
 
     if (!targetRole) return res.status(404).json({ message: 'Role not found' })
@@ -423,6 +434,21 @@ export const adminAssignRoleHandler = async (
         roleStatus: 'PENDING',
       },
     })
+
+    if (memberId !== session.user.profileId) {
+      await prisma.notification.create({
+        data: {
+          Receiver: { connect: { id: memberId } },
+          title: 'Role assignment',
+          message: `You were assigned the role '${
+            targetRole.RoleType.name
+          }' on ${format(
+            new Date(targetRole.Meeting.timeStart),
+            'DD.MM.yyyy'
+          )}`,
+        },
+      })
+    }
 
     return res.json({ message: 'Role assigned' })
   } catch ({ message }) {
@@ -529,18 +555,24 @@ export const toggleSpeechApprovalHandler = async (
       data: { roleStatus: 'UNASSIGNED', memberId: null },
     })
     const speechQuery = prisma.speech.delete({ where: { id: targetSpeech.id } })
-    const notificationQuery = await prisma.notification.create({
-      data: {
-        title: 'Speech rejected',
-        message: `Your speech on ${format(
-          new Date(targetSpeech.Attendance.Meeting.timeStart),
-          'DD.MM.yyyy'
-        )} has been rejected by a board member`,
-        Receiver: { connect: { id: targetSpeech.Attendance.memberId! } },
-      },
-    })
 
-    await Promise.all([attendanceQuery, speechQuery, notificationQuery])
+    await Promise.all([attendanceQuery, speechQuery])
+
+    // if approving/rejecting a speech other than my own, send a notification
+    if (targetSpeech.Attendance.memberId !== session.user.profileId) {
+      await prisma.notification.create({
+        data: {
+          title: 'Speech rejected',
+          message: `Your speech on ${format(
+            new Date(targetSpeech.Attendance.Meeting.timeStart),
+            'DD.MM.yyyy'
+          )} has been ${
+            approved === 'true' ? 'approved' : 'rejected'
+          } by a board member`,
+          Receiver: { connect: { id: targetSpeech.Attendance.memberId! } },
+        },
+      })
+    }
 
     return res.json({ message: 'Speech rejected' })
   } catch ({ message }) {

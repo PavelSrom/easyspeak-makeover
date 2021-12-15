@@ -125,6 +125,9 @@ export const requests = {
       axios.put(`/api/posts/${id}`, payload).then(response => response.data),
     deletePostById: (id: string): Promise<{ message: string }> =>
       axios.delete(`/api/posts/${id}`).then(response => response.data),
+    // PIN
+    tooglePostPinStatus: (id: string): Promise<{ message: string }> =>
+      axios.put(`/api/posts/${id}/pin`).then(response => response.data),
     // COMMENTS
     createNewComment: (payload: CreateCommentPayload): Promise<CommentDTO> =>
       axios.post('/api/comments', payload).then(response => response.data),

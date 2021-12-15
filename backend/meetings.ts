@@ -63,6 +63,7 @@ export const getMeetingByIdHandler = async (
           distinct: ['memberId'],
           orderBy: { Member: { surname: 'asc' } },
           select: {
+            roleStatus: true,
             Member: {
               select: { id: true, avatar: true, name: true, surname: true },
             },

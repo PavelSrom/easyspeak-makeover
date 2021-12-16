@@ -10,7 +10,7 @@ type Props = {
 }
 
 export const PostCard = ({ post, onNavigate }: Props) => (
-  <Paper className="p-4 rounded-xl">
+  <Paper className="p-4 rounded-xl cursor-pointer">
     <div className="flex items-center">
       <Avatar src={post.Author.avatar ?? ''} className="w-12 h-12" />
       <div className="ml-4">

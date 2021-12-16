@@ -5,6 +5,7 @@ import { AssignRoleDialog } from 'components/assign-role-dialog'
 import { RequestSpeechDialog } from 'components/request-speech-dialog'
 import { useAuth } from 'contexts/auth'
 import { useMeetingAgenda } from 'contexts/meeting-agenda'
+import router from 'next/router'
 import { createContext, useContext, useMemo, useState } from 'react'
 import { AgendaFullDTO } from 'types/api'
 import { Button, ConfirmationDialog, Text } from 'ui'
@@ -141,7 +142,6 @@ const Information: React.FC = () => {
           <Text variant="caption">
             {`${Member?.name} ${Member?.surname}`} (pending)
           </Text>
-
           <div className="mt-2">
             <Text variant="body2" className="font-semibold">
               {Speech?.title}

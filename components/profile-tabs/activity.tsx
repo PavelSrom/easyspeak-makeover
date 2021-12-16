@@ -46,12 +46,13 @@ export const ProfileActivity = () => {
               <div
                 key={post.id}
                 onClick={() => router.push(`/discussion/${post.id}`)}
+                className="cursor-pointer hover:opacity-75"
               >
                 <Text variant="h1">{post.title}</Text>
                 <Text>{post.body.slice(0, 250)}</Text>
-              </div>
 
-              <Divider className="my-4" />
+                <Divider className="my-4" />
+              </div>
             </>
           ))
         ) : (

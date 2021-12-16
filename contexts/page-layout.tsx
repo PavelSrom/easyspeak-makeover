@@ -73,7 +73,11 @@ export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
 
   const drawer = (
     <div className="p-4 bg-primary h-full flex flex-col">
-      <div className="flex">
+      <div
+        className="flex cursor-pointer"
+        onClick={() => router.push(`/profile`)}
+        role="link"
+      >
         <Avatar src={profile?.avatar ?? ''} className="w-16 h-16" />
         <div className="pl-4">
           <Text

@@ -19,7 +19,9 @@ export const NotificationPopper = () => {
   const queryClient = useTypeSafeQueryClient()
   const { optimisticUpdate, rollback } = useTypeSafeOptimisticUpdate()
 
-  const { data: notifications = [] } = useTypeSafeQuery('getAllNotifications')
+  const { data: notifications = [] } = useTypeSafeQuery('getAllNotifications', {
+    refetchInterval: 30_000, // refetch every 30 seconds
+  })
 
   const { mutateAsync: markNotifsAsRead } = useTypeSafeMutation(
     'markNotificationsAsRead',

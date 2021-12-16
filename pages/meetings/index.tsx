@@ -114,8 +114,7 @@ const Meetings: CustomNextPage = () => {
             />
           ))
         ) : (
-          // TODO: A better message for the user
-          <Text>No meetings is found</Text>
+          <Text className="text-center">(No meetings have been found)</Text>
         )}
         <div
           className={clsx('text-center width-full mt-2', {

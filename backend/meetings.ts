@@ -320,7 +320,7 @@ export const memberAssignRoleHandler = async (
             targetRole.Member?.surname
           } has requested a speech on ${format(
             new Date(targetRole.Meeting.timeStart),
-            'DD.MM.yyyy'
+            'dd.MM.yyyy'
           )}`,
         },
       })
@@ -436,6 +436,7 @@ export const adminAssignRoleHandler = async (
     })
 
     if (memberId !== session.user.profileId) {
+      console.log('send notification')
       await prisma.notification.create({
         data: {
           Receiver: { connect: { id: memberId } },
@@ -444,7 +445,7 @@ export const adminAssignRoleHandler = async (
             targetRole.RoleType.name
           }' on ${format(
             new Date(targetRole.Meeting.timeStart),
-            'DD.MM.yyyy'
+            'dd.MM.yyyy'
           )}`,
         },
       })
@@ -565,7 +566,7 @@ export const toggleSpeechApprovalHandler = async (
           title: 'Speech rejected',
           message: `Your speech on ${format(
             new Date(targetSpeech.Attendance.Meeting.timeStart),
-            'DD.MM.yyyy'
+            'dd.MM.yyyy'
           )} has been ${
             approved === 'true' ? 'approved' : 'rejected'
           } by a board member`,

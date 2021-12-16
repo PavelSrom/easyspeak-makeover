@@ -53,7 +53,7 @@ const SignIn: CustomNextPage = () => {
       >
         <Form className="space-y-6">
           <TextField name="email" label="Email" />
-          <TextField name="password" label="Password" />
+          <TextField name="password" type="password" label="Password" />
           <Button
             type="submit"
             fullWidth

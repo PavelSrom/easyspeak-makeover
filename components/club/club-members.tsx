@@ -110,50 +110,61 @@ export const ClubMembers = () => {
         </Text>
         {clubMembersQuery.isLoading && <p>Loading...</p>}
         {clubMembersQuery.isError && <p>Error!</p>}
-        {clubMembersQuery.isSuccess &&
-          clubMembersQuery.data &&
-          clubMembersQuery.data.pendingInvites.map(invite => (
-            <Fragment key={invite.id}>
-              <div className="flex">
-                <Divider className="my-4" />
-                <div className="flex-1 flex justify-between items-start">
-                  <div>
-                    <Text className="font-semibold">{invite.email}</Text>
-                    <Text variant="body2">
-                      {formatDistance(new Date(invite.createdAt), new Date())}{' '}
-                      ago
-                    </Text>
-                    {invite.invitationSent && (
-                      <div className="flex items-center">
-                        <MarkEmailRead className="text-lg mr-2" />
-                        <Text variant="caption">Email sent</Text>
+        {clubMembersQuery.isSuccess && clubMembersQuery.data && (
+          <>
+            {clubMembersQuery.data.pendingInvites.length > 0 ? (
+              clubMembersQuery.data.pendingInvites.map(invite => (
+                <Fragment key={invite.id}>
+                  <div className="flex">
+                    <Divider className="my-4" />
+                    <div className="flex-1 flex justify-between items-start">
+                      <div>
+                        <Text className="font-semibold">{invite.email}</Text>
+                        <Text variant="body2">
+                          {formatDistance(
+                            new Date(invite.createdAt),
+                            new Date()
+                          )}{' '}
+                          ago
+                        </Text>
+                        {invite.invitationSent && (
+                          <div className="flex items-center">
+                            <MarkEmailRead className="text-lg mr-2" />
+                            <Text variant="caption">Email sent</Text>
+                          </div>
+                        )}
                       </div>
-                    )}
+                      <div className="flex space-x-2 relative -right-2">
+                        <IconButton
+                          size="small"
+                          edge="end"
+                          disabled={isResendingInvitation}
+                          onClick={() => resendInvitation([invite.id])}
+                        >
+                          <Email />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          edge="end"
+                          disabled={isDeletingInvite}
+                          onClick={() => deleteMemberInvite([invite.id])}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex space-x-2 relative -right-2">
-                    <IconButton
-                      size="small"
-                      edge="end"
-                      disabled={isResendingInvitation}
-                      onClick={() => resendInvitation([invite.id])}
-                    >
-                      <Email />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      edge="end"
-                      disabled={isDeletingInvite}
-                      onClick={() => deleteMemberInvite([invite.id])}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </div>
-                </div>
-              </div>
 
-              <Divider className="my-4" />
-            </Fragment>
-          ))}
+                  <Divider className="my-4" />
+                </Fragment>
+              ))
+            ) : (
+              <Text className="text-center">
+                (There are no pending invites)
+              </Text>
+            )}
+          </>
+        )}
       </Paper>
 
       <Fab

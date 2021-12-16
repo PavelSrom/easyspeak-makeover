@@ -23,17 +23,15 @@ export const ProfileActivity = () => {
           Next meetings
         </Text>
         {meetings.length > 0 ? (
-          <div className="divide-y-2">
-            {meetings.map(meeting => (
-              <MeetingCard
-                key={meeting.id}
-                meeting={meeting}
-                onNavigate={() => router.push(`/meetings/${meeting.id}`)}
-              />
-            ))}
-          </div>
+          meetings.map(meeting => (
+            <MeetingCard
+              key={meeting.id}
+              meeting={meeting}
+              onNavigate={() => router.push(`/meetings/${meeting.id}`)}
+            />
+          ))
         ) : (
-          <Text className="text-center">(There are no meetings yet)</Text>
+          <Text className="text-center">(No meetings have been found)</Text>
         )}
       </Paper>
 

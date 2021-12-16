@@ -7,7 +7,7 @@ import { useAuth } from 'contexts/auth'
 import { useMeetingAgenda } from 'contexts/meeting-agenda'
 import { createContext, useContext, useMemo, useState } from 'react'
 import { AgendaFullDTO } from 'types/api'
-import { Button, Text } from 'ui'
+import { Button, ConfirmationDialog, Text } from 'ui'
 
 type SpeakerBaseProps = {
   speaker: AgendaFullDTO['speakers'][number]
@@ -53,12 +53,12 @@ const useSpeaker = (): SpeakerBaseProps['speaker'] => {
 
 const AddButtonOrAvatar: React.FC = () => {
   const [speechDialogOpen, setSpeechDialogOpen] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [assignRoleDialogOpen, setAssignRoleDialogOpen] =
     useState<boolean>(false)
   const { profile } = useAuth()
   const {
     isBoardMember,
-    isAssigningRole,
     meetingId,
     meetingIsReadOnly,
     members,
@@ -85,7 +85,7 @@ const AddButtonOrAvatar: React.FC = () => {
             color="secondary"
             size="small"
             className="text-white"
-            disabled={isAssigningRole || meetingIsReadOnly}
+            disabled={meetingIsReadOnly}
             onClick={handleButtonClick}
           >
             <AddOutlined />
@@ -93,7 +93,7 @@ const AddButtonOrAvatar: React.FC = () => {
 
           <RequestSpeechDialog
             open={speechDialogOpen}
-            isSubmitting={isAssigningRole}
+            isSubmitting={isLoading}
             onClose={() => setSpeechDialogOpen(false)}
             onRequest={values =>
               memberAssignRole({
@@ -108,10 +108,14 @@ const AddButtonOrAvatar: React.FC = () => {
             open={assignRoleDialogOpen}
             defaultValue={profile?.id ?? ''}
             members={members}
+            loading={isLoading}
             onClose={() => setAssignRoleDialogOpen(false)}
             onAssign={async ({ memberId }) => {
+              setIsLoading(true)
+
               await adminAssignRole({ memberId, meetingId, roleId: roleTypeId })
               setAssignRoleDialogOpen(false)
+              setIsLoading(false)
             }}
           />
         </>
@@ -170,6 +174,8 @@ SpeakerBase.Information.displayName = 'SpeakerBase.Information'
 const DeleteIcon: React.FC = () => {
   const { isBoardMember, memberUnassignRole, meetingId, meetingIsReadOnly } =
     useMeetingAgenda()
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const { memberId, roleTypeId, roleStatus } = useSpeaker()
   const { profile } = useAuth()
 
@@ -182,13 +188,29 @@ const DeleteIcon: React.FC = () => {
   if (meetingIsReadOnly) return null
 
   return (
-    <IconButton
-      size="small"
-      edge="end"
-      onClick={() => memberUnassignRole({ meetingId, roleId: roleTypeId })}
-    >
-      <Delete />
-    </IconButton>
+    <>
+      <IconButton
+        size="small"
+        edge="end"
+        onClick={() => setConfirmDialogOpen(true)}
+      >
+        <Delete />
+      </IconButton>
+
+      <ConfirmationDialog
+        loading={isLoading}
+        open={confirmDialogOpen}
+        onClose={() => setConfirmDialogOpen(false)}
+        onConfirm={async () => {
+          setIsLoading(true)
+
+          await memberUnassignRole({ meetingId, roleId: roleTypeId })
+          setIsLoading(false)
+        }}
+        description="Are you sure you want to remove yourself from this role?"
+        confirmText="Remove"
+      />
+    </>
   )
 }
 

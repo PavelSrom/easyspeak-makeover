@@ -14,7 +14,6 @@ type ContextProps = {
   meetingId: string
   meetingIsReadOnly: boolean
   isBoardMember: boolean
-  isAssigningRole: boolean
   agenda: AgendaFullDTO
   members: MemberSchemaDTO['clubMembers']
   memberAssignRole: typeof requests['mutation']['memberAssignRole']
@@ -45,32 +44,32 @@ export const MeetingAgendaProvider = ({
   )
   useOnboarding({ shown: !!membersQuery.data && !!agendaQuery.data })
 
-  const {
-    mutateAsync: memberAssignRoleMutation,
-    isLoading: isAssigningMemberRole,
-  } = useTypeSafeMutation('memberAssignRole', {
-    onSettled: () => {
-      queryClient.invalidateQueries('getFullAgenda')
-    },
-  })
+  const { mutateAsync: memberAssignRoleMutation } = useTypeSafeMutation(
+    'memberAssignRole',
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries('getFullAgenda')
+      },
+    }
+  )
 
-  const {
-    mutateAsync: memberUnassignRoleMutation,
-    isLoading: isUnassigningMemberRole,
-  } = useTypeSafeMutation('memberUnassignRole', {
-    onSettled: () => {
-      queryClient.invalidateQueries('getFullAgenda')
-    },
-  })
+  const { mutateAsync: memberUnassignRoleMutation } = useTypeSafeMutation(
+    'memberUnassignRole',
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries('getFullAgenda')
+      },
+    }
+  )
 
-  const {
-    mutateAsync: adminAssignRoleMutation,
-    isLoading: isAssigningAdminRole,
-  } = useTypeSafeMutation('adminAssignRole', {
-    onSettled: () => {
-      queryClient.invalidateQueries('getFullAgenda')
-    },
-  })
+  const { mutateAsync: adminAssignRoleMutation } = useTypeSafeMutation(
+    'adminAssignRole',
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries('getFullAgenda')
+      },
+    }
+  )
 
   const { mutateAsync: acceptAssignedRoleMutation } = useTypeSafeMutation(
     'acceptAssignedRole',
@@ -95,10 +94,6 @@ export const MeetingAgendaProvider = ({
       meetingId: router.query.id as string,
       meetingIsReadOnly: new Date(meetingStart) < new Date(),
       isBoardMember: !!profile?.roleTypeId ?? false,
-      isAssigningRole:
-        isAssigningMemberRole ||
-        isUnassigningMemberRole ||
-        isAssigningAdminRole,
       agenda: agendaQuery.data!,
       members: membersQuery.data?.clubMembers ?? [],
       memberAssignRole: values => memberAssignRoleMutation([values]),
@@ -111,9 +106,6 @@ export const MeetingAgendaProvider = ({
       router.query.id,
       meetingStart,
       profile?.roleTypeId,
-      isAssigningMemberRole,
-      isUnassigningMemberRole,
-      isAssigningAdminRole,
       agendaQuery.data,
       membersQuery.data,
       memberAssignRoleMutation,

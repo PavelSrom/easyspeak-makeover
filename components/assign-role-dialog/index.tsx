@@ -7,6 +7,7 @@ type Props = {
   open: boolean
   defaultValue: string
   members: MemberSchemaDTO['clubMembers']
+  loading: boolean
   onClose: () => void
   onAssign: (values: { memberId: string }) => void
 }
@@ -15,6 +16,7 @@ export const AssignRoleDialog = ({
   open,
   defaultValue,
   members,
+  loading,
   onClose,
   onAssign,
 }: Props) => (
@@ -45,7 +47,7 @@ export const AssignRoleDialog = ({
           <Button variant="outlined" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" color="secondary">
+          <Button loading={loading} type="submit" color="secondary">
             Assign
           </Button>
         </DialogActions>

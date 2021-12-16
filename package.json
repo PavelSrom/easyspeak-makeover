@@ -15,7 +15,8 @@
     "prisma:studio": "npx prisma studio",
     "prisma:edit-db": "npm run prisma:push && npm run prisma:generate",
     "prisma:seed": "npx prisma db seed",
-    "test": "jest -i"
+    "test": "jest",
+    "cypress:open": "cypress open"
   },
   "dependencies": {
     "@emotion/cache": "^11.6.0",
@@ -45,6 +46,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@testing-library/react": "^12.1.2",
     "@types/bcryptjs": "^2.4.2",
     "@types/jest": "^27.0.3",
     "@types/node": "16.11.10",
@@ -52,6 +54,7 @@
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "autoprefixer": "^10.4.0",
+    "cypress": "^9.1.1",
     "eslint": "^8.3.0",
     "eslint-config-airbnb": "^19.0.1",
     "eslint-config-airbnb-typescript": "^16.0.0",

@@ -37,10 +37,10 @@ export const RequestSpeechDialog = ({
       validationSchema={requestSpeechSchema}
       onSubmit={onRequest}
     >
-      <Form>
+      <Form className="space-y-4">
         <TextField name="title" label="Speech title" />
         <TextField name="description" label="Speech description" />
-        <DialogActions className="px-0 pt-6 pb-0">
+        <DialogActions className="px-0 pt-2 pb-0">
           <Button variant="outlined" onClick={onClose}>
             Cancel
           </Button>

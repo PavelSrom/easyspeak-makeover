@@ -116,7 +116,7 @@ export const MeetingAgendaProvider = ({
     ]
   )
 
-  if (agendaQuery.isLoading) return <p>Loading...</p>
+  if (agendaQuery.isLoading || membersQuery.isLoading) return <p>Loading...</p>
   if (agendaQuery.isError || !agendaQuery.data || !membersQuery.data)
     return <p>Error!</p>
 

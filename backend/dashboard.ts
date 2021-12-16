@@ -1,4 +1,3 @@
-import { Attendance, PrismaPromise } from '@prisma/client'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiSession } from 'types/helpers'
 import { prisma } from 'utils/prisma-client'
@@ -8,8 +7,9 @@ export const getDashBoardHandler = async (
   res: NextApiResponse,
   session: ApiSession
 ) => {
+  let requestedItemsQuery
+
   try {
-    let requestedItemsQuery: PrismaPromise<Attendance> | []
     const clubInfoQuery = await prisma.club.findUnique({
       where: { id: session.user.clubId },
       select: {

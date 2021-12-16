@@ -4,7 +4,6 @@ import {
   Divider,
   IconButton,
   Menu,
-  MenuItem,
   Paper,
 } from '@mui/material'
 import MoreVert from '@mui/icons-material/MoreVert'
@@ -21,6 +20,9 @@ import { Text } from 'ui'
 import { useAuth } from 'contexts/auth'
 import { useSnackbar } from 'notistack'
 import { PostComments } from 'components/post-comments'
+import Delete from '@mui/icons-material/Delete'
+import { MenuItem } from 'ui/menu-item'
+import { PushPin } from '@mui/icons-material'
 
 const PostDetail: CustomNextPage = () => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null)
@@ -34,7 +36,6 @@ const PostDetail: CustomNextPage = () => {
     { enabled: !!router.query.id },
     router.query.id as string
   )
-  console.log(postDetailQuery.data)
 
   const { mutateAsync: deletePost, isLoading: isDeletingPost } =
     useTypeSafeMutation('deletePostById', {
@@ -52,6 +53,27 @@ const PostDetail: CustomNextPage = () => {
       },
     })
 
+  const { mutateAsync: tooglePostPinStatus, isLoading: isPinningPost } =
+    useTypeSafeMutation('tooglePostPinStatus', {
+      onSuccess: data => {
+        enqueueSnackbar(data.message, { variant: 'success' })
+      },
+      onError: err => {
+        enqueueSnackbar(
+          err.response.data.message ?? 'Club already got a pinned post',
+          {
+            variant: 'error',
+          }
+        )
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries([
+          'getPostById',
+          router.query.id as string,
+        ])
+      },
+    })
+
   if (postDetailQuery.isLoading) return <p>Loading...</p>
   if (postDetailQuery.isError || !postDetailQuery.data) return <p>Error!</p>
 
@@ -64,13 +86,22 @@ const PostDetail: CustomNextPage = () => {
         open={!!anchorEl}
         onClose={() => setAnchorEl(null)}
       >
-        {profile?.roleTypeId && <MenuItem>Pin post (TODO)</MenuItem>}
+        {profile?.roleTypeId && (
+          <MenuItem
+            disabled={isPinningPost}
+            onClick={() => tooglePostPinStatus([post.id])}
+            label={post.isPinned ? 'Delete pin' : 'Pin post'}
+            icon={<PushPin />}
+            variant={post.isPinned ? 'danger' : 'neutral'}
+          />
+        )}
         <MenuItem
           disabled={isDeletingPost}
           onClick={() => deletePost([post.id])}
-        >
-          Delete post
-        </MenuItem>
+          variant="danger"
+          icon={<Delete />}
+          label="Delete post"
+        />
       </Menu>
 
       <Paper className="p-4 rounded-xl">

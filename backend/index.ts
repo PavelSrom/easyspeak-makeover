@@ -15,6 +15,7 @@ import {
   PostSimpleDTO,
   ProfileActivityDTO,
   ProfileDTO,
+  DashboardDTO,
 } from 'types/api'
 import {
   AdminRoleAssignPayload,
@@ -86,6 +87,9 @@ export const requests = {
       axios.get('/api/pathways').then(response => response.data),
     getClubRoles: (): Promise<{ id: string; name: string }[]> =>
       axios.get('/api/club-roles').then(response => response.data),
+    // DASHBOARD
+    getDashboard: (): Promise<DashboardDTO> =>
+      axios.get('/api/dashboard').then(response => response.data),
   },
   mutation: {
     // AUTH
@@ -125,6 +129,9 @@ export const requests = {
       axios.put(`/api/posts/${id}`, payload).then(response => response.data),
     deletePostById: (id: string): Promise<{ message: string }> =>
       axios.delete(`/api/posts/${id}`).then(response => response.data),
+    // PIN
+    tooglePostPinStatus: (id: string): Promise<{ message: string }> =>
+      axios.put(`/api/posts/${id}/pin`).then(response => response.data),
     // COMMENTS
     createNewComment: (payload: CreateCommentPayload): Promise<CommentDTO> =>
       axios.post('/api/comments', payload).then(response => response.data),

@@ -31,9 +31,9 @@ export const theme = createTheme({
       main: '#009FB2',
       dark: '#004662',
     },
-    text:{
+    text: {
       primary: '#515151',
-    }
+    },
   },
   breakpoints: {
     values: {
@@ -48,11 +48,11 @@ export const theme = createTheme({
 
 declare module '@mui/material/styles' {
   interface Palette {
-    neutral: Palette['primary'];
+    neutral: Palette['primary']
   }
 
   // allow configuration using `createTheme`
   interface PaletteOptions {
-    neutral?: PaletteOptions['primary'];
+    neutral?: PaletteOptions['primary']
   }
 }

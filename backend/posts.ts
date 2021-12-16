@@ -154,18 +154,41 @@ export const deletePostByIdHandler = async (
   }
 }
 
-// export const togglePostPinStatusHandler = async (
-//   req: NextApiRequest,
-//   res: NextApiResponse,
-//   session: ApiSession
-// ) => {
-//   const { pin } = req.query
+export const togglePostPinStatusHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  try {
+    const postToTogglePin = await prisma.post.findUnique({
+      where: { id: req.query.id as string },
+    })
 
-//   try {
-//     const postToTogglePin = await prisma.post.findUnique({
-//       where: { id: req.query.id as string },
-//     })
-//   } catch ({ message }) {
-//     return res.status(500).json({ message })
-//   }
-// }
+    if (postToTogglePin?.isPinned) {
+      await prisma.post.update({
+        where: { id: req.query.id as string },
+        data: { isPinned: false },
+      })
+      return res.json({ message: 'Pin is removed from post' })
+    }
+    const pinnedPostInClub = await prisma.post.findFirst({
+      where: {
+        clubId: session.user.clubId as string,
+        isPinned: true as boolean,
+      },
+    })
+    if (pinnedPostInClub) {
+      return res
+        .status(404)
+        .json({ message: 'Pinned post in club already exist' })
+    }
+
+    await prisma.post.update({
+      where: { id: req.query.id as string },
+      data: { isPinned: true },
+    })
+    return res.json({ message: 'Post is pinned' })
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}

@@ -6,7 +6,6 @@ import { BoardMemberItem } from './club-boardmember-item'
 // TODO: remove lorem ipsum
 
 export const ClubBoard = () => {
-
   const clubBoardQuery = useTypeSafeQuery('getClubBoard')
 
   return (

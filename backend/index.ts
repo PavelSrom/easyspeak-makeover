@@ -15,6 +15,7 @@ import {
   PostSimpleDTO,
   ProfileActivityDTO,
   ProfileDTO,
+  DashboardDTO,
 } from 'types/api'
 import {
   AdminRoleAssignPayload,
@@ -86,6 +87,9 @@ export const requests = {
       axios.get('/api/pathways').then(response => response.data),
     getClubRoles: (): Promise<{ id: string; name: string }[]> =>
       axios.get('/api/club-roles').then(response => response.data),
+    // DASHBOARD
+    getDashboard: (): Promise<DashboardDTO> =>
+      axios.get('/api/dashboard').then(response => response.data),
   },
   mutation: {
     // AUTH
@@ -97,6 +101,8 @@ export const requests = {
       axios
         .delete(`/api/auth/create-member/${id}`)
         .then(response => response.data),
+    resendInvitationEmail: (id: string): Promise<{ message: string }> =>
+      axios.post(`/api/auth/email/${id}`).then(response => response.data),
     authCheckUser: (email: string): Promise<{ id: string }> =>
       axios
         .post('/api/auth/check-user', { email })
@@ -123,6 +129,9 @@ export const requests = {
       axios.put(`/api/posts/${id}`, payload).then(response => response.data),
     deletePostById: (id: string): Promise<{ message: string }> =>
       axios.delete(`/api/posts/${id}`).then(response => response.data),
+    // PIN
+    tooglePostPinStatus: (id: string): Promise<{ message: string }> =>
+      axios.put(`/api/posts/${id}/pin`).then(response => response.data),
     // COMMENTS
     createNewComment: (payload: CreateCommentPayload): Promise<CommentDTO> =>
       axios.post('/api/comments', payload).then(response => response.data),
@@ -178,6 +187,37 @@ export const requests = {
     }: AdminRoleAssignPayload): Promise<{ message: string }> =>
       axios
         .post(`/api/meetings/${meetingId}/admin-assign/${roleId}`, { memberId })
+        .then(response => response.data),
+    acceptAssignedRole: ({
+      meetingId,
+      roleId,
+      accepted,
+      speech,
+    }: {
+      meetingId: string
+      roleId: string
+      accepted: boolean
+      speech?: { title: string; description: string }
+    }): Promise<{ message: string }> =>
+      axios
+        .post(
+          `/api/meetings/${meetingId}/accept-role/${roleId}?accepted=${accepted}`,
+          { speech }
+        )
+        .then(response => response.data),
+    toggleSpeechApproval: ({
+      meetingId,
+      speechId,
+      approved,
+    }: {
+      meetingId: string
+      speechId: string
+      approved: boolean
+    }): Promise<{ message: string }> =>
+      axios
+        .post(
+          `/api/meetings/${meetingId}/speech-approval/${speechId}?approved=${approved}`
+        )
         .then(response => response.data),
   },
 }

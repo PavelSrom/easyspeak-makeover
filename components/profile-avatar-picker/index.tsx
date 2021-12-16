@@ -9,6 +9,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import { Button, Text } from 'ui'
 import { useSnackbar } from 'notistack'
+import { useOnboarding } from 'contexts/onboarding'
 
 export const ProfileAvatarPicker = () => {
   const [newAvatar, setNewAvatar] = useState<File>()
@@ -16,6 +17,7 @@ export const ProfileAvatarPicker = () => {
   const { enqueueSnackbar } = useSnackbar()
   const { profile } = useAuth()
   const { upload, uploadFile } = useFirebaseStorage()
+  useOnboarding({ shown: !!profile })
 
   const {
     mutateAsync: uploadAvatarToProfile,
@@ -62,35 +64,41 @@ export const ProfileAvatarPicker = () => {
     }
   }
 
-  return profile?.avatar ? (
-    <Avatar src={profile.avatar} className="w-36 h-36 mx-auto" />
-  ) : (
-    <div className="bg-tertiary rounded-xl p-4 text-white flex flex-col items-center">
-      <label htmlFor="icon-button-file">
-        <input
-          accept="image/*"
-          id="icon-button-file"
-          type="file"
-          className="hidden"
-          onChange={handleFileChange}
-        />
-        <div className="bg-white rounded-full">
-          <IconButton size="large" color="primary" component="span">
-            <PhotoCamera className="text-tertiary" />
-          </IconButton>
-        </div>
-      </label>
-      <Text>{newAvatar?.name ?? 'Choose image'}</Text>
+  return (
+    <div className="onboarding-2">
+      {profile?.avatar ? (
+        <Avatar src={profile.avatar} className="w-36 h-36 mx-auto" />
+      ) : (
+        <div className="bg-tertiary rounded-xl p-4 text-white flex flex-col items-center">
+          <label htmlFor="icon-button-file">
+            <input
+              accept="image/*"
+              id="icon-button-file"
+              type="file"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <div className="bg-white rounded-full">
+              <IconButton size="large" color="primary" component="span">
+                <PhotoCamera className="text-tertiary" />
+              </IconButton>
+            </div>
+          </label>
+          <Text>{newAvatar?.name ?? 'Choose image'}</Text>
 
-      {!!newAvatar && (
-        <Button
-          loading={upload.status === 'pending' || isUploadingAvatarToProfile}
-          className="mt-4"
-          color="secondary"
-          onClick={handleUpload}
-        >
-          Upload
-        </Button>
+          {!!newAvatar && (
+            <Button
+              loading={
+                upload.status === 'pending' || isUploadingAvatarToProfile
+              }
+              className="mt-4"
+              color="secondary"
+              onClick={handleUpload}
+            >
+              Upload
+            </Button>
+          )}
+        </div>
       )}
     </div>
   )

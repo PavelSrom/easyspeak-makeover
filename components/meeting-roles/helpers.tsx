@@ -25,6 +25,7 @@ export const AgendaHelpers = () => {
             </div>
             <div className="flex-1">
               <HelperBase.Information />
+              <HelperBase.AcceptOrDecline />
             </div>
             <HelperBase.DeleteIcon />
           </div>

@@ -14,6 +14,7 @@ import {
   getFullAgendaHandler,
   getMeetingByIdHandler,
 } from 'backend/meetings'
+import { getDashBoardHandler } from 'backend/dashboard'
 import { ApiResponse } from './helpers'
 
 export type NewUserDTO = ApiResponse<ReturnType<typeof createNewMemberHandler>>
@@ -61,3 +62,5 @@ export type MeetingFullDTO = ApiResponse<
 >
 
 export type AgendaFullDTO = ApiResponse<ReturnType<typeof getFullAgendaHandler>>
+
+export type DashboardDTO = ApiResponse<ReturnType<typeof getDashBoardHandler>>

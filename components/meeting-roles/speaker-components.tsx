@@ -7,7 +7,7 @@ import { useAuth } from 'contexts/auth'
 import { useMeetingAgenda } from 'contexts/meeting-agenda'
 import { createContext, useContext, useMemo, useState } from 'react'
 import { AgendaFullDTO } from 'types/api'
-import { Text } from 'ui'
+import { Button, Text } from 'ui'
 
 type SpeakerBaseProps = {
   speaker: AgendaFullDTO['speakers'][number]
@@ -172,7 +172,7 @@ const DeleteIcon: React.FC = () => {
   const { profile } = useAuth()
 
   // do not show anything if not a board member or not their speech
-  if (!isBoardMember || memberId !== profile?.id || roleStatus === 'UNASSIGNED')
+  if (!isBoardMember || memberId !== profile?.id || roleStatus !== 'CONFIRMED')
     return null
 
   return (
@@ -189,14 +189,126 @@ const DeleteIcon: React.FC = () => {
 SpeakerBase.DeleteIcon = DeleteIcon
 SpeakerBase.DeleteIcon.displayName = 'SpeakerBase.DeleteIcon'
 
-// TODO
-const ApproveOrReject: React.FC = () => null
+const ApproveOrReject: React.FC = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { isBoardMember, meetingId, approveSpeech } = useMeetingAgenda()
+  const { roleStatus, Speech, memberId } = useSpeaker()
+  const { profile } = useAuth()
+
+  const toggleApproval = async (approved: boolean): Promise<void> => {
+    setIsLoading(true)
+
+    await approveSpeech({ meetingId, speechId: Speech!.id, approved })
+    setIsLoading(false)
+  }
+
+  const isMyRole = profile?.id === memberId
+  const isPending = roleStatus === 'PENDING'
+  const speechIsAssigned = !!Speech
+
+  if (!isBoardMember) return null
+  if (isMyRole) return null
+  if (!isPending) return null
+  if (!speechIsAssigned) return null
+
+  return (
+    <div className="flex space-x-4 mt-4">
+      <Button
+        color="secondary"
+        loading={isLoading}
+        onClick={() => toggleApproval(true)}
+      >
+        Approve
+      </Button>
+      <Button
+        variant="outlined"
+        color="secondary"
+        loading={isLoading}
+        onClick={() => toggleApproval(false)}
+      >
+        Reject
+      </Button>
+    </div>
+  )
+}
 
 SpeakerBase.ApproveOrReject = ApproveOrReject
 SpeakerBase.ApproveOrReject.displayName = 'SpeakerBase.ApproveOrReject'
 
-// TODO
-const AcceptOrDecline: React.FC = () => null
+const AcceptOrDecline: React.FC = () => {
+  const [speechDialogOpen, setSpeechDialogOpen] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { acceptAssignedRole, meetingId } = useMeetingAgenda()
+  const { id, RoleType, Speech, memberId, roleStatus } = useSpeaker()
+  const { profile } = useAuth()
+
+  const handleAccept = (): void => {
+    const isAcceptingSpeech = RoleType.name.toLowerCase().includes('speaker')
+
+    if (isAcceptingSpeech) {
+      setSpeechDialogOpen(true)
+    } else {
+      setIsLoading(true)
+
+      acceptAssignedRole({
+        meetingId,
+        roleId: id,
+        accepted: true,
+      }).finally(() => setIsLoading(false))
+    }
+  }
+
+  const isMyRole = profile?.id === memberId
+  const isPending = roleStatus === 'PENDING'
+  const speechIsAssigned = !!Speech
+
+  if (!isMyRole) return null
+  if (!isPending) return null
+  if (speechIsAssigned) return null
+
+  return (
+    <>
+      <div className="flex space-x-4 mt-4">
+        <Button color="secondary" loading={isLoading} onClick={handleAccept}>
+          Accept
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          loading={isLoading}
+          onClick={() => {
+            setIsLoading(true)
+
+            acceptAssignedRole({
+              meetingId,
+              roleId: id,
+              accepted: false,
+            }).finally(() => setIsLoading(false))
+          }}
+        >
+          Decline
+        </Button>
+      </div>
+
+      <RequestSpeechDialog
+        open={speechDialogOpen}
+        isSubmitting={isLoading}
+        onClose={() => setSpeechDialogOpen(false)}
+        onRequest={async values => {
+          setIsLoading(true)
+
+          await acceptAssignedRole({
+            meetingId,
+            roleId: id,
+            accepted: true,
+            speech: values,
+          })
+          setIsLoading(false)
+        }}
+      />
+    </>
+  )
+}
 
 SpeakerBase.AcceptOrDecline = AcceptOrDecline
 SpeakerBase.AcceptOrDecline.displayName = 'SpeakerBase.AcceptOrDecline'

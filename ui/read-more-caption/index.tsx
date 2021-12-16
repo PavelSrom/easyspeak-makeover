@@ -1,31 +1,30 @@
 import { Text } from 'ui'
-import Link from 'next/link'
 
 export type ReadMoreCaptionProps = {
   children: React.ReactNode
   captionText?: string
-  href?: string
+  onNavigate?: () => void
 }
 
 export const ReadMoreCaption = ({
   children,
   captionText,
-  href,
+  onNavigate,
 }: ReadMoreCaptionProps) => (
   <div>
     <div className="flex justify-between mb-1">
       <Text variant="small" className="font-medium uppercase text-inactiveGrey">
         {captionText}
       </Text>
-      {href && (
-        <Link href={href}>
+      {onNavigate && (
+        // eslint-disable-next-line
+        <div onClick={onNavigate}>
           <Text className="font-bold uppercase text-primary" variant="small">
             More
           </Text>
-        </Link>
+        </div>
       )}
     </div>
     {children}
   </div>
-  // onNavigate={() => router.push(`/discussion/${post.id}`)}
 )

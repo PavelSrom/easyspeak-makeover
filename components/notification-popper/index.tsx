@@ -42,6 +42,7 @@ export const NotificationPopper = () => {
 
         return { prevData }
       },
+      // eslint-disable-next-line
       onError: (err, [_variables], context) => {
         enqueueSnackbar(
           err.response.data.message ?? 'Cannot delete notification',
@@ -67,6 +68,7 @@ export const NotificationPopper = () => {
       <IconButton
         size="small"
         edge="end"
+        className="onboarding-3"
         onClick={e => setAnchorEl(e.currentTarget)}
       >
         <Badge

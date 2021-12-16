@@ -97,6 +97,8 @@ export const requests = {
       axios
         .delete(`/api/auth/create-member/${id}`)
         .then(response => response.data),
+    resendInvitationEmail: (id: string): Promise<{ message: string }> =>
+      axios.post(`/api/auth/email/${id}`).then(response => response.data),
     authCheckUser: (email: string): Promise<{ id: string }> =>
       axios
         .post('/api/auth/check-user', { email })

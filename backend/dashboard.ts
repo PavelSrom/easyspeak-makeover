@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { ApiSession } from 'types/helpers'
+import { ApiSession, MapObjPropsToUnion } from 'types/helpers'
 import { prisma } from 'utils/prisma-client'
 
 export const getDashBoardHandler = async (
@@ -7,7 +7,15 @@ export const getDashBoardHandler = async (
   res: NextApiResponse,
   session: ApiSession
 ) => {
-  let requestedItemsQuery
+  const template = {
+    one: undefined,
+    two: undefined,
+    three: undefined,
+  }
+
+  const finalApiResponse: MapObjPropsToUnion<typeof template, undefined> = {
+    ...template,
+  }
 
   try {
     const clubInfoQuery = await prisma.club.findUnique({
@@ -89,6 +97,9 @@ export const getDashBoardHandler = async (
       requestedItemsQuery,
       pinnedPostQuery,
     ])
+
+    // res.json(finalApiResponse)
+    // return finalApiResponse
     res.json({ clubInfo, requestedItems, pinnedPost })
     return { clubInfo, requestedItems, pinnedPost }
   } catch ({ message }) {

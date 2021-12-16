@@ -5,8 +5,12 @@ import { AgendaEvaluators } from 'components/meeting-roles/evaluators'
 import { AgendaHelpers } from 'components/meeting-roles/helpers'
 import { MeetingAgendaProvider } from 'contexts/meeting-agenda'
 
-export const MeetingAgenda = () => (
-  <MeetingAgendaProvider>
+type Props = {
+  meetingStart: Date
+}
+
+export const MeetingAgenda = ({ meetingStart }: Props) => (
+  <MeetingAgendaProvider meetingStart={meetingStart}>
     <Paper className="p-4 onboarding-9">
       <Text variant="h1_light" className="mb-4 onboarding-10">
         Speakers

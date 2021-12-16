@@ -12,6 +12,7 @@ import { useOnboarding } from './onboarding'
 
 type ContextProps = {
   meetingId: string
+  meetingIsReadOnly: boolean
   isBoardMember: boolean
   isAssigningRole: boolean
   agenda: AgendaFullDTO
@@ -26,8 +27,10 @@ type ContextProps = {
 const MeetingAgendaContext = createContext<ContextProps>({} as ContextProps)
 
 export const MeetingAgendaProvider = ({
+  meetingStart,
   children,
 }: {
+  meetingStart: Date
   children: React.ReactNode
 }) => {
   const router = useRouter()
@@ -90,6 +93,7 @@ export const MeetingAgendaProvider = ({
   const value: ContextProps = useMemo(
     () => ({
       meetingId: router.query.id as string,
+      meetingIsReadOnly: new Date(meetingStart) < new Date(),
       isBoardMember: !!profile?.roleTypeId ?? false,
       isAssigningRole:
         isAssigningMemberRole ||
@@ -105,6 +109,7 @@ export const MeetingAgendaProvider = ({
     }),
     [
       router.query.id,
+      meetingStart,
       profile?.roleTypeId,
       isAssigningMemberRole,
       isUnassigningMemberRole,

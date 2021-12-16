@@ -5,31 +5,22 @@ import ThumbUp from '@mui/icons-material/ThumbUp'
 import ThumbDown from '@mui/icons-material/ThumbDown'
 import { Avatar, Paper } from '@mui/material'
 import formatDistance from 'date-fns/formatDistance'
-import {
-  useTypeSafeMutation,
-  useTypeSafeQuery,
-  useTypeSafeQueryClient,
-} from 'hooks'
+import { useTypeSafeMutation, useTypeSafeQueryClient } from 'hooks'
 import { Button, Text } from 'ui'
 import { useAuth } from 'contexts/auth'
 import { useSnackbar } from 'notistack'
 import { useOnboarding } from 'contexts/onboarding'
+import { MeetingFullDTO } from 'types/api'
 
 type Props = {
-  meetingId: string
+  meeting: MeetingFullDTO
 }
 
-export const MeetingDetails = ({ meetingId }: Props) => {
+export const MeetingDetails = ({ meeting }: Props) => {
   const { profile } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const queryClient = useTypeSafeQueryClient()
-
-  const meetingDetailsQuery = useTypeSafeQuery(
-    ['getMeetingById', meetingId],
-    { enabled: !!meetingId },
-    meetingId
-  )
-  useOnboarding({ shown: !!meetingDetailsQuery.data })
+  useOnboarding({ shown: !!meeting })
 
   const { mutateAsync: toggleAttendance, isLoading: isTogglingAttendance } =
     useTypeSafeMutation('toggleMeetingAttendance', {
@@ -43,51 +34,47 @@ export const MeetingDetails = ({ meetingId }: Props) => {
         )
       },
       onSettled: () => {
-        queryClient.invalidateQueries(['getMeetingById', meetingId])
+        queryClient.invalidateQueries(['getMeetingById', meeting.id])
       },
     })
 
   const toggleAttend = (coming: boolean) => {
-    toggleAttendance([{ meetingId, attending: coming === true }])
+    toggleAttendance([{ meetingId: meeting.id, attending: coming === true }])
   }
 
-  const iAmComing = meetingDetailsQuery.data?.Attendance.some(
+  const iAmComing = meeting.Attendance.some(
     member => member.Member?.id === profile?.id
   )
-
-  if (meetingDetailsQuery.isLoading) return <p>Loading...</p>
-  if (meetingDetailsQuery.isError || !meetingDetailsQuery.data)
-    return <p>Error!</p>
 
   return (
     <>
       <Paper className="p-4 mb-8 space-y-2 onboarding-8">
-        <Text variant="h1_light">{meetingDetailsQuery.data.title}</Text>
+        <Text variant="h1_light">{meeting.title}</Text>
         <div className="flex items-center">
           <LocationOn className="mr-2" />
-          <Text variant="body2">{meetingDetailsQuery.data.venue}</Text>
+          <Text variant="body2">{meeting.venue}</Text>
         </div>
         <div className="flex items-center">
           <AccessTime className="mr-2" />
           <Text variant="body2">
             {formatDistance(
-              new Date(meetingDetailsQuery.data.timeStart),
-              new Date(meetingDetailsQuery.data.timeEnd)
+              new Date(meeting.timeStart),
+              new Date(meeting.timeEnd)
             )}
           </Text>
         </div>
         <div className="flex items-start">
           <Description className="mr-2" />
-          <Text variant="body2">{meetingDetailsQuery.data.description}</Text>
+          <Text variant="body2">{meeting.description}</Text>
         </div>
 
         <div className="flex pt-4">
           <Avatar
-            src={meetingDetailsQuery.data.Manager.avatar ?? ''}
+            src={meeting.Manager.avatar ?? ''}
             className="w-10 h-10 mr-4"
           />
           <div>
-            <Text className="font-semibold">{`${meetingDetailsQuery.data.Manager.name} ${meetingDetailsQuery.data.Manager.surname}`}</Text>
+            <Text className="font-semibold">{`${meeting.Manager.name} ${meeting.Manager.surname}`}</Text>
             <Text variant="caption">Meeting manager</Text>
           </div>
         </div>
@@ -125,8 +112,8 @@ export const MeetingDetails = ({ meetingId }: Props) => {
         </div>
 
         <div className="space-y-4">
-          {meetingDetailsQuery.data.Attendance.length > 0 ? (
-            meetingDetailsQuery.data.Attendance.map(member => (
+          {meeting.Attendance.length > 0 ? (
+            meeting.Attendance.map(member => (
               <div key={member.Member?.id} className="flex items-center">
                 <Avatar
                   src={member.Member?.avatar ?? ''}

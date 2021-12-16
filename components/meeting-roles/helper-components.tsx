@@ -58,6 +58,7 @@ const AddButtonOrAvatar: React.FC = () => {
   const {
     isBoardMember,
     isAssigningRole,
+    meetingIsReadOnly,
     meetingId,
     memberAssignRole,
     adminAssignRole,
@@ -84,7 +85,7 @@ const AddButtonOrAvatar: React.FC = () => {
           color="secondary"
           size="small"
           className="text-white"
-          disabled={isAssigningRole}
+          disabled={isAssigningRole || meetingIsReadOnly}
           onClick={handleButtonClick}
         >
           <AddOutlined />
@@ -133,13 +134,18 @@ HelperBase.Information = Information
 HelperBase.Information.displayName = 'HelperBase.Information'
 
 const DeleteIcon: React.FC = () => {
-  const { isBoardMember, memberUnassignRole, meetingId } = useMeetingAgenda()
+  const { isBoardMember, memberUnassignRole, meetingId, meetingIsReadOnly } =
+    useMeetingAgenda()
   const { memberId, roleTypeId, roleStatus } = useHelper()
   const { profile } = useAuth()
 
-  // do not show anything if not a board member or not their role
-  if (!isBoardMember || memberId !== profile?.id || roleStatus !== 'CONFIRMED')
-    return null
+  const isMyRole = profile?.id === memberId
+  const isConfirmedRole = roleStatus === 'CONFIRMED'
+
+  if (!isBoardMember) return null
+  if (!isMyRole) return null
+  if (!isConfirmedRole) return null
+  if (meetingIsReadOnly) return null
 
   return (
     <IconButton
@@ -157,7 +163,8 @@ HelperBase.DeleteIcon.displayName = 'HelperBase.DeleteIcon'
 
 const AcceptOrDecline: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const { acceptAssignedRole, meetingId } = useMeetingAgenda()
+  const { acceptAssignedRole, meetingId, meetingIsReadOnly } =
+    useMeetingAgenda()
   const { id, memberId, roleStatus } = useHelper()
   const { profile } = useAuth()
 
@@ -176,6 +183,7 @@ const AcceptOrDecline: React.FC = () => {
 
   if (!isMyRole) return null
   if (!isPending) return null
+  if (meetingIsReadOnly) return null
 
   return (
     <div className="flex space-x-4 mt-4">

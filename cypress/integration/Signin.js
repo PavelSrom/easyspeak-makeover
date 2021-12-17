@@ -1,6 +1,6 @@
 describe('Signin with missing credentials', () => {
-  it('Should show error messages when missing credentials', () => {
-    cy.visit('http://localhost:3000/signin')
+  it('Show error message when missing password', () => {
+    cy.visit('/signin')
 
     cy.get('input[name="email"]')
       .click()
@@ -20,8 +20,8 @@ describe('Signin with missing credentials', () => {
 })
 
 describe('Signin procedure with correct credentials', () => {
-    it('Should signin and redirect to protected dashboard page', () => {
-      cy.visit('http://localhost:3000/signin')
+    it('Signin and redirect to protected dashboard page', () => {
+      cy.visit('/signin')
 
       cy.get('input[name="email"]')
       .click()
@@ -39,7 +39,7 @@ describe('Signin procedure with correct credentials', () => {
       cy.url().should('eq', 'http://localhost:3000/')
   
     })
-    it('Should show a green success message when signed in', () => {
+    it('Show a green success message when signed in', () => {
       cy.get('.SnackbarItem-message')
       .should('have.text', 'Signed in')
     })

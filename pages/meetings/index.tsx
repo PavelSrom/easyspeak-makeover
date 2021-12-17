@@ -1,4 +1,4 @@
-import { Badge, Container, Fab, Paper } from '@mui/material'
+import { Badge, Container, Fab } from '@mui/material'
 import AddOutlined from '@mui/icons-material/AddOutlined'
 import { PickersDay } from '@mui/lab'
 import {
@@ -12,13 +12,12 @@ import {
 } from 'date-fns'
 import { useState } from 'react'
 import { CustomNextPage } from 'types/helpers'
-import { Button, StaticDatePicker, Text } from 'ui'
+import { StaticDatePicker } from 'ui'
 import { useTypeSafeQuery } from 'hooks'
 import { useRouter } from 'next/router'
 import { useAuth } from 'contexts/auth'
-import { MeetingCard } from 'components/meeting-card'
-import clsx from 'clsx'
 import { useOnboarding } from 'contexts/onboarding'
+import { MeetingsList } from 'components/meetings-list'
 
 const Meetings: CustomNextPage = () => {
   const [rangeIsChanged, setRangeIsChanged] = useState<boolean>(false)
@@ -101,43 +100,21 @@ const Meetings: CustomNextPage = () => {
         />
       </div>
 
-      <Paper className="mt-4 p-4">
-        <Text variant="h1_light" className="mb-4 onboarding-7">
-          {headline}
-        </Text>
-        {meetingListQuery.data ? (
-          (meetingListQuery.data ?? []).map(meeting => (
-            <MeetingCard
-              key={meeting.id}
-              meeting={meeting}
-              onNavigate={() => router.push(`/meetings/${meeting.id}`)}
-            />
-          ))
-        ) : (
-          <Text className="text-center">(No meetings have been found)</Text>
-        )}
-        <div
-          className={clsx('text-center width-full mt-2', {
-            'opacity-0': !rangeIsChanged,
-          })}
-        >
-          <Button
-            variant="outlined"
-            className="ml-auto"
-            onClick={() => {
-              setListRange({
-                start: new Date().toISOString(),
-                end: add(new Date(), { months: 1 }).toISOString(),
-              })
-              setHeadline('Next meetings')
-              setValue(new Date())
-              setRangeIsChanged(false)
-            }}
-          >
-            Reset
-          </Button>
-        </div>
-      </Paper>
+      <MeetingsList
+        query={meetingListQuery}
+        headline={headline}
+        rangeIsChanged={rangeIsChanged}
+        onClick={() => {
+          setListRange({
+            start: new Date().toISOString(),
+            end: add(new Date(), { months: 1 }).toISOString(),
+          })
+          setHeadline('Next meetings')
+          setValue(new Date())
+          setRangeIsChanged(false)
+        }}
+        className="mt-4"
+      />
 
       {profile?.roleTypeId && (
         <Fab

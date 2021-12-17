@@ -3,8 +3,6 @@ import { useTypeSafeQuery } from 'hooks'
 import { Text } from 'ui'
 import { BoardMemberItem } from './club-boardmember-item'
 
-// TODO: remove lorem ipsum
-
 export const ClubBoard = () => {
   const clubBoardQuery = useTypeSafeQuery('getClubBoard')
 

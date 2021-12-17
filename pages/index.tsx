@@ -43,7 +43,8 @@ const Dashboard: CustomNextPage = () => {
   const dashboardDataQuery = useTypeSafeQuery('getDashboard')
 
   return (
-    <Container className="onboarding-1 py-4 grid gap-4 grid-cols-1 md:grid-cols-2">
+    <Container className="py-4 grid gap-4 grid-cols-1 md:grid-cols-2">
+      <div className="onboarding-1" />
       <ReadMoreCaption
         captionText="About club"
         onNavigate={() => router.push(`/club`)}
@@ -83,9 +84,7 @@ const Dashboard: CustomNextPage = () => {
                 <PostCard
                   key={post.id}
                   post={post}
-                  onNavigate={() =>
-                    router.push(`/discussion/${dashboardDataQuery.data!.id}`)
-                  }
+                  onNavigate={() => router.push(`/discussion/${post.id}`)}
                 />
               ))
             ) : (
@@ -124,8 +123,7 @@ const Dashboard: CustomNextPage = () => {
           {dashboardDataQuery.isSuccess &&
             dashboardDataQuery.data &&
             (profile?.roleTypeId ? (
-              dashboardDataQuery.data.requestedRoles.map(speaker => (
-                // @ts-ignore
+              dashboardDataQuery.data.requestedSpeeches!.map(speaker => (
                 <SpeakerBase key={speaker.id} speaker={speaker}>
                   <div className="flex items-start">
                     <div className="mr-4">

@@ -11,6 +11,13 @@ import { ReadMoreCaption } from 'ui/read-more-caption'
 import { withAuth } from 'utils/with-auth'
 import { useTypeSafeQuery } from 'hooks'
 import { useRouter } from 'next/router'
+import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
+import error from 'public/feedback-illustrations/error.svg'
+import no_pinned_post from 'public/feedback-illustrations/no_pinned_post.svg'
+import calendar from 'public/feedback-illustrations/calendar.svg'
+import { MeetingsList } from 'components/meetings-list'
+import { LoadingPostItem } from 'ui/feedback/loading-post-item'
+import { LoadingListItem } from 'ui/feedback/loadling-list-item'
 
 export const getServerSideProps = withAuth(async ({ session }) => ({
   props: { session },
@@ -29,6 +36,10 @@ const Dashboard: CustomNextPage = () => {
     { timeStart: listRange.start, timeEnd: listRange.end }
   )
 
+  const pinnedPostQuery = useTypeSafeQuery(['getAllPosts', 'isPinned'], null, {
+    isPinned: true,
+  })
+
   const dashboardDataQuery = useTypeSafeQuery('getDashboard')
 
   return (
@@ -43,49 +54,46 @@ const Dashboard: CustomNextPage = () => {
         captionText="Next meetings"
         onNavigate={() => router.push(`/meetings`)}
       >
-        {meetingListQuery.isLoading && (
-          /* spinner or skeletons */ <p>Loading...</p>
-        )}
-        {meetingListQuery.isError && /* error UI */ <p>Error!</p>}
-        {meetingListQuery.isSuccess && meetingListQuery.data && (
-          <Paper className="p-4">
-            {meetingListQuery.data ? (
-              (meetingListQuery.data ?? []).map(meeting => (
-                <MeetingCard
-                  key={meeting.id}
-                  meeting={meeting}
-                  onNavigate={() => router.push(`/meetings/${meeting.id}`)}
-                />
-              ))
-            ) : (
-              // TODO: A better message for the user
-              <Text>No meetings is found</Text>
-            )}
-          </Paper>
-        )}
+        <MeetingsList query={meetingListQuery} headline="Next meetings" />
       </ReadMoreCaption>
       <ReadMoreCaption
         captionText="Pinned post"
         onNavigate={() => router.push(`/discussion`)}
       >
-        {dashboardDataQuery.isLoading && (
-          /* spinner or skeletons */ <p>Loading...</p>
+        {pinnedPostQuery.isLoading && (
+          <Paper className="p-4">
+            <LoadingPostItem />
+          </Paper>
         )}
-        {dashboardDataQuery.isError && /* error UI */ <p>Error!</p>}
-        {dashboardDataQuery.isSuccess && dashboardDataQuery.data && (
+        {pinnedPostQuery.isError && (
+          <Paper className="p-4">
+            <IllustrationFeedback
+              title="Sorry!"
+              message={`Something went wrong, we couldn't find the pinned post from ${
+                profile?.User.Club.name || 'your club'
+              }`}
+              illustration={error}
+            />
+          </Paper>
+        )}
+        {pinnedPostQuery.isSuccess && (
           <>
-            {dashboardDataQuery.data.pinnedPost ? (
-              <PostCard
-                key={dashboardDataQuery.data.pinnedPost.id}
-                post={dashboardDataQuery.data.pinnedPost}
-                onNavigate={() =>
-                  router.push(
-                    `/discussion/${dashboardDataQuery.data.pinnedPost!.id}`
-                  )
-                }
-              />
+            {pinnedPostQuery.data ? (
+              pinnedPostQuery.data.map(post => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onNavigate={() =>
+                    router.push(`/discussion/${dashboardDataQuery.data!.id}`)
+                  }
+                />
+              ))
             ) : (
-              <p>No posts have been added yet</p>
+              <IllustrationFeedback
+                title="No pinned post"
+                message="There isn't pinned an important post in your club yet"
+                illustration={no_pinned_post}
+              />
             )}
           </>
         )}
@@ -95,14 +103,28 @@ const Dashboard: CustomNextPage = () => {
           profile?.roleTypeId ? 'Requested speeches' : 'Requested roles'
         }
       >
-        {dashboardDataQuery.isLoading && (
-          /* spinner or skeletons */ <p>Loading...</p>
-        )}
-        {dashboardDataQuery.isError && /* error UI */ <p>Error!</p>}
-        {dashboardDataQuery.isSuccess && dashboardDataQuery.data && (
-          <Paper className="p-4">
-            {profile?.roleTypeId ? (
-              dashboardDataQuery.data.requestedItems.map(speaker => (
+        <Paper className="p-4">
+          {dashboardDataQuery.isLoading && (
+            <div className="flex flex-col gap-4">
+              <LoadingListItem />
+              <LoadingListItem />
+            </div>
+          )}
+          {dashboardDataQuery.isError && (
+            <IllustrationFeedback
+              title="Sorry!"
+              message={`Something went wrong, we couldn't find ${
+                profile?.roleTypeId
+                  ? 'the Requested speeches'
+                  : 'Requested roles'
+              }`}
+              illustration={error}
+            />
+          )}
+          {dashboardDataQuery.isSuccess &&
+            dashboardDataQuery.data &&
+            (profile?.roleTypeId ? (
+              dashboardDataQuery.data.requestedRoles.map(speaker => (
                 // @ts-ignore
                 <SpeakerBase key={speaker.id} speaker={speaker}>
                   <div className="flex items-start">
@@ -122,9 +144,8 @@ const Dashboard: CustomNextPage = () => {
               ))
             ) : (
               <Text>Normal member</Text>
-            )}
-          </Paper>
-        )}
+            ))}
+        </Paper>
       </ReadMoreCaption>
     </Container>
   )

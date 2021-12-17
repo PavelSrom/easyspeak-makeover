@@ -7,7 +7,11 @@ import {
   getClubMembersHandler,
 } from 'backend/club'
 import { getAllNotificationsHandler } from 'backend/notifications'
-import { getAllPostsHandler, getPostByIdHandler } from 'backend/posts'
+import {
+  getAllPostsHandler,
+  getPinnedPostHandler,
+  getPostByIdHandler,
+} from 'backend/posts'
 import { getUserActivityHandler, getUserProfileHandler } from 'backend/profile'
 import {
   getAllMeetingsHandler,
@@ -28,6 +32,8 @@ export type PostSimpleDTO = ApiResponse<
 >[number]
 
 export type PostFullDTO = ApiResponse<ReturnType<typeof getPostByIdHandler>>
+
+export type PinnedPostDTO = ApiResponse<ReturnType<typeof getPinnedPostHandler>>
 
 export type CommentDTO = ApiResponse<
   ReturnType<typeof getAllCommentsHandler>

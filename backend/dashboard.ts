@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { ApiSession, MapObjPropsToUnion } from 'types/helpers'
+import { ApiSession } from 'types/helpers'
 import { prisma } from 'utils/prisma-client'
 
 export const getDashBoardHandler = async (
@@ -8,61 +8,17 @@ export const getDashBoardHandler = async (
   session: ApiSession
 ) => {
   const template = {
-    one: undefined,
-    two: undefined,
-    three: undefined,
-  }
-
-  const finalApiResponse: MapObjPropsToUnion<typeof template, undefined> = {
-    ...template,
+    requestedSpeeches: undefined,
+    requestedRoles: undefined,
   }
 
   try {
-    const clubInfoQuery = await prisma.club.findUnique({
-      where: { id: session.user.clubId },
-      select: {
-        name: true,
-        location: true,
-        description: true,
-        Users: {
-          where: {
-            Profile: { ClubRole: { name: 'President' } },
-          },
-          select: {
-            Profile: {
-              select: { avatar: true, name: true, surname: true },
-            },
-          },
-        },
-      },
-    })
-
-    const pinnedPostQuery = prisma.post.findFirst({
-      where: { isPinned: true, clubId: session.user.clubId },
-      select: {
-        id: true,
-        title: true,
-        body: true,
-        isPinned: true,
-        createdAt: true,
-        _count: { select: { Comments: true } },
-        Author: {
-          select: {
-            name: true,
-            surname: true,
-            avatar: true,
-            ClubRole: { select: { name: true } },
-          },
-        },
-      },
-    })
-
     const auth = await prisma.profile.findFirst({
       where: { id: session.user.profileId },
     })
     if (!auth) return res.status(404).json({ message: 'Access denied' })
     if (auth.roleTypeId) {
-      const requestedSpeechesQuery = prisma.attendance.findMany({
+      const requestedSpeechesQuery = await prisma.attendance.findMany({
         where: {
           roleStatus: 'PENDING',
           RoleType: { name: { startsWith: 'Speaker' } },
@@ -75,13 +31,14 @@ export const getDashBoardHandler = async (
           Member: { select: { avatar: true, name: true, surname: true } },
         },
       })
-      requestedItemsQuery = requestedSpeechesQuery
+      // @ts-ignore
+      template.requestedSpeeches = requestedSpeechesQuery
     } else {
-      const requestedRoles = prisma.attendance.findMany({
+      const requestedRolesQuery = await prisma.attendance.findMany({
         where: {
           roleStatus: 'PENDING',
-          Member: { id: session.user.userId },
-          // Speech: false,  Check if speech isn't there
+          Member: { id: session.user.profileId },
+          // Speech: false,
         },
         orderBy: { RoleType: { name: 'asc' } },
         include: {
@@ -89,19 +46,16 @@ export const getDashBoardHandler = async (
           Member: { select: { avatar: true, name: true, surname: true } },
         },
       })
-      requestedItemsQuery = requestedRoles
+      // @ts-ignore
+      template.requestedRoles = requestedRolesQuery
     }
 
-    const [clubInfo, requestedItems, pinnedPost] = await Promise.all([
-      clubInfoQuery,
-      requestedItemsQuery,
-      pinnedPostQuery,
-    ])
+    const finalApiResponse = {
+      ...template,
+    } as const
 
-    // res.json(finalApiResponse)
-    // return finalApiResponse
-    res.json({ clubInfo, requestedItems, pinnedPost })
-    return { clubInfo, requestedItems, pinnedPost }
+    res.json(finalApiResponse)
+    return { finalApiResponse }
   } catch ({ message }) {
     return res.status(500).json({ message })
   }

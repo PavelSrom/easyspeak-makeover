@@ -12,7 +12,7 @@ export const ReadMoreCaption = ({
   onNavigate,
 }: ReadMoreCaptionProps) => (
   <div>
-    <div className="flex justify-between mb-1">
+    <div className="flex justify-between mb-1 items-center h-6">
       <Text variant="small" className="font-medium uppercase text-inactiveGrey">
         {captionText}
       </Text>

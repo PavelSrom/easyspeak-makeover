@@ -30,8 +30,10 @@ import {
 export const requests = {
   query: {
     // POSTS
-    getAllPosts: (): Promise<PostSimpleDTO[]> =>
-      axios.get('/api/posts').then(response => response.data),
+    getAllPosts: (params: { isPinned?: true }): Promise<PostSimpleDTO[]> => {
+      const query = queryString.stringify(params)
+      return axios.get(`/api/posts?${query}`).then(response => response.data)
+    },
     getPostById: (id: string): Promise<PostFullDTO> =>
       axios.get(`/api/posts/${id}`).then(response => response.data),
     // NOTIFICATIONS

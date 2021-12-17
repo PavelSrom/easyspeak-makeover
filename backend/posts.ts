@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiSession } from 'types/helpers'
 import { createNewPostSchema, validateBody } from 'utils/payload-validations'
@@ -8,9 +9,13 @@ export const getAllPostsHandler = async (
   res: NextApiResponse,
   session: ApiSession
 ) => {
+  const where: Prisma.PostWhereInput = {}
+  where.clubId = session.user.clubId as string
+  if (req.query.isPinned) where.isPinned = true
+
   try {
     const allPosts = await prisma.post.findMany({
-      where: { clubId: session.user.clubId },
+      where,
       select: {
         id: true,
         title: true,
@@ -43,6 +48,34 @@ export const getPostByIdHandler = async (
   try {
     const post = await prisma.post.findUnique({
       where: { id: req.query.id as string },
+      include: {
+        Author: {
+          select: {
+            avatar: true,
+            name: true,
+            surname: true,
+            ClubRole: { select: { name: true } },
+          },
+        },
+      },
+    })
+    if (!post) return res.status(404).json({ message: 'Post not found' })
+
+    res.json(post)
+    return post
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
+export const getPinnedPostHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  try {
+    const post = await prisma.post.findFirst({
+      where: { clubId: session.user.clubId, isPinned: true },
       include: {
         Author: {
           select: {

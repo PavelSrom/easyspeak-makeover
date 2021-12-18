@@ -8,14 +8,16 @@ datasource db {
 }
 
 model User {
-  id             String   @id @default(cuid())
-  email          String   @unique
-  password       String?
-  invitationSent Boolean  @default(false)
-  clubId         String
-  Club           Club     @relation(fields: [clubId], references: [id])
-  Profile        Profile?
-  // TODO: reset password things
+  id                String   @id @default(cuid())
+  email             String   @unique
+  password          String?
+  invitationSent    Boolean  @default(false)
+  clubId            String
+  Club              Club     @relation(fields: [clubId], references: [id])
+  Profile           Profile?
+  createdAt         DateTime @default(now())
+  pwResetToken      String?
+  pwResetExpiration String?
 }
 
 model Profile {
@@ -30,15 +32,15 @@ model Profile {
   ClubRole      ClubRole?      @relation(fields: [roleTypeId], references: [id])
   pathwayId     String
   Pathway       Pathway        @relation(fields: [pathwayId], references: [id])
-  // TODO: settings here
+  receiveEmail  Boolean        @default(false)
+  receiveNotifs Boolean        @default(false)
   Notifications Notification[]
   Posts         Post[]
   Comments      Comment[]
   Meetings      Meeting[] // meetings the user has managed
+  Attendance    Attendance[]
 }
 
-// this setup works for individual notifications to users
-// for a notification to the entire club, it has to be done differently
 model Notification {
   id         String   @id @default(cuid())
   receiverId String
@@ -73,17 +75,39 @@ model Comment {
 }
 
 model Meeting {
-  id          String   @id @default(cuid())
-  clubId      String   @unique
-  Club        Club     @relation(fields: [clubId], references: [id])
-  managerId   String   @unique
-  Manager     Profile  @relation(fields: [managerId], references: [id])
+  id          String       @id @default(cuid())
+  clubId      String
+  Club        Club         @relation(fields: [clubId], references: [id])
+  managerId   String
+  Manager     Profile      @relation(fields: [managerId], references: [id])
   venue       String
   timeStart   DateTime
   timeEnd     DateTime
+  title       String
   description String
   theme       String?
   wotd        String?
+  Attendance  Attendance[]
+}
+
+model Attendance {
+  id         String            @id @default(cuid())
+  meetingId  String
+  Meeting    Meeting           @relation(fields: [meetingId], references: [id])
+  roleTypeId String
+  RoleType   MeetingRoleType   @relation(fields: [roleTypeId], references: [id])
+  memberId   String?
+  Member     Profile?          @relation(fields: [memberId], references: [id])
+  roleStatus MeetingRoleStatus
+  Speech     Speech?
+}
+
+model Speech {
+  id           String     @id @default(cuid())
+  attendanceId String     @unique
+  Attendance   Attendance @relation(fields: [attendanceId], references: [id])
+  title        String
+  description  String
 }
 
 model Club {
@@ -108,25 +132,14 @@ model Pathway {
   Profile Profile[]
 }
 
-enum MeetingRoleType {
-  SPEAKER_1
-  SPEAKER_2
-  SPEAKER_3
-  EVALUATOR_1
-  EVALUATOR_2
-  EVALUATOR_3
-  TOASTMASTER
-  TOPIC_MASTER
-  TIMER
-  AH_COUNTER
-  GRAMMARIAN
-  GENERAL_EVALUATOR
-  AWARDS
-  PRESIDENT_INTRO
+model MeetingRoleType {
+  id         String       @id @default(cuid())
+  name       String
+  Attendance Attendance[]
 }
 
 enum MeetingRoleStatus {
   PENDING
   CONFIRMED
-  REJECTED
+  UNASSIGNED
 }

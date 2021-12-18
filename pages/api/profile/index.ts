@@ -1,4 +1,7 @@
-import { getUserProfileHandler } from 'backend/profile'
+import {
+  getUserProfileHandler,
+  updateUserProfileHandler,
+} from 'backend/profile'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getApiSession } from 'utils/get-api-session'
 
@@ -9,6 +12,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
     case 'GET':
       return getUserProfileHandler(req, res, session)
+
+    case 'PUT':
+      return updateUserProfileHandler(req, res, session)
 
     default:
       return res.status(405).json({ message: 'Method not allowed' })

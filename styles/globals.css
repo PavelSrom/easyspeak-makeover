@@ -7,3 +7,9 @@
   margin: 0;
   padding: 0;
 }
+
+@layer base {
+  p {
+    font-family: 'Nunito', 'Helvetica', 'Arial', sans-serif;
+  }
+}

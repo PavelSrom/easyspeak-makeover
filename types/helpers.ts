@@ -11,12 +11,8 @@ export type ApiResponse<T> = T extends Promise<infer U>
     : U
   : never
 
-export type ErrorResponse = {
-  response: {
-    data: {
-      msg: string
-    }
-  }
+export type MapObjPropsToUnion<TObj extends {}, UType> = {
+  [P in keyof TObj]: UType extends P ? P : TObj[P] | UType
 }
 
 export type ApiSession = Session & {
@@ -46,10 +42,20 @@ export type CustomAppProps<P = {}> = Omit<
 export type CustomNextPage = NextPage & PageOptions
 
 export type TextFieldName =
+  | 'body'
+  | 'clubRole'
   | 'confirmPassword'
+  | 'description'
   | 'email'
+  | 'end'
+  | 'memberId'
+  | 'message'
   | 'name'
+  | 'numOfSpeakers'
   | 'password'
   | 'pathway'
   | 'phone'
+  | 'start'
   | 'surname'
+  | 'title'
+  | 'venue'

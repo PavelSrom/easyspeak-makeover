@@ -1,5 +1,8 @@
 export { Button } from './button'
 export type { ButtonProps } from './button'
+export { ConfirmationDialog } from './confirmation-dialog'
+export { StaticDatePicker, TimePicker } from './pickers'
+export type { StaticDatePickerProps } from './pickers'
 export { Text } from './text'
 export type { TextProps } from './text'
 export { TextField } from './text-field'

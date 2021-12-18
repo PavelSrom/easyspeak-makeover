@@ -1,6 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getApiSession } from 'utils/get-api-session'
-import { getAllNotificationsHandler } from 'backend/notifications'
+import {
+  getAllNotificationsHandler,
+  markNotificationsAsReadHandler,
+} from 'backend/notifications'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const session = await getApiSession(req)
@@ -9,6 +12,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
     case 'GET':
       return getAllNotificationsHandler(req, res, session)
+
+    case 'PUT':
+      return markNotificationsAsReadHandler(req, res, session)
 
     default:
       return res.status(405).json({ message: 'Method not allowed' })

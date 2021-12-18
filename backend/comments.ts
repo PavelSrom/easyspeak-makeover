@@ -16,7 +16,9 @@ export const getAllCommentsHandler = async (
     const allComments = await prisma.comment.findMany({
       where,
       orderBy: { createdAt: 'asc' },
-      include: { Author: { select: { id: true, name: true, surname: true } } },
+      include: {
+        Author: { select: { avatar: true, name: true, surname: true } },
+      },
     })
 
     res.json(allComments)
@@ -31,7 +33,7 @@ export const createNewCommentHandler = async (
   res: NextApiResponse,
   session: ApiSession
 ) => {
-  const { isValid, msg } = await validateBody(createNewCommentSchema, req)
+  const { isValid, msg } = await validateBody(createNewCommentSchema, req.body)
   if (!isValid) return res.status(400).json({ message: msg })
 
   const { postId, message: commentMessage } = req.body
@@ -43,7 +45,9 @@ export const createNewCommentHandler = async (
         Post: { connect: { id: postId } },
         message: commentMessage,
       },
-      include: { Author: { select: { id: true, name: true, surname: true } } },
+      include: {
+        Author: { select: { avatar: true, name: true, surname: true } },
+      },
     })
 
     return res.status(201).json(newComment)

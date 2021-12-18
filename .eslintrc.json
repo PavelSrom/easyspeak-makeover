@@ -38,11 +38,14 @@
         ]
       }
     ],
+    "no-underscore-dangle": "off",
     "no-unused-vars": "error",
     "prettier/prettier": ["error", { "endOfLine": "lf" }], // necessary
     "react/function-component-definition": "off",
     "react/jsx-filename-extension": "off", // same?
+    "react/jsx-no-useless-fragment": "off",
     "react/jsx-props-no-spreading": "off",
+    "react/prop-types": "off",
     "react/react-in-jsx-scope": "off", // probably doesn't work with React v17?
     "react/require-default-props": "off",
     "@typescript-eslint/return-await": "off"

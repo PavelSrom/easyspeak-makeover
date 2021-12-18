@@ -10,6 +10,8 @@ export const getAllNotificationsHandler = async (
   try {
     const notifications = await prisma.notification.findMany({
       where: { receiverId: session.user.profileId },
+      // order by unread first, then from newest to oldest
+      orderBy: [{ read: 'asc' }, { createdAt: 'desc' }],
     })
 
     res.json(notifications)
@@ -19,24 +21,28 @@ export const getAllNotificationsHandler = async (
   }
 }
 
-export const markNotificationAsReadHandler = async (
+export const markNotificationsAsReadHandler = async (
   req: NextApiRequest,
   res: NextApiResponse,
   session: ApiSession
 ) => {
   try {
-    const notificationToUpdate = await prisma.notification.findUnique({
-      where: { id: req.query.id as string },
+    const notificationsToUpdate = await prisma.notification.findMany({
+      where: { receiverId: session.user.profileId, read: false },
     })
-    if (notificationToUpdate?.receiverId !== session.user.profileId)
+    const allNotifsBelongToUser = notificationsToUpdate.every(
+      notif => notif.receiverId === session.user.profileId
+    )
+
+    if (!allNotifsBelongToUser)
       return res.status(403).json({ message: 'Access denied' })
 
-    const updatedNotification = await prisma.notification.update({
-      where: { id: req.query.id as string },
+    const updatedNotifications = await prisma.notification.updateMany({
+      where: { receiverId: session.user.profileId, read: false },
       data: { read: true },
     })
 
-    return res.json(updatedNotification)
+    return res.json(updatedNotifications)
   } catch ({ message }) {
     return res.status(500).json({ message })
   }

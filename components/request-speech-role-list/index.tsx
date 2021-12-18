@@ -13,7 +13,7 @@ import { Text } from 'ui'
 const RequestedSpeechItem = (
   requestedSpeeches: DashboardDTO['requestedSpeeches']
 ) => {
-  if (requestedSpeeches) {
+  if (requestedSpeeches?.length > 0) {
     return requestedSpeeches!.map(speaker => (
       <SpeakerBase key={speaker.id} speaker={speaker}>
         <div className="flex items-start">

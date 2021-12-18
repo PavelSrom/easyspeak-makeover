@@ -16,6 +16,7 @@ import { LoadingPostItem } from 'ui/feedback/loading-post-item'
 import error from 'public/feedback-illustrations/error.svg'
 import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
 import { useAuth } from 'contexts/auth'
+import no_pinned_post from 'public/feedback-illustrations/no_pinned_post.svg'
 
 const Discussion: CustomNextPage = () => {
   const [newPostDialogOpen, setNewPostDialogOpen] = useState<boolean>(false)
@@ -79,7 +80,15 @@ const Discussion: CustomNextPage = () => {
               />
             ))
           ) : (
-            <p>No posts have been added yet</p>
+            <Paper>
+              <IllustrationFeedback
+                title="Be the first!"
+                message={`No posts have been added in ${
+                  profile?.User.Club.name || 'your club'
+                }, click "create post" and make the first post`}
+                illustration={no_pinned_post}
+              />
+            </Paper>
           )}
         </div>
       )}

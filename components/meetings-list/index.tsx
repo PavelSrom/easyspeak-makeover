@@ -8,6 +8,7 @@ import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
 import { LoadingListItem } from 'ui/feedback/loadling-list-item'
 import error from 'public/feedback-illustrations/error.svg'
 import { useAuth } from 'contexts/auth'
+import no_notifications from 'public/feedback-illustrations/no_notifications.svg'
 
 export type MeetingListProps = {
   query: UseQueryResult<
@@ -59,11 +60,24 @@ export const MeetingsList = ({
       )}
       {query.isSuccess &&
         query.data &&
-        (query.data ?? []).map(meeting => (
-          <MeetingCard
-            key={meeting.id}
-            meeting={meeting}
-            onNavigate={() => router.push(`/meetings/${meeting.id}`)}
+        (query.data.length > 0 ? (
+          <>
+            {(query.data ?? []).map(meeting => (
+              <MeetingCard
+                key={meeting.id}
+                meeting={meeting}
+                onNavigate={() => router.push(`/meetings/${meeting.id}`)}
+              />
+            ))}
+          </>
+        ) : (
+          <IllustrationFeedback
+            title="No Meetings"
+            message={`${
+              profile?.User.Club.name || 'Your club'
+            } does not have any meetings yet `}
+            illustration={no_notifications}
+            illustrationStyles="w-1/2 sm:w-1/3"
           />
         ))}
       {onClick && (

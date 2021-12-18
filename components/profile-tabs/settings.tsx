@@ -5,6 +5,9 @@ import { useAuth } from 'contexts/auth'
 import { Form, Formik } from 'formik'
 import { useState } from 'react'
 import { Button, Text, TextField } from 'ui'
+import { useTypeSafeMutation } from 'hooks'
+import { useSnackbar } from 'notistack'
+import { changePasswordSchema } from 'utils/payload-validations'
 
 const initialValues = {
   password: '',
@@ -13,8 +16,21 @@ const initialValues = {
 
 export const ProfileSettings = () => {
   const { profile } = useAuth()
+  const { enqueueSnackbar } = useSnackbar()
   const [notifsEmail, setNotifsEmail] = useState(profile?.receiveEmail)
   const [notifsPhone, setNotifsPhone] = useState(profile?.receiveNotifs)
+
+  const { mutateAsync: changePassword, isLoading: isChangingPassword } =
+    useTypeSafeMutation('changePassword', {
+      onSuccess: () => {
+        enqueueSnackbar('Password has been changed', { variant: 'success' })
+      },
+      onError: err => {
+        enqueueSnackbar(err.response.data.message ?? 'Cannot change password', {
+          variant: 'error',
+        })
+      },
+    })
 
   return (
     <>
@@ -25,17 +41,23 @@ export const ProfileSettings = () => {
 
         <Formik
           initialValues={initialValues}
-          onSubmit={values => console.log(values)}
+          validationSchema={changePasswordSchema}
+          onSubmit={async (values, { resetForm }) => {
+            await changePassword([values])
+            resetForm()
+          }}
         >
           <Form className="space-y-4">
-            <TextField name="password" type="password" label="Password" />
+            <TextField name="password" type="password" label="New password" />
             <TextField
               name="confirmPassword"
               type="password"
               label="Confirm password"
             />
             <div className="flex justify-end">
-              <Button type="submit">Change password</Button>
+              <Button loading={isChangingPassword} type="submit">
+                Change password
+              </Button>
             </div>
           </Form>
         </Formik>

@@ -24,6 +24,7 @@ import {
   CreateMemberPayload,
   CreatePostPayload,
   MemberRoleAssignPayload,
+  PasswordChangePayload,
   UpdateProfilePayload,
 } from 'types/payloads'
 
@@ -111,6 +112,12 @@ export const requests = {
         .then(response => response.data),
     authSignup: (payload: CreateMemberPayload): Promise<{ message: string }> =>
       axios.post('/api/auth/signup', payload).then(response => response.data),
+    changePassword: (
+      payload: PasswordChangePayload
+    ): Promise<{ message: string }> =>
+      axios
+        .post('/api/auth/change-password', payload)
+        .then(response => response.data),
     deleteUserAccount: (): Promise<{ message: string }> =>
       axios.delete('/api/auth/delete').then(response => response.data),
     // PROFILE

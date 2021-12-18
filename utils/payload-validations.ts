@@ -40,7 +40,10 @@ export const authSignupSchema = Yup.object().shape({
     .min(6, YUP_MSG.CHAR_MIN(6))
     .max(20, YUP_MSG.CHAR_MAX(20))
     .required(YUP_MSG.REQ),
-  confirmPassword: Yup.ref('password'),
+  confirmPassword: Yup.string().oneOf(
+    [Yup.ref('password')],
+    'Passwords do not match'
+  ),
   pathway: Yup.string().required(YUP_MSG.REQ),
 })
 
@@ -50,6 +53,17 @@ export const authSigninSchema = Yup.object().shape({
     .min(6, YUP_MSG.CHAR_MIN(6))
     .max(20, YUP_MSG.CHAR_MAX(20))
     .required(YUP_MSG.REQ),
+})
+
+export const changePasswordSchema = Yup.object().shape({
+  password: Yup.string()
+    .min(6, YUP_MSG.CHAR_MIN(6))
+    .max(20, YUP_MSG.CHAR_MAX(20))
+    .required(YUP_MSG.REQ),
+  confirmPassword: Yup.string().oneOf(
+    [Yup.ref('password')],
+    'Passwords do not match'
+  ),
 })
 
 export const createNewPostSchema = Yup.object().shape({

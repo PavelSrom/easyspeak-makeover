@@ -16,7 +16,7 @@ import { useTypeSafeMutation, useTypeSafeQuery } from 'hooks'
 import { useRouter } from 'next/router'
 import { Fragment, useMemo, useState } from 'react'
 import { CustomNextPage } from 'types/helpers'
-import { Button, Text, TextField, TimePicker } from 'ui'
+import { Button, ConfirmationDialog, Text, TextField, TimePicker } from 'ui'
 import { useSnackbar } from 'notistack'
 import { CreateMeetingPayload } from 'types/payloads'
 import {
@@ -28,6 +28,7 @@ import { Help } from '@mui/icons-material'
 import { theme } from 'styles/theme'
 
 const AddMeeting: CustomNextPage = () => {
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false)
   const [anchorEl, setAnchorEl] = useState<Element | null>(null)
   const [helperRoles, setHelperRoles] = useState<
     { id: string; name: string }[]
@@ -90,7 +91,7 @@ const AddMeeting: CustomNextPage = () => {
     numOfSpeakers: 3,
   }
 
-  const handleSubmit = async ({
+  const handleMeetingSubmit = async ({
     numOfSpeakers,
     ...values
   }: typeof initialValues): Promise<void> => {
@@ -130,9 +131,9 @@ const AddMeeting: CustomNextPage = () => {
         <Formik
           initialValues={initialValues}
           validationSchema={createNewMeetingSchemaPartial}
-          onSubmit={handleSubmit}
+          onSubmit={handleMeetingSubmit}
         >
-          {({ values, setFieldValue }) => (
+          {({ values, setFieldValue, handleSubmit }) => (
             <Form>
               <div className="space-y-4">
                 <Text variant="h3">Meeting details</Text>
@@ -247,14 +248,22 @@ const AddMeeting: CustomNextPage = () => {
               </div>
               <div className="mt-4 max-w-xs m-auto">
                 <Button
-                  loading={isCreatingMeeting}
-                  type="submit"
                   color="secondary"
                   fullWidth
+                  onClick={() => setConfirmDialogOpen(true)}
                 >
                   Create meeting
                 </Button>
               </div>
+
+              <ConfirmationDialog
+                open={confirmDialogOpen}
+                onClose={() => setConfirmDialogOpen(false)}
+                onConfirm={() => handleSubmit()}
+                loading={isCreatingMeeting}
+                description="Are you sure you want to create this meeting? This action is irreversible and you will not be able to adjust the agenda anymore!"
+                confirmText="Create"
+              />
             </Form>
           )}
         </Formik>

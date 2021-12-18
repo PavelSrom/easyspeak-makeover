@@ -73,7 +73,11 @@ export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
 
   const drawer = (
     <div className="p-4 bg-primary h-full flex flex-col">
-      <div className="flex">
+      <div
+        className="flex cursor-pointer"
+        onClick={() => router.push(`/profile`)}
+        role="link"
+      >
         <Avatar src={profile?.avatar ?? ''} className="w-16 h-16" />
         <div className="pl-4">
           <Text
@@ -138,11 +142,11 @@ export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
           position="fixed"
           className="rounded-b-3xl"
           sx={{
-            width: { md: !!session ? `calc(100% - ${drawerWidth}px)` : '100%' },
-            ml: { md: !!session ? `${drawerWidth}px` : '100%' },
+            width: { md: session ? `calc(100% - ${drawerWidth}px)` : '100%' },
+            ml: { md: session ? `${drawerWidth}px` : '100%' },
           }}
         >
-          <Toolbar>
+          <Toolbar className="onboarding-3">
             <div
               className={clsx('w-full flex items-center text-white', {
                 'justify-between': !!session,
@@ -203,7 +207,7 @@ export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
               open={drawerOpen}
               anchor="left"
               onClose={() => setDrawerOpen(false)}
-              className={'p-4'}
+              className="p-4"
               sx={{
                 display: { xs: 'block', md: 'none' },
                 '& .MuiDrawer-paper': { boxSizing: 'border-box' },
@@ -213,7 +217,7 @@ export const LayoutProvider = ({ pageTitle, children, tabs = [] }: Props) => {
             </Drawer>
             <Drawer
               variant="permanent"
-              className={'p-4'}
+              className="p-4"
               sx={{
                 display: { xs: 'none', md: 'block' },
                 '& .MuiDrawer-paper': {

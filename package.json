@@ -15,8 +15,7 @@
     "prisma:studio": "npx prisma studio",
     "prisma:edit-db": "npm run prisma:push && npm run prisma:generate",
     "prisma:seed": "npx prisma db seed",
-    "test": "jest",
-    "cypress:open": "cypress open"
+    "postinstall": "npm run prisma:generate && npm run format"
   },
   "dependencies": {
     "@emotion/cache": "^11.6.0",
@@ -29,6 +28,7 @@
     "@mui/material": "^5.2.0",
     "@mui/styles": "^5.2.1",
     "@prisma/client": "^3.6.0",
+    "@sendgrid/mail": "^7.6.0",
     "axios": "^0.24.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^1.1.1",
@@ -42,6 +42,7 @@
     "query-string": "^7.0.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-joyride": "^2.3.2",
     "react-query": "^3.33.4",
     "yup": "^0.32.11"
   },

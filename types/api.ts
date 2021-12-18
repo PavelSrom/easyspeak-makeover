@@ -7,13 +7,18 @@ import {
   getClubMembersHandler,
 } from 'backend/club'
 import { getAllNotificationsHandler } from 'backend/notifications'
-import { getAllPostsHandler, getPostByIdHandler } from 'backend/posts'
+import {
+  getAllPostsHandler,
+  getPinnedPostHandler,
+  getPostByIdHandler,
+} from 'backend/posts'
 import { getUserActivityHandler, getUserProfileHandler } from 'backend/profile'
 import {
   getAllMeetingsHandler,
   getFullAgendaHandler,
   getMeetingByIdHandler,
 } from 'backend/meetings'
+import { getDashBoardHandler } from 'backend/dashboard'
 import { ApiResponse } from './helpers'
 
 export type NewUserDTO = ApiResponse<ReturnType<typeof createNewMemberHandler>>
@@ -27,6 +32,8 @@ export type PostSimpleDTO = ApiResponse<
 >[number]
 
 export type PostFullDTO = ApiResponse<ReturnType<typeof getPostByIdHandler>>
+
+export type PinnedPostDTO = ApiResponse<ReturnType<typeof getPinnedPostHandler>>
 
 export type CommentDTO = ApiResponse<
   ReturnType<typeof getAllCommentsHandler>
@@ -61,3 +68,5 @@ export type MeetingFullDTO = ApiResponse<
 >
 
 export type AgendaFullDTO = ApiResponse<ReturnType<typeof getFullAgendaHandler>>
+
+export type DashboardDTO = ApiResponse<ReturnType<typeof getDashBoardHandler>>

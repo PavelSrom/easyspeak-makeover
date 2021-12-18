@@ -6,6 +6,7 @@ import { Fragment, useState } from 'react'
 import { Text } from 'ui'
 import { theme } from 'styles/theme'
 import { BoardSimpleDTO } from 'types/api'
+import { clubRolesExplanations } from 'utils/club-roles-explanations'
 
 type Props = { boardMember: BoardSimpleDTO }
 
@@ -17,7 +18,9 @@ export const BoardMemberItem = ({ boardMember }: Props) => {
       <div className="flex items-start">
         <div className="flex-1 mr-4">
           <Text variant="h3">{boardMember.ClubRole?.name}</Text>
-          <Text variant="body">Lorem ipsum for now</Text>
+          <Text variant="body">
+            {clubRolesExplanations[boardMember.ClubRole!.name]}
+          </Text>
 
           <Collapse in={isExpanded}>
             <div className="flex items-center mt-2">

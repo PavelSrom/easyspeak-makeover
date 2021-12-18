@@ -25,6 +25,11 @@ export type AuthSignInPayload = {
   password: string
 }
 
+export type PasswordChangePayload = {
+  password: string
+  confirmPassword: string
+}
+
 export type CreatePostPayload = {
   title: string
   body: string

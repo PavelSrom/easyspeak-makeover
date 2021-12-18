@@ -6,7 +6,7 @@ import { useAuth } from 'contexts/auth'
 import { useMeetingAgenda } from 'contexts/meeting-agenda'
 import { createContext, useContext, useMemo, useState } from 'react'
 import { AgendaFullDTO } from 'types/api'
-import { Text } from 'ui'
+import { Button, ConfirmationDialog, Text } from 'ui'
 
 type HelperBaseProps = {
   helper: AgendaFullDTO['helpers'][number]
@@ -52,12 +52,13 @@ const useHelper = (): HelperBaseProps['helper'] => {
 
 const AddButtonOrAvatar: React.FC = () => {
   const { roleStatus, roleTypeId, Member } = useHelper()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [assignRoleDialogOpen, setAssignRoleDialogOpen] =
     useState<boolean>(false)
   const { profile } = useAuth()
   const {
     isBoardMember,
-    isAssigningRole,
+    meetingIsReadOnly,
     meetingId,
     memberAssignRole,
     adminAssignRole,
@@ -84,7 +85,7 @@ const AddButtonOrAvatar: React.FC = () => {
           color="secondary"
           size="small"
           className="text-white"
-          disabled={isAssigningRole}
+          disabled={meetingIsReadOnly}
           onClick={handleButtonClick}
         >
           <AddOutlined />
@@ -95,10 +96,14 @@ const AddButtonOrAvatar: React.FC = () => {
         open={assignRoleDialogOpen}
         defaultValue={profile?.id ?? ''}
         members={members}
+        loading={isLoading}
         onClose={() => setAssignRoleDialogOpen(false)}
         onAssign={async ({ memberId }) => {
+          setIsLoading(true)
+
           await adminAssignRole({ memberId, meetingId, roleId: roleTypeId })
           setAssignRoleDialogOpen(false)
+          setIsLoading(false)
         }}
       />
     </>
@@ -133,30 +138,95 @@ HelperBase.Information = Information
 HelperBase.Information.displayName = 'HelperBase.Information'
 
 const DeleteIcon: React.FC = () => {
-  const { isBoardMember, memberUnassignRole, meetingId } = useMeetingAgenda()
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { isBoardMember, memberUnassignRole, meetingId, meetingIsReadOnly } =
+    useMeetingAgenda()
   const { memberId, roleTypeId, roleStatus } = useHelper()
   const { profile } = useAuth()
 
-  // do not show anything if not a board member or not their role
-  if (!isBoardMember || memberId !== profile?.id || roleStatus === 'UNASSIGNED')
-    return null
+  const isMyRole = profile?.id === memberId
+  const isConfirmedRole = roleStatus === 'CONFIRMED'
+
+  if (!isBoardMember) return null
+  if (!isMyRole) return null
+  if (!isConfirmedRole) return null
+  if (meetingIsReadOnly) return null
 
   return (
-    <IconButton
-      size="small"
-      edge="end"
-      onClick={() => memberUnassignRole({ meetingId, roleId: roleTypeId })}
-    >
-      <Delete />
-    </IconButton>
+    <>
+      <IconButton
+        size="small"
+        edge="end"
+        onClick={() => setConfirmDialogOpen(true)}
+      >
+        <Delete />
+      </IconButton>
+
+      <ConfirmationDialog
+        loading={isLoading}
+        open={confirmDialogOpen}
+        onClose={() => setConfirmDialogOpen(false)}
+        onConfirm={async () => {
+          setIsLoading(true)
+
+          await memberUnassignRole({ meetingId, roleId: roleTypeId })
+          setIsLoading(false)
+        }}
+        description="Are you sure you want to remove yourself from this role?"
+        confirmText="Remove"
+      />
+    </>
   )
 }
 
 HelperBase.DeleteIcon = DeleteIcon
 HelperBase.DeleteIcon.displayName = 'HelperBase.DeleteIcon'
 
-// TODO
-const AcceptOrDecline: React.FC = () => null
+const AcceptOrDecline: React.FC = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { acceptAssignedRole, meetingId, meetingIsReadOnly } =
+    useMeetingAgenda()
+  const { id, memberId, roleStatus } = useHelper()
+  const { profile } = useAuth()
+
+  const handleAccept = (accepted: boolean): void => {
+    setIsLoading(true)
+
+    acceptAssignedRole({
+      meetingId,
+      roleId: id,
+      accepted,
+    }).finally(() => setIsLoading(false))
+  }
+
+  const isMyRole = profile?.id === memberId
+  const isPending = roleStatus === 'PENDING'
+
+  if (!isMyRole) return null
+  if (!isPending) return null
+  if (meetingIsReadOnly) return null
+
+  return (
+    <div className="flex space-x-4 mt-4">
+      <Button
+        color="secondary"
+        loading={isLoading}
+        onClick={() => handleAccept(true)}
+      >
+        Accept
+      </Button>
+      <Button
+        variant="outlined"
+        color="secondary"
+        loading={isLoading}
+        onClick={() => handleAccept(false)}
+      >
+        Decline
+      </Button>
+    </div>
+  )
+}
 
 HelperBase.AcceptOrDecline = AcceptOrDecline
 HelperBase.AcceptOrDecline.displayName = 'HelperBase.AcceptOrDecline'

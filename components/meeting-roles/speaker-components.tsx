@@ -7,7 +7,7 @@ import { useAuth } from 'contexts/auth'
 import { useMeetingAgenda } from 'contexts/meeting-agenda'
 import { createContext, useContext, useMemo, useState } from 'react'
 import { AgendaFullDTO } from 'types/api'
-import { Text } from 'ui'
+import { Button, ConfirmationDialog, Text } from 'ui'
 
 type SpeakerBaseProps = {
   speaker: AgendaFullDTO['speakers'][number]
@@ -53,13 +53,14 @@ const useSpeaker = (): SpeakerBaseProps['speaker'] => {
 
 const AddButtonOrAvatar: React.FC = () => {
   const [speechDialogOpen, setSpeechDialogOpen] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [assignRoleDialogOpen, setAssignRoleDialogOpen] =
     useState<boolean>(false)
   const { profile } = useAuth()
   const {
     isBoardMember,
-    isAssigningRole,
     meetingId,
+    meetingIsReadOnly,
     members,
     memberAssignRole,
     adminAssignRole,
@@ -84,7 +85,7 @@ const AddButtonOrAvatar: React.FC = () => {
             color="secondary"
             size="small"
             className="text-white"
-            disabled={isAssigningRole}
+            disabled={meetingIsReadOnly}
             onClick={handleButtonClick}
           >
             <AddOutlined />
@@ -92,7 +93,7 @@ const AddButtonOrAvatar: React.FC = () => {
 
           <RequestSpeechDialog
             open={speechDialogOpen}
-            isSubmitting={isAssigningRole}
+            isSubmitting={isLoading}
             onClose={() => setSpeechDialogOpen(false)}
             onRequest={values =>
               memberAssignRole({
@@ -107,10 +108,14 @@ const AddButtonOrAvatar: React.FC = () => {
             open={assignRoleDialogOpen}
             defaultValue={profile?.id ?? ''}
             members={members}
+            loading={isLoading}
             onClose={() => setAssignRoleDialogOpen(false)}
             onAssign={async ({ memberId }) => {
+              setIsLoading(true)
+
               await adminAssignRole({ memberId, meetingId, roleId: roleTypeId })
               setAssignRoleDialogOpen(false)
+              setIsLoading(false)
             }}
           />
         </>
@@ -136,7 +141,6 @@ const Information: React.FC = () => {
           <Text variant="caption">
             {`${Member?.name} ${Member?.surname}`} (pending)
           </Text>
-
           <div className="mt-2">
             <Text variant="body2" className="font-semibold">
               {Speech?.title}
@@ -167,36 +171,175 @@ SpeakerBase.Information = Information
 SpeakerBase.Information.displayName = 'SpeakerBase.Information'
 
 const DeleteIcon: React.FC = () => {
-  const { isBoardMember, memberUnassignRole, meetingId } = useMeetingAgenda()
+  const { isBoardMember, memberUnassignRole, meetingId, meetingIsReadOnly } =
+    useMeetingAgenda()
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const { memberId, roleTypeId, roleStatus } = useSpeaker()
   const { profile } = useAuth()
 
-  // do not show anything if not a board member or not their speech
-  if (!isBoardMember || memberId !== profile?.id || roleStatus === 'UNASSIGNED')
-    return null
+  const isMyRole = profile?.id === memberId
+  const isConfirmedRole = roleStatus === 'CONFIRMED'
+
+  if (!isBoardMember) return null
+  if (!isMyRole) return null
+  if (!isConfirmedRole) return null
+  if (meetingIsReadOnly) return null
 
   return (
-    <IconButton
-      size="small"
-      edge="end"
-      onClick={() => memberUnassignRole({ meetingId, roleId: roleTypeId })}
-    >
-      <Delete />
-    </IconButton>
+    <>
+      <IconButton
+        size="small"
+        edge="end"
+        onClick={() => setConfirmDialogOpen(true)}
+      >
+        <Delete />
+      </IconButton>
+
+      <ConfirmationDialog
+        loading={isLoading}
+        open={confirmDialogOpen}
+        onClose={() => setConfirmDialogOpen(false)}
+        onConfirm={async () => {
+          setIsLoading(true)
+
+          await memberUnassignRole({ meetingId, roleId: roleTypeId })
+          setIsLoading(false)
+        }}
+        description="Are you sure you want to remove yourself from this role?"
+        confirmText="Remove"
+      />
+    </>
   )
 }
 
 SpeakerBase.DeleteIcon = DeleteIcon
 SpeakerBase.DeleteIcon.displayName = 'SpeakerBase.DeleteIcon'
 
-// TODO
-const ApproveOrReject: React.FC = () => null
+const ApproveOrReject: React.FC = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { isBoardMember, meetingId, meetingIsReadOnly, approveSpeech } =
+    useMeetingAgenda()
+  const { roleStatus, Speech, memberId } = useSpeaker()
+  const { profile } = useAuth()
+
+  const toggleApproval = async (approved: boolean): Promise<void> => {
+    setIsLoading(true)
+
+    await approveSpeech({ meetingId, speechId: Speech!.id, approved })
+    setIsLoading(false)
+  }
+
+  const isMyRole = profile?.id === memberId
+  const isPending = roleStatus === 'PENDING'
+  const speechIsAssigned = !!Speech
+
+  if (!isBoardMember) return null
+  if (isMyRole) return null
+  if (!isPending) return null
+  if (!speechIsAssigned) return null
+  if (meetingIsReadOnly) return null
+
+  return (
+    <div className="flex space-x-4 mt-4">
+      <Button
+        color="secondary"
+        loading={isLoading}
+        onClick={() => toggleApproval(true)}
+      >
+        Approve
+      </Button>
+      <Button
+        variant="outlined"
+        color="secondary"
+        loading={isLoading}
+        onClick={() => toggleApproval(false)}
+      >
+        Reject
+      </Button>
+    </div>
+  )
+}
 
 SpeakerBase.ApproveOrReject = ApproveOrReject
 SpeakerBase.ApproveOrReject.displayName = 'SpeakerBase.ApproveOrReject'
 
-// TODO
-const AcceptOrDecline: React.FC = () => null
+const AcceptOrDecline: React.FC = () => {
+  const [speechDialogOpen, setSpeechDialogOpen] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { acceptAssignedRole, meetingId, meetingIsReadOnly } =
+    useMeetingAgenda()
+  const { id, RoleType, Speech, memberId, roleStatus } = useSpeaker()
+  const { profile } = useAuth()
+
+  const handleAccept = (): void => {
+    const isAcceptingSpeech = RoleType.name.toLowerCase().includes('speaker')
+
+    if (isAcceptingSpeech) {
+      setSpeechDialogOpen(true)
+    } else {
+      setIsLoading(true)
+
+      acceptAssignedRole({
+        meetingId,
+        roleId: id,
+        accepted: true,
+      }).finally(() => setIsLoading(false))
+    }
+  }
+
+  const isMyRole = profile?.id === memberId
+  const isPending = roleStatus === 'PENDING'
+  const speechIsAssigned = !!Speech
+
+  if (!isMyRole) return null
+  if (!isPending) return null
+  if (speechIsAssigned) return null
+  if (meetingIsReadOnly) return null
+
+  return (
+    <>
+      <div className="flex space-x-4 mt-4">
+        <Button color="secondary" loading={isLoading} onClick={handleAccept}>
+          Accept
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          loading={isLoading}
+          onClick={() => {
+            setIsLoading(true)
+
+            acceptAssignedRole({
+              meetingId,
+              roleId: id,
+              accepted: false,
+            }).finally(() => setIsLoading(false))
+          }}
+        >
+          Decline
+        </Button>
+      </div>
+
+      <RequestSpeechDialog
+        open={speechDialogOpen}
+        isSubmitting={isLoading}
+        onClose={() => setSpeechDialogOpen(false)}
+        onRequest={async values => {
+          setIsLoading(true)
+
+          await acceptAssignedRole({
+            meetingId,
+            roleId: id,
+            accepted: true,
+            speech: values,
+          })
+          setIsLoading(false)
+        }}
+      />
+    </>
+  )
+}
 
 SpeakerBase.AcceptOrDecline = AcceptOrDecline
 SpeakerBase.AcceptOrDecline.displayName = 'SpeakerBase.AcceptOrDecline'

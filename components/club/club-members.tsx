@@ -1,5 +1,7 @@
 import { Avatar, Divider, Fab, IconButton, Paper } from '@mui/material'
 import AddOutlined from '@mui/icons-material/AddOutlined'
+import MarkEmailRead from '@mui/icons-material/MarkEmailRead'
+import Email from '@mui/icons-material/Email'
 import Delete from '@mui/icons-material/Delete'
 import { Text } from 'ui'
 import {
@@ -54,6 +56,16 @@ export const ClubMembers = () => {
       },
     })
 
+  const { mutate: resendInvitation, isLoading: isResendingInvitation } =
+    useTypeSafeMutation('resendInvitationEmail', {
+      onSuccess: () => {
+        enqueueSnackbar('Invitation email resent', { variant: 'success' })
+      },
+      onError: () => {
+        enqueueSnackbar('Cannot resend invitation email', { variant: 'error' })
+      },
+    })
+
   const handleMemberNavigate = (id: string) => {
     if (id === profile?.id) return
 
@@ -98,34 +110,61 @@ export const ClubMembers = () => {
         </Text>
         {clubMembersQuery.isLoading && <p>Loading...</p>}
         {clubMembersQuery.isError && <p>Error!</p>}
-        {clubMembersQuery.isSuccess &&
-          clubMembersQuery.data &&
-          clubMembersQuery.data.pendingInvites.map(invite => (
-            <Fragment key={invite.id}>
-              <div className="flex">
-                <Divider className="my-4" />
-
-                <Avatar src="" className="w-10 h-10 mr-4" />
-                <div className="flex-1 flex justify-between items-center">
-                  <div>
-                    <Text className="font-semibold">{invite.email}</Text>
-                    <Text variant="body2">
-                      {formatDistance(new Date(invite.createdAt), new Date())}{' '}
-                      ago
-                    </Text>
+        {clubMembersQuery.isSuccess && clubMembersQuery.data && (
+          <>
+            {clubMembersQuery.data.pendingInvites.length > 0 ? (
+              clubMembersQuery.data.pendingInvites.map(invite => (
+                <Fragment key={invite.id}>
+                  <div className="flex">
+                    <Divider className="my-4" />
+                    <div className="flex-1 flex justify-between items-start">
+                      <div>
+                        <Text className="font-semibold">{invite.email}</Text>
+                        <Text variant="body2">
+                          {formatDistance(
+                            new Date(invite.createdAt),
+                            new Date()
+                          )}{' '}
+                          ago
+                        </Text>
+                        {invite.invitationSent && (
+                          <div className="flex items-center">
+                            <MarkEmailRead className="text-lg mr-2" />
+                            <Text variant="caption">Email sent</Text>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex space-x-2 relative -right-2">
+                        <IconButton
+                          size="small"
+                          edge="end"
+                          disabled={isResendingInvitation}
+                          onClick={() => resendInvitation([invite.id])}
+                        >
+                          <Email />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          edge="end"
+                          disabled={isDeletingInvite}
+                          onClick={() => deleteMemberInvite([invite.id])}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </div>
+                    </div>
                   </div>
-                  <IconButton
-                    disabled={isDeletingInvite}
-                    onClick={() => deleteMemberInvite([invite.id])}
-                  >
-                    <Delete />
-                  </IconButton>
-                </div>
-              </div>
 
-              <Divider className="my-4" />
-            </Fragment>
-          ))}
+                  <Divider className="my-4" />
+                </Fragment>
+              ))
+            ) : (
+              <Text className="text-center">
+                (There are no pending invites)
+              </Text>
+            )}
+          </>
+        )}
       </Paper>
 
       <Fab

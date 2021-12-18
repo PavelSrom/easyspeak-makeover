@@ -15,6 +15,8 @@ export const AgendaSpeakers = () => {
       </Text>
     )
 
+  console.log(speakers)
+
   return (
     <>
       {speakers.map(speaker => (
@@ -25,6 +27,8 @@ export const AgendaSpeakers = () => {
             </div>
             <div className="flex-1">
               <SpeakerBase.Information />
+              <SpeakerBase.ApproveOrReject />
+              <SpeakerBase.AcceptOrDecline />
             </div>
             <SpeakerBase.DeleteIcon />
           </div>

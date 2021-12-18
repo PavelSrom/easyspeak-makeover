@@ -15,6 +15,7 @@ import {
   PostSimpleDTO,
   ProfileActivityDTO,
   ProfileDTO,
+  DashboardDTO,
 } from 'types/api'
 import {
   AdminRoleAssignPayload,
@@ -23,14 +24,17 @@ import {
   CreateMemberPayload,
   CreatePostPayload,
   MemberRoleAssignPayload,
+  PasswordChangePayload,
   UpdateProfilePayload,
 } from 'types/payloads'
 
 export const requests = {
   query: {
     // POSTS
-    getAllPosts: (): Promise<PostSimpleDTO[]> =>
-      axios.get('/api/posts').then(response => response.data),
+    getAllPosts: (params: { isPinned?: true }): Promise<PostSimpleDTO[]> => {
+      const query = queryString.stringify(params)
+      return axios.get(`/api/posts?${query}`).then(response => response.data)
+    },
     getPostById: (id: string): Promise<PostFullDTO> =>
       axios.get(`/api/posts/${id}`).then(response => response.data),
     // NOTIFICATIONS
@@ -86,6 +90,9 @@ export const requests = {
       axios.get('/api/pathways').then(response => response.data),
     getClubRoles: (): Promise<{ id: string; name: string }[]> =>
       axios.get('/api/club-roles').then(response => response.data),
+    // DASHBOARD
+    getDashboard: (): Promise<DashboardDTO> =>
+      axios.get('/api/dashboard').then(response => response.data),
   },
   mutation: {
     // AUTH
@@ -97,12 +104,20 @@ export const requests = {
       axios
         .delete(`/api/auth/create-member/${id}`)
         .then(response => response.data),
+    resendInvitationEmail: (id: string): Promise<{ message: string }> =>
+      axios.post(`/api/auth/email/${id}`).then(response => response.data),
     authCheckUser: (email: string): Promise<{ id: string }> =>
       axios
         .post('/api/auth/check-user', { email })
         .then(response => response.data),
     authSignup: (payload: CreateMemberPayload): Promise<{ message: string }> =>
       axios.post('/api/auth/signup', payload).then(response => response.data),
+    changePassword: (
+      payload: PasswordChangePayload
+    ): Promise<{ message: string }> =>
+      axios
+        .post('/api/auth/change-password', payload)
+        .then(response => response.data),
     deleteUserAccount: (): Promise<{ message: string }> =>
       axios.delete('/api/auth/delete').then(response => response.data),
     // PROFILE
@@ -123,6 +138,9 @@ export const requests = {
       axios.put(`/api/posts/${id}`, payload).then(response => response.data),
     deletePostById: (id: string): Promise<{ message: string }> =>
       axios.delete(`/api/posts/${id}`).then(response => response.data),
+    // PIN
+    tooglePostPinStatus: (id: string): Promise<{ message: string }> =>
+      axios.put(`/api/posts/${id}/pin`).then(response => response.data),
     // COMMENTS
     createNewComment: (payload: CreateCommentPayload): Promise<CommentDTO> =>
       axios.post('/api/comments', payload).then(response => response.data),
@@ -178,6 +196,37 @@ export const requests = {
     }: AdminRoleAssignPayload): Promise<{ message: string }> =>
       axios
         .post(`/api/meetings/${meetingId}/admin-assign/${roleId}`, { memberId })
+        .then(response => response.data),
+    acceptAssignedRole: ({
+      meetingId,
+      roleId,
+      accepted,
+      speech,
+    }: {
+      meetingId: string
+      roleId: string
+      accepted: boolean
+      speech?: { title: string; description: string }
+    }): Promise<{ message: string }> =>
+      axios
+        .post(
+          `/api/meetings/${meetingId}/accept-role/${roleId}?accepted=${accepted}`,
+          { speech }
+        )
+        .then(response => response.data),
+    toggleSpeechApproval: ({
+      meetingId,
+      speechId,
+      approved,
+    }: {
+      meetingId: string
+      speechId: string
+      approved: boolean
+    }): Promise<{ message: string }> =>
+      axios
+        .post(
+          `/api/meetings/${meetingId}/speech-approval/${speechId}?approved=${approved}`
+        )
         .then(response => response.data),
   },
 }

@@ -12,6 +12,7 @@ import { SnackbarProvider } from 'notistack'
 import { AuthProvider } from 'contexts/auth'
 import { LayoutProvider } from 'contexts/page-layout'
 import { CustomAppProps } from 'types/helpers'
+import { OnboardingProvider } from 'contexts/onboarding'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -39,9 +40,11 @@ const MyApp = ({
                   pageTitle={Component.pageTitle}
                   tabs={Component.tabs}
                 >
-                  {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                  <CssBaseline />
-                  <Component {...otherPageProps} />
+                  <OnboardingProvider>
+                    {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                    <CssBaseline />
+                    <Component {...otherPageProps} />
+                  </OnboardingProvider>
                 </LayoutProvider>
               </AuthProvider>
             </SnackbarProvider>

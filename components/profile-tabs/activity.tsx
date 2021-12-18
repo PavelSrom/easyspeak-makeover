@@ -23,17 +23,15 @@ export const ProfileActivity = () => {
           Next meetings
         </Text>
         {meetings.length > 0 ? (
-          <div className="divide-y-2">
-            {meetings.map(meeting => (
-              <MeetingCard
-                key={meeting.id}
-                meeting={meeting}
-                onNavigate={() => router.push(`/meetings/${meeting.id}`)}
-              />
-            ))}
-          </div>
+          meetings.map(meeting => (
+            <MeetingCard
+              key={meeting.id}
+              meeting={meeting}
+              onNavigate={() => router.push(`/meetings/${meeting.id}`)}
+            />
+          ))
         ) : (
-          <Text className="text-center">(There are no meetings yet)</Text>
+          <Text className="text-center">(No meetings have been found)</Text>
         )}
       </Paper>
 
@@ -48,12 +46,13 @@ export const ProfileActivity = () => {
               <div
                 key={post.id}
                 onClick={() => router.push(`/discussion/${post.id}`)}
+                className="cursor-pointer hover:opacity-75"
               >
                 <Text variant="h1">{post.title}</Text>
                 <Text>{post.body.slice(0, 250)}</Text>
-              </div>
 
-              <Divider className="my-4" />
+                <Divider className="my-4" />
+              </div>
             </>
           ))
         ) : (

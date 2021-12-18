@@ -12,6 +12,8 @@ import {
 import { useSnackbar } from 'notistack'
 import { Fragment, useMemo, useState } from 'react'
 import { Text } from 'ui'
+import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
+import no_notifications from 'public/feedback-illustrations/no_notifications.svg'
 
 export const NotificationPopper = () => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null)
@@ -19,7 +21,9 @@ export const NotificationPopper = () => {
   const queryClient = useTypeSafeQueryClient()
   const { optimisticUpdate, rollback } = useTypeSafeOptimisticUpdate()
 
-  const { data: notifications = [] } = useTypeSafeQuery('getAllNotifications')
+  const { data: notifications = [] } = useTypeSafeQuery('getAllNotifications', {
+    refetchInterval: 30_000, // refetch every 30 seconds
+  })
 
   const { mutateAsync: markNotifsAsRead } = useTypeSafeMutation(
     'markNotificationsAsRead',
@@ -42,6 +46,7 @@ export const NotificationPopper = () => {
 
         return { prevData }
       },
+      // eslint-disable-next-line
       onError: (err, [_variables], context) => {
         enqueueSnackbar(
           err.response.data.message ?? 'Cannot delete notification',
@@ -67,6 +72,7 @@ export const NotificationPopper = () => {
       <IconButton
         size="small"
         edge="end"
+        className="onboarding-3"
         onClick={e => setAnchorEl(e.currentTarget)}
       >
         <Badge
@@ -119,9 +125,11 @@ export const NotificationPopper = () => {
               </Fragment>
             ))
           ) : (
-            <Text variant="body2" className="text-center">
-              (You have no notifications)
-            </Text>
+            <IllustrationFeedback
+              title="No Notifications"
+              message="We'll notify you when something arrives"
+              illustration={no_notifications}
+            />
           )}
         </div>
       </Popover>

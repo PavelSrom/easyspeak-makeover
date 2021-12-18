@@ -1,3 +1,4 @@
+import format from 'date-fns/format'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiSession } from 'types/helpers'
 import { prisma } from 'utils/prisma-client'
@@ -62,6 +63,7 @@ export const getMeetingByIdHandler = async (
           distinct: ['memberId'],
           orderBy: { Member: { surname: 'asc' } },
           select: {
+            roleStatus: true,
             Member: {
               select: { id: true, avatar: true, name: true, surname: true },
             },
@@ -169,15 +171,6 @@ export const toggleMeetingAttendanceHandler = async (
         },
       })
 
-      // TODO: remove this once testing of notifs is completed
-      await prisma.notification.create({
-        data: {
-          Receiver: { connect: { id: session.user.profileId } },
-          title: 'Meeting attendance',
-          message: 'You are coming to a meeting',
-        },
-      })
-
       return res.json({ message: 'You are attending' })
     }
     if (alreadyAttending?.RoleType.name !== 'Coming') {
@@ -279,7 +272,11 @@ export const memberAssignRoleHandler = async (
         meetingId: req.query.id as string,
         roleTypeId: req.query.roleId as string,
       },
-      include: { RoleType: true },
+      include: {
+        RoleType: true,
+        Meeting: { select: { managerId: true, timeStart: true } },
+        Member: { select: { name: true, surname: true } },
+      },
     })
 
     if (!targetRole) return res.status(404).json({ message: 'Role not found' })
@@ -314,7 +311,19 @@ export const memberAssignRoleHandler = async (
         },
       })
 
-      // TODO: send notification to meeting manager to approve it
+      // send notification to meeting manager to approve it
+      await prisma.notification.create({
+        data: {
+          Receiver: { connect: { id: targetRole.Meeting.managerId } },
+          title: 'Request for a speech',
+          message: `${targetRole.Member?.name} ${
+            targetRole.Member?.surname
+          } has requested a speech on ${format(
+            new Date(targetRole.Meeting.timeStart),
+            'dd.MM.yyyy'
+          )}`,
+        },
+      })
     }
 
     await prisma.attendance.update({
@@ -399,6 +408,10 @@ export const adminAssignRoleHandler = async (
         meetingId: req.query.id as string,
         roleTypeId: req.query.roleId as string,
       },
+      include: {
+        RoleType: { select: { name: true } },
+        Meeting: { select: { timeStart: true } },
+      },
     })
 
     if (!targetRole) return res.status(404).json({ message: 'Role not found' })
@@ -422,7 +435,147 @@ export const adminAssignRoleHandler = async (
       },
     })
 
+    if (memberId !== session.user.profileId) {
+      console.log('send notification')
+      await prisma.notification.create({
+        data: {
+          Receiver: { connect: { id: memberId } },
+          title: 'Role assignment',
+          message: `You were assigned the role '${
+            targetRole.RoleType.name
+          }' on ${format(
+            new Date(targetRole.Meeting.timeStart),
+            'dd.MM.yyyy'
+          )}`,
+        },
+      })
+    }
+
     return res.json({ message: 'Role assigned' })
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
+export const acceptAssignedRoleHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  const { roleId, accepted } = req.query
+  // if accepting a non-speaker role, 'speech' is undefined
+  const { speech } = req.body
+
+  try {
+    const targetRole = await prisma.attendance.findUnique({
+      where: { id: roleId as string },
+      include: { RoleType: { select: { name: true } } },
+    })
+    if (!targetRole) return res.status(404).json({ message: 'Role not found' })
+
+    const roleToEditIsSpeaker = targetRole?.RoleType.name
+      .toLowerCase()
+      .includes('speaker')
+
+    if (roleToEditIsSpeaker) {
+      // if accepting speech, set status to CONFIRMED and create speech
+      if (accepted === 'true') {
+        await prisma.attendance.update({
+          where: { id: targetRole.id },
+          data: {
+            roleStatus: 'CONFIRMED',
+            Speech: {
+              create: { title: speech.title, description: speech.description },
+            },
+          },
+        })
+      } else {
+        // if rejecting a speech, set status to UNASSIGNED and unlink person
+        await prisma.attendance.update({
+          where: { id: targetRole.id },
+          data: { roleStatus: 'UNASSIGNED', memberId: null },
+        })
+      }
+    }
+
+    await prisma.attendance.update({
+      where: { id: targetRole.id },
+      data: {
+        roleStatus: accepted === 'true' ? 'CONFIRMED' : 'UNASSIGNED',
+        memberId: accepted === 'true' ? session.user.profileId : null,
+      },
+    })
+
+    return res.json({ message: `Role ${accepted ? 'accepted' : 'rejected'}` })
+  } catch ({ message }) {
+    return res.status(500).json({ message })
+  }
+}
+
+export const toggleSpeechApprovalHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession
+) => {
+  try {
+    const profile = await prisma.profile.findUnique({
+      where: { id: session.user.profileId },
+    })
+    if (!profile)
+      return res.status(404).json({ message: 'Cannot toggle speech approval' })
+    if (!profile.roleTypeId)
+      return res.status(403).json({ message: 'Access denied' })
+
+    const { approved } = req.query
+    // if 'approved' is not provided
+    if (approved === undefined)
+      return res.status(400).json({ message: 'Cannot toggle speech approval' })
+
+    const targetSpeech = await prisma.speech.findUnique({
+      where: { id: req.query.speechId as string },
+      include: {
+        Attendance: { include: { Meeting: { select: { timeStart: true } } } },
+      },
+    })
+    if (!targetSpeech)
+      return res.status(404).json({ message: 'Speech not found' })
+
+    // if speech should be approved, it's just a simple Attendance update
+    if (approved === 'true') {
+      await prisma.attendance.update({
+        where: { id: targetSpeech.attendanceId },
+        data: { roleStatus: 'CONFIRMED' },
+      })
+
+      return res.json({ message: 'Speech approved' })
+    }
+
+    // update Attendance, send notification to user and remove the speech
+    const attendanceQuery = prisma.attendance.update({
+      where: { id: targetSpeech.attendanceId },
+      data: { roleStatus: 'UNASSIGNED', memberId: null },
+    })
+    const speechQuery = prisma.speech.delete({ where: { id: targetSpeech.id } })
+
+    await Promise.all([attendanceQuery, speechQuery])
+
+    // if approving/rejecting a speech other than my own, send a notification
+    if (targetSpeech.Attendance.memberId !== session.user.profileId) {
+      await prisma.notification.create({
+        data: {
+          title: 'Speech rejected',
+          message: `Your speech on ${format(
+            new Date(targetSpeech.Attendance.Meeting.timeStart),
+            'dd.MM.yyyy'
+          )} has been ${
+            approved === 'true' ? 'approved' : 'rejected'
+          } by a board member`,
+          Receiver: { connect: { id: targetSpeech.Attendance.memberId! } },
+        },
+      })
+    }
+
+    return res.json({ message: 'Speech rejected' })
   } catch ({ message }) {
     return res.status(500).json({ message })
   }

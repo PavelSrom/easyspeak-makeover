@@ -7,6 +7,7 @@ type Props = {
   open: boolean
   defaultValue: string
   members: MemberSchemaDTO['clubMembers']
+  loading: boolean
   onClose: () => void
   onAssign: (values: { memberId: string }) => void
 }
@@ -15,6 +16,7 @@ export const AssignRoleDialog = ({
   open,
   defaultValue,
   members,
+  loading,
   onClose,
   onAssign,
 }: Props) => (
@@ -25,7 +27,9 @@ export const AssignRoleDialog = ({
     onClose={onClose}
     PaperProps={{ className: 'p-4' }}
   >
-    <Text variant="h1_light">Assign member</Text>
+    <Text variant="h1_light" className="mb-4">
+      Assign member
+    </Text>
 
     <Formik initialValues={{ memberId: defaultValue }} onSubmit={onAssign}>
       <Form>
@@ -45,7 +49,7 @@ export const AssignRoleDialog = ({
           <Button variant="outlined" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" color="secondary">
+          <Button loading={loading} type="submit" color="secondary">
             Assign
           </Button>
         </DialogActions>

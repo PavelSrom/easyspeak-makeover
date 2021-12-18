@@ -1,5 +1,3 @@
-import { ClassNamesProps } from '@emotion/react'
-import { Paper } from '@mui/material'
 import { Button, Text } from 'ui'
 
 export type IllustrationFeedbackProps = {

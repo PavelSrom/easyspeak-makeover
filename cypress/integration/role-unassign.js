@@ -29,13 +29,13 @@ describe('Signing up for two roles and removing one', () => {
 
         cy.scrollTo('bottom')
 
-        // 7 = Ah counter
+        // eq(4) = Ah counter
         cy.get('.MuiFab-circular').eq(4).click()
 
         cy.get('button[type="submit"]')
         .click()
 
-        // 9 = Grammarian
+        // eq(5) = Grammarian
         cy.get('.MuiFab-circular').eq(5).click()
 
         cy.get('button[type="submit"]')
@@ -43,6 +43,8 @@ describe('Signing up for two roles and removing one', () => {
 
         cy.wait(4000)
 
+        // eq(6) = Ah counter label
+        // eq(7) = Grammarian label
         cy.get('label').eq(6).should('contain', "Patryk Czarnecki")
         cy.get('label').eq(7).should('contain', "Patryk Czarnecki")
 

@@ -24,7 +24,9 @@ const Discussion: CustomNextPage = () => {
   const router = useRouter()
   const { profile } = useAuth()
 
-  const postsQuery = useTypeSafeQuery('getAllPosts')
+  const postsQuery = useTypeSafeQuery(['getAllPosts', false], null, {
+    isPinned: undefined,
+  })
   useOnboarding({ shown: !!postsQuery.data && postsQuery.isSuccess })
 
   const { mutateAsync: createNewPost, isLoading: isCreatingNewPost } =

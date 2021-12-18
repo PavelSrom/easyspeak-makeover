@@ -15,7 +15,7 @@
     "prisma:studio": "npx prisma studio",
     "prisma:edit-db": "npm run prisma:push && npm run prisma:generate",
     "prisma:seed": "npx prisma db seed",
-    "postinstall": "npm run prisma:generate"
+    "postinstall": "npm run prisma:generate && npm run format"
   },
   "dependencies": {
     "@emotion/cache": "^11.6.0",

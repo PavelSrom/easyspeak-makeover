@@ -178,6 +178,7 @@ export const toggleMeetingAttendanceHandler = async (
       where: { meetingId: id as string },
       include: { RoleType: { select: { name: true } } },
     })
+
     // let alreadyAttening = 'NOT COMING' | 'COMING' | 'UNDEFINED'
     let alreadyAttending: 'NOT COMING' | 'COMING' | 'UNDEFINED' = 'UNDEFINED'
 
@@ -190,10 +191,12 @@ export const toggleMeetingAttendanceHandler = async (
       }
     })
     // This is a typescript error, it would be changes above
+    // @ts-ignore
     if (alreadyAttending === 'COMING' && attending === 'true')
       return res
         .status(400)
         .json({ message: 'You already confirmed attending' })
+    // @ts-ignore
     if (alreadyAttending === 'NOT COMING' && attending === 'false')
       return res
         .status(400)
@@ -222,6 +225,7 @@ export const toggleMeetingAttendanceHandler = async (
       }
     }
     // if attending === 'false' -- Set user to "Not coming"
+    // @ts-ignore
     if (alreadyAttending === 'COMING') {
       const alreadyAttendance = await prisma.attendance.findFirst({
         where: { memberId: session.user.profileId },

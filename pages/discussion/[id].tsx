@@ -23,6 +23,9 @@ import { PostComments } from 'components/post-comments'
 import Delete from '@mui/icons-material/Delete'
 import { MenuItem } from 'ui/menu-item'
 import { PushPin } from '@mui/icons-material'
+import { LoadingPostItem } from 'ui/feedback/loading-post-item'
+import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
+import error from 'public/feedback-illustrations/error.svg'
 
 const PostDetail: CustomNextPage = () => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null)
@@ -74,71 +77,85 @@ const PostDetail: CustomNextPage = () => {
       },
     })
 
-  if (postDetailQuery.isLoading) return <p>Loading...</p>
-  if (postDetailQuery.isError || !postDetailQuery.data) return <p>Error!</p>
-
   const post = postDetailQuery.data
 
   return (
     <Container className="py-4">
-      <Menu
-        anchorEl={anchorEl}
-        open={!!anchorEl}
-        onClose={() => setAnchorEl(null)}
-      >
-        {profile?.roleTypeId && (
-          <MenuItem
-            disabled={isPinningPost}
-            onClick={() => tooglePostPinStatus([post.id])}
-            label={post.isPinned ? 'Delete pin' : 'Pin post'}
-            icon={<PushPin />}
-            variant={post.isPinned ? 'danger' : 'neutral'}
+      {postDetailQuery.isLoading && (
+        <Paper className="p-4">
+          <LoadingPostItem />
+        </Paper>
+      )}
+      {postDetailQuery.isError && (
+        <Paper className="p4">
+          <IllustrationFeedback
+            title="We couldn't find the post!"
+            message="Something went wrong, we couldn't find the post you are looking for."
+            illustration={error}
           />
-        )}
-        <MenuItem
-          disabled={isDeletingPost}
-          onClick={() => deletePost([post.id])}
-          variant="danger"
-          icon={<Delete />}
-          label="Delete post"
-        />
-      </Menu>
+        </Paper>
+      )}
+      {postDetailQuery.isSuccess && post !== undefined && (
+        <>
+          <Menu
+            anchorEl={anchorEl}
+            open={!!anchorEl}
+            onClose={() => setAnchorEl(null)}
+          >
+            {profile?.roleTypeId && (
+              <MenuItem
+                disabled={isPinningPost}
+                onClick={() => tooglePostPinStatus([post.id])}
+                label={post.isPinned ? 'Delete pin' : 'Pin post'}
+                icon={<PushPin />}
+                variant={post?.isPinned ? 'danger' : 'neutral'}
+              />
+            )}
+            <MenuItem
+              disabled={isDeletingPost}
+              onClick={() => deletePost([post.id])}
+              variant="danger"
+              icon={<Delete />}
+              label="Delete post"
+            />
+          </Menu>
 
-      <Paper className="p-4 rounded-xl">
-        <div className="flex items-center">
-          <Avatar src={post.Author.avatar ?? ''} className="w-12 h-12" />
-          <div className="ml-4 flex-1">
-            <div className="flex justify-between items-center">
-              <Text variant="h2">{`${post.Author.name} ${post.Author.surname}`}</Text>
-              {/* if it's a board member or author of the post */}
-              {(post.authorId === profile?.id || profile?.roleTypeId) && (
-                <IconButton
-                  size="small"
-                  edge="end"
-                  onClick={e => setAnchorEl(e.currentTarget)}
-                >
-                  <MoreVert />
-                </IconButton>
-              )}
+          <Paper className="p-4 rounded-xl">
+            <div className="flex items-center">
+              <Avatar src={post.Author.avatar ?? ''} className="w-12 h-12" />
+              <div className="ml-4 flex-1">
+                <div className="flex justify-between items-center">
+                  <Text variant="h2">{`${post.Author.name} ${post.Author.surname}`}</Text>
+                  {/* if it's a board member or author of the post */}
+                  {(post.authorId === profile?.id || profile?.roleTypeId) && (
+                    <IconButton
+                      size="small"
+                      edge="end"
+                      onClick={e => setAnchorEl(e.currentTarget)}
+                    >
+                      <MoreVert />
+                    </IconButton>
+                  )}
+                </div>
+                <Text variant="body2">
+                  {post.Author.ClubRole?.name ?? 'Member'}
+                </Text>
+                <Text variant="body2">
+                  {formatDistance(new Date(post.createdAt), new Date())} ago
+                </Text>
+              </div>
             </div>
-            <Text variant="body2">
-              {post.Author.ClubRole?.name ?? 'Member'}
-            </Text>
-            <Text variant="body2">
-              {formatDistance(new Date(post.createdAt), new Date())} ago
-            </Text>
-          </div>
-        </div>
 
-        <Divider className="my-4" />
+            <Divider className="my-4" />
 
-        <Text variant="h2">{post.title}</Text>
-        <Text variant="body2">{post.body}</Text>
+            <Text variant="h2">{post.title}</Text>
+            <Text variant="body2">{post.body}</Text>
 
-        <Divider className="my-4" />
-
-        <PostComments postId={router.query.id as string} />
-      </Paper>
+            <Divider className="my-4" />
+            <PostComments postId={router.query.id as string} />
+          </Paper>
+        </>
+      )}
     </Container>
   )
 }

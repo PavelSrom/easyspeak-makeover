@@ -1,4 +1,4 @@
-import { Avatar, Container, Fab, Paper } from '@mui/material'
+import { Avatar, CircularProgress, Container, Fab, Paper } from '@mui/material'
 import LocationOn from '@mui/icons-material/LocationOn'
 import AccountCircle from '@mui/icons-material/AccountCircle'
 import Phone from '@mui/icons-material/Phone'
@@ -16,6 +16,8 @@ import { useAuth } from 'contexts/auth'
 import { ChangeRoleDialog } from 'components/change-role-dialog'
 import { useState } from 'react'
 import { useSnackbar } from 'notistack'
+import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
+import error from 'public/feedback-illustrations/error.svg'
 import { theme } from '../../../styles/theme'
 
 const ClubMember: CustomNextPage = () => {
@@ -54,8 +56,24 @@ const ClubMember: CustomNextPage = () => {
       },
     })
 
-  if (memberDetailQuery.isLoading) return <p>Loading...</p>
-  if (memberDetailQuery.isError || !memberDetailQuery.data) return <p>Error!</p>
+  if (memberDetailQuery.isLoading)
+    return (
+      <Container className="py-4 text-center">
+        <CircularProgress color="primary" />
+      </Container>
+    )
+  if (memberDetailQuery.isError || !memberDetailQuery.data)
+    return (
+      <Container className="py-4">
+        <Paper className="p-4">
+          <IllustrationFeedback
+            title="Sorry"
+            message="Something went wrong, we couldn't this members profile"
+            illustration={error}
+          />
+        </Paper>
+      </Container>
+    )
 
   const { avatar, name, surname, phone, ClubRole, User } =
     memberDetailQuery.data

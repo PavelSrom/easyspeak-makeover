@@ -1,3 +1,4 @@
+import { CircularProgress, Container, Paper } from '@mui/material'
 import { requests } from 'backend'
 import {
   useTypeSafeMutation,
@@ -7,8 +8,10 @@ import {
 import { useRouter } from 'next/router'
 import { createContext, useContext, useMemo } from 'react'
 import { AgendaFullDTO, MemberSchemaDTO } from 'types/api'
+import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
 import { useAuth } from './auth'
 import { useOnboarding } from './onboarding'
+import error from 'public/feedback-illustrations/error.svg'
 
 type ContextProps = {
   meetingId: string
@@ -116,9 +119,22 @@ export const MeetingAgendaProvider = ({
     ]
   )
 
-  if (agendaQuery.isLoading || membersQuery.isLoading) return <p>Loading...</p>
+  if (agendaQuery.isLoading || membersQuery.isLoading)
+    return (
+      <Container className="py-4 text-center">
+        <CircularProgress color="primary" />
+      </Container>
+    )
   if (agendaQuery.isError || !agendaQuery.data || !membersQuery.data)
-    return <p>Error!</p>
+    return (
+      <Paper className="p-4">
+        <IllustrationFeedback
+          title="Sorry!"
+          message="Something went wrong, we couldn't find the agenda for this meeting."
+          illustration={error}
+        />
+      </Paper>
+    )
 
   return (
     <MeetingAgendaContext.Provider value={value}>

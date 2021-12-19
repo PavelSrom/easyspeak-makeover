@@ -9,7 +9,14 @@ import { Theme } from '@mui/material/styles'
 import makeStyles from '@mui/styles/makeStyles'
 
 type ThemeProps = {
-  color?: 'primary' | 'secondary'
+  color?:
+    | 'info'
+    | 'error'
+    | 'inherit'
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'warning'
 }
 
 const useStyles = makeStyles<Theme, ThemeProps>(() => ({
@@ -24,7 +31,14 @@ const useStyles = makeStyles<Theme, ThemeProps>(() => ({
 }))
 
 export type ButtonProps = Omit<MuiButtonProps, 'color'> & {
-  color?: 'primary' | 'secondary'
+  color?:
+    | 'info'
+    | 'error'
+    | 'inherit'
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'warning'
   loading?: boolean
   component?: React.ElementType
   href?: string

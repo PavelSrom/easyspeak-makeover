@@ -73,9 +73,13 @@ export const MeetingsList = ({
         ) : (
           <IllustrationFeedback
             title="No Meetings"
-            message={`${
-              profile?.User.Club.name || 'Your club'
-            } does not have any meetings yet `}
+            message={
+              rangeIsChanged
+                ? `No ${headline}`
+                : `${
+                    profile?.User.Club.name || 'Your club'
+                  } does not have any meetings yet `
+            }
             illustration={no_notifications}
             illustrationStyles="w-1/2 sm:w-1/3"
           />

@@ -11,9 +11,11 @@ import { HelperBase } from 'components/meeting-roles/helper-components'
 import { Text } from 'ui'
 
 const RequestedSpeechItem = (
-  requestedSpeeches: DashboardDTO['requestedSpeeches']
+  requestedSpeeches: DashboardDTO['requestedSpeeches'] | undefined
 ) => {
-  if (requestedSpeeches?.length > 0) {
+  if (!requestedSpeeches) return null
+
+  if (requestedSpeeches!.length > 0) {
     return (
       <>
         <Text variant="h1_light">Requested speeches</Text>
@@ -41,6 +43,7 @@ const RequestedSpeechItem = (
       </>
     )
   }
+
   return (
     <IllustrationFeedback
       title="You are up to date"
@@ -50,8 +53,12 @@ const RequestedSpeechItem = (
   )
 }
 
-const RequestedRoles = (requestedRoles: DashboardDTO['requestedRoles']) => {
-  if (requestedRoles?.length > 0) {
+const RequestedRoles = (
+  requestedRoles: DashboardDTO['requestedRoles'] | undefined
+) => {
+  if (!requestedRoles) return null
+
+  if (requestedRoles!.length > 0) {
     return (
       <>
         <Text variant="h1_light">Requested roles</Text>

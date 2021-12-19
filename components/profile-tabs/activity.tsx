@@ -37,7 +37,8 @@ export const ProfileActivity = () => {
         </Paper>
       </>
     )
-  if (activityQuery.isError)
+
+  if (activityQuery.isError || !activityQuery.data)
     return (
       <IllustrationFeedback
         title="We couldn't find the comments!"

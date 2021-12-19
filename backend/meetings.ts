@@ -67,6 +67,9 @@ export const getMeetingByIdHandler = async (
             Member: {
               select: { id: true, avatar: true, name: true, surname: true },
             },
+            RoleType: {
+              select: { name: true },
+            },
           },
         },
       },
@@ -125,6 +128,42 @@ export const createNewMeetingHandler = async (
   }
 }
 
+const createAttendence = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session: ApiSession,
+  roletypeName: 'Coming' | 'Not coming',
+  id: string | string[]
+) => {
+  const memberRoleType = await prisma.meetingRoleType.findFirst({
+    where: { name: roletypeName },
+  })
+
+  if (!memberRoleType)
+    return res.status(500).json({ message: 'Cannot toggle attendance' })
+
+  if (roletypeName === 'Coming') {
+    await prisma.attendance.create({
+      data: {
+        Meeting: { connect: { id: id as string } },
+        Member: { connect: { id: session.user.profileId } },
+        RoleType: { connect: { id: memberRoleType.id } },
+        roleStatus: 'CONFIRMED',
+      },
+    })
+    return res.json({ message: 'You are attending' })
+  }
+  await prisma.attendance.create({
+    data: {
+      Meeting: { connect: { id: id as string } },
+      Member: { connect: { id: session.user.profileId } },
+      RoleType: { connect: { id: memberRoleType.id } },
+      roleStatus: 'CONFIRMED',
+    },
+  })
+  return res.json({ message: 'You are not attending' })
+}
+
 export const toggleMeetingAttendanceHandler = async (
   req: NextApiRequest,
   res: NextApiResponse,
@@ -139,56 +178,84 @@ export const toggleMeetingAttendanceHandler = async (
       where: { meetingId: id as string },
       include: { RoleType: { select: { name: true } } },
     })
-    const alreadyAttending = meetingAttendance.find(
-      member => member.memberId === session.user.profileId
-    )
 
-    if (alreadyAttending && attending === 'true')
+    // let alreadyAttening = 'NOT COMING' | 'COMING' | 'UNDEFINED'
+    let alreadyAttending: 'NOT COMING' | 'COMING' | 'UNDEFINED' = 'UNDEFINED'
+
+    meetingAttendance.forEach(member => {
+      if (member.memberId === session.user.profileId) {
+        alreadyAttending = 'COMING'
+        if (member.RoleType.name === 'Not coming') {
+          alreadyAttending = 'NOT COMING'
+        }
+      }
+    })
+    // This is a typescript error, it would be changes above
+    // @ts-ignore
+    if (alreadyAttending === 'COMING' && attending === 'true')
       return res
         .status(400)
         .json({ message: 'You already confirmed attending' })
-    if (!alreadyAttending && attending === 'false')
+    // @ts-ignore
+    if (alreadyAttending === 'NOT COMING' && attending === 'false')
       return res
         .status(400)
         .json({ message: 'You already confirmed not attending' })
 
     if (attending === 'true') {
-      // we've already checked if they're attending, so if they had a role,
-      // they would've already shown up => they don't have a role, so create
-      // a member role
+      // we've already checked if they have comfimed if they are coming or not
+      // If they have said "not coming" before the roletype should be updated
+      // Else it should create a new row
+      if (alreadyAttending === 'UNDEFINED') {
+        return createAttendence(req, res, session, 'Coming', id)
+      }
+      if (alreadyAttending === 'NOT COMING') {
+        const attendenceId = await prisma.attendance.findFirst({
+          where: { memberId: session.user.profileId },
+        })
+        const memberRoleType = await prisma.meetingRoleType.findFirst({
+          where: { name: 'Coming' },
+        })
+
+        await prisma.attendance.update({
+          data: { roleTypeId: memberRoleType?.id, roleStatus: 'PENDING' },
+          where: { id: attendenceId?.id },
+        })
+        return res.json({ message: 'You are attending' })
+      }
+    }
+    // if attending === 'false' -- Set user to "Not coming"
+    // @ts-ignore
+    if (alreadyAttending === 'COMING') {
+      const alreadyAttendance = await prisma.attendance.findFirst({
+        where: { memberId: session.user.profileId },
+        select: { id: true, RoleType: true, Speech: true },
+      })
+
       const memberRoleType = await prisma.meetingRoleType.findFirst({
-        where: { name: 'Coming' },
-      })
-      if (!memberRoleType)
-        return res.status(500).json({ message: 'Cannot toggle attendance' })
-
-      await prisma.attendance.create({
-        data: {
-          Meeting: { connect: { id: id as string } },
-          Member: { connect: { id: session.user.profileId } },
-          RoleType: { connect: { id: memberRoleType.id } },
-          roleStatus: 'CONFIRMED',
-        },
+        where: { name: 'Not coming' },
       })
 
-      return res.json({ message: 'You are attending' })
-    }
-    if (alreadyAttending?.RoleType.name !== 'Coming') {
-      // if they don't wanna attend but have a role
+      if (alreadyAttendance?.RoleType.name === 'Coming') {
+        await prisma.attendance.update({
+          where: { id: alreadyAttendance?.id as string },
+          data: { roleTypeId: memberRoleType?.id },
+        })
+
+        return res.json({ message: 'You are not attending' })
+      }
+      if (alreadyAttendance?.Speech) {
+        await prisma.speech.delete({
+          where: { id: alreadyAttendance.Speech.id },
+        })
+      }
       await prisma.attendance.update({
-        where: { id: alreadyAttending!.id },
-        data: { memberId: null, roleStatus: 'PENDING' },
+        data: { memberId: null, roleStatus: 'UNASSIGNED' },
+        where: { id: alreadyAttendance?.id as string },
       })
-
-      // TODO: remove speeches if there are any
-    } else {
-      // if they don't wanna attend and don't have a role
-      await prisma.attendance.delete({
-        where: { id: alreadyAttending?.id },
-      })
+      return createAttendence(req, res, session, 'Not coming', id)
     }
-
-    return res.json({ message: 'You are not attending' })
+    return createAttendence(req, res, session, 'Not coming', id)
   } catch ({ message }) {
     return res.status(500).json({ message })
   }
@@ -580,3 +647,5 @@ export const toggleSpeechApprovalHandler = async (
     return res.status(500).json({ message })
   }
 }
+
+// Attendance

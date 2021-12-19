@@ -1,4 +1,3 @@
-import { Paper } from '@mui/material'
 import { Button, Text } from 'ui'
 
 export type IllustrationFeedbackProps = {
@@ -12,6 +11,7 @@ export type IllustrationFeedbackProps = {
   alt?: string
   onNavigate?: () => void
   buttonText?: string
+  illustrationStyles?: string
 }
 
 export const IllustrationFeedback = ({
@@ -21,6 +21,7 @@ export const IllustrationFeedback = ({
   alt,
   onNavigate,
   buttonText,
+  illustrationStyles,
 }: IllustrationFeedbackProps) => (
   <div className="p-5 flex justify-center">
     <div className="w-full sm:w-3/4 text-center flex flex-col gap-y-2">
@@ -30,7 +31,7 @@ export const IllustrationFeedback = ({
       </div>
       {illustration && (
         <div className="flex justify-center">
-          <div className="w-full sm:w-3/4">
+          <div className={illustrationStyles || 'w-full sm:w-3/4'}>
             <img src={illustration.src} alt={alt || 'Feedback illustration'} />
           </div>
         </div>

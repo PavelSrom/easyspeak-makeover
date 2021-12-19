@@ -8,7 +8,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
-import { TooltipRenderProps } from 'react-joyride'
+import { TooltipRenderProps, BeaconRenderProps } from 'react-joyride'
 import { Button, Text } from 'ui'
 import { ONBOARDING_STEPS } from 'utils/onboarding-steps'
 import { useLayout } from './page-layout'
@@ -34,7 +34,7 @@ export const OnboardingProvider = ({
   const [stepIndex, setStepIndex] = useState<number>(0)
 
   const Tooltip = memo(({ index, step, tooltipProps }: TooltipRenderProps) => (
-    <div className="p-4 bg-white max-w-xs rounded-md" {...tooltipProps}>
+    <div className="p-4 bg-white max-w-xs rounded-md top-0" {...tooltipProps}>
       <Text variant="h2">{step.title}</Text>
       <Text>{step.content}</Text>
 
@@ -109,6 +109,7 @@ export const OnboardingProvider = ({
           stepIndex={stepIndex}
           styles={{ options: { zIndex: 10000 } }}
           tooltipComponent={Tooltip}
+          floaterProps={{ placement: 'top' }}
         />
       ) : null}
       {children}

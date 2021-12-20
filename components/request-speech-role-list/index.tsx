@@ -11,27 +11,39 @@ import { HelperBase } from 'components/meeting-roles/helper-components'
 import { Text } from 'ui'
 
 const RequestedSpeechItem = (
-  requestedSpeeches: DashboardDTO['requestedSpeeches']
+  requestedSpeeches: DashboardDTO['requestedSpeeches'] | undefined
 ) => {
-  if (requestedSpeeches?.length > 0) {
-    return requestedSpeeches!.map(speaker => (
-      <SpeakerBase key={speaker.id} speaker={speaker}>
-        <div className="flex items-start">
-          <div className="mr-4">
-            <SpeakerBase.AddButtonOrAvatar />
-          </div>
-          <div className="flex-1">
-            <SpeakerBase.Information />
-            <SpeakerBase.ApproveOrReject />
-            <SpeakerBase.AcceptOrDecline />
-          </div>
-          <SpeakerBase.DeleteIcon />
-        </div>
+  if (!requestedSpeeches) return null
 
-        <Divider className="my-2" />
-      </SpeakerBase>
-    ))
+  if (requestedSpeeches!.length > 0) {
+    return (
+      <>
+        <Text variant="h1_light">Requested speeches</Text>
+        <Text variant="body" className="mb-4">
+          Following members has requested speeches <br />
+          (You need to go to the meeting to accept)
+        </Text>
+        {requestedSpeeches!.map(speaker => (
+          <SpeakerBase key={speaker.id} speaker={speaker}>
+            <div className="flex items-start">
+              <div className="mr-4">
+                <SpeakerBase.AddButtonOrAvatar />
+              </div>
+              <div className="flex-1">
+                <SpeakerBase.Information />
+                <SpeakerBase.ApproveOrReject />
+                <SpeakerBase.AcceptOrDecline />
+              </div>
+              <SpeakerBase.DeleteIcon />
+            </div>
+
+            <Divider className="my-2" />
+          </SpeakerBase>
+        ))}
+      </>
+    )
   }
+
   return (
     <IllustrationFeedback
       title="You are up to date"
@@ -41,25 +53,34 @@ const RequestedSpeechItem = (
   )
 }
 
-const RequestedRoles = (requestedRoles: DashboardDTO['requestedRoles']) => {
-  if (requestedRoles?.length > 0) {
-    // return requestedRoles?.map(role => (
-    //   <HelperBase key={role.id} helper={role}>
-    //     <div className="flex items-start">
-    //       <div className="mr-4">
-    //         <HelperBase.AddButtonOrAvatar />
-    //       </div>
-    //       <div className="flex-1">
-    //         <HelperBase.Information />
-    //         <HelperBase.AcceptOrDecline />
-    //       </div>
-    //       <HelperBase.DeleteIcon />
-    //     </div>
+const RequestedRoles = (
+  requestedRoles: DashboardDTO['requestedRoles'] | undefined
+) => {
+  if (!requestedRoles) return null
 
-    //     <Divider className="my-2" />
-    //   </HelperBase>
-    // ))
-    return <Text>SOME HELP HERE PLEASE</Text>
+  if (requestedRoles!.length > 0) {
+    return (
+      <>
+        <Text variant="h1_light">Requested roles</Text>
+        <Text variant="body" className="mb-4">
+          You have been requested to optain following roles <br />
+          (You need to go to the meeting to confirm)
+        </Text>
+        {requestedRoles!.map(role => (
+          <HelperBase key={role.id} helper={role}>
+            <div className="flex items-start">
+              <div className="flex-1">
+                <HelperBase.Information />
+              </div>
+              <HelperBase.DeleteIcon />
+            </div>
+
+            <Divider className="my-2" />
+          </HelperBase>
+        ))}
+      </>
+    )
+    // return <Text>SOME HELP HERE PLEASE</Text>
   }
   return (
     <IllustrationFeedback

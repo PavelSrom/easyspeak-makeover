@@ -1,4 +1,4 @@
-import { Avatar, Divider, Fab, IconButton, Paper } from '@mui/material'
+import { Avatar, Divider, Fab, IconButton, Paper, Tooltip } from '@mui/material'
 import AddOutlined from '@mui/icons-material/AddOutlined'
 import MarkEmailRead from '@mui/icons-material/MarkEmailRead'
 import Email from '@mui/icons-material/Email'
@@ -14,6 +14,9 @@ import { Fragment, useState } from 'react'
 import formatDistance from 'date-fns/formatDistance'
 import { useRouter } from 'next/router'
 import { useAuth } from 'contexts/auth'
+import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
+import error from 'public/feedback-illustrations/error.svg'
+import { LoadingListItem } from 'ui/feedback/loadling-list-item'
 import { NewMemberDialog } from './new-member-dialog'
 
 export const ClubMembers = () => {
@@ -78,8 +81,24 @@ export const ClubMembers = () => {
         <Text variant="h1_light" className="mb-6">
           Members
         </Text>
-        {clubMembersQuery.isLoading && <p>Loading...</p>}
-        {clubMembersQuery.isError && <p>Error!</p>}
+        {clubMembersQuery.isLoading && (
+          <div className="flex flex-col gap-4">
+            <LoadingListItem />
+            <LoadingListItem />
+            <LoadingListItem />
+          </div>
+        )}
+        {clubMembersQuery.isError && (
+          <Paper className="p-4">
+            <IllustrationFeedback
+              title="Sorry!"
+              message={`Something went wrong, we couldn't find the members in ${
+                profile?.User.Club.name || 'your club'
+              }.`}
+              illustration={error}
+            />
+          </Paper>
+        )}
         {clubMembersQuery.isSuccess &&
           clubMembersQuery.data &&
           clubMembersQuery.data.clubMembers.map(member => (
@@ -108,8 +127,20 @@ export const ClubMembers = () => {
         <Text variant="h1_light" className="mb-6">
           Pending invites
         </Text>
-        {clubMembersQuery.isLoading && <p>Loading...</p>}
-        {clubMembersQuery.isError && <p>Error!</p>}
+        {clubMembersQuery.isLoading && (
+          <div className="flex flex-col gap-4">
+            <LoadingListItem />
+          </div>
+        )}
+        {clubMembersQuery.isError && (
+          <IllustrationFeedback
+            title="Sorry!"
+            message={`Something went wrong, we couldn't find the pending invites for ${
+              profile?.User.Club.name || 'your club'
+            }.`}
+            illustration={error}
+          />
+        )}
         {clubMembersQuery.isSuccess && clubMembersQuery.data && (
           <>
             {clubMembersQuery.data.pendingInvites.length > 0 ? (
@@ -135,22 +166,26 @@ export const ClubMembers = () => {
                         )}
                       </div>
                       <div className="flex space-x-2 relative -right-2">
-                        <IconButton
-                          size="small"
-                          edge="end"
-                          disabled={isResendingInvitation}
-                          onClick={() => resendInvitation([invite.id])}
-                        >
-                          <Email />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          edge="end"
-                          disabled={isDeletingInvite}
-                          onClick={() => deleteMemberInvite([invite.id])}
-                        >
-                          <Delete />
-                        </IconButton>
+                        <Tooltip title="Resend invitation">
+                          <IconButton
+                            size="small"
+                            edge="end"
+                            disabled={isResendingInvitation}
+                            onClick={() => resendInvitation([invite.id])}
+                          >
+                            <Email />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete invitation">
+                          <IconButton
+                            size="small"
+                            edge="end"
+                            disabled={isDeletingInvite}
+                            onClick={() => deleteMemberInvite([invite.id])}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </Tooltip>
                       </div>
                     </div>
                   </div>

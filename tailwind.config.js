@@ -7,9 +7,9 @@ module.exports = {
   ],
   darkMode: false, // or 'media' or 'class'
   theme: {
-    fontFamily:{
-      'sans': ['Roboto', 'ui-sans-serif'],
-      'body': ['Nunito', 'ui-sans-serif'],
+    fontFamily: {
+      sans: ['Roboto', 'ui-sans-serif'],
+      body: ['Nunito', 'ui-sans-serif'],
     },
     extend: {
       colors: {

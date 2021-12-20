@@ -11,6 +11,10 @@ import { useAuth } from 'contexts/auth'
 import { Form, Formik } from 'formik'
 import { createNewCommentSchema } from 'utils/payload-validations'
 import { useSnackbar } from 'notistack'
+import error from 'public/feedback-illustrations/error.svg'
+import connection from 'public/feedback-illustrations/connection.svg'
+import { LoadingCommentItem } from 'ui/feedback/loading-comment-item'
+import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
 
 type Props = {
   postId: string
@@ -59,8 +63,14 @@ export const PostComments = ({ postId }: Props) => {
 
   return (
     <div>
-      {commentsQuery.isLoading && <p>Loading...</p>}
-      {commentsQuery.isError && <p>Error!</p>}
+      {commentsQuery.isLoading && <LoadingCommentItem />}
+      {commentsQuery.isError && (
+        <IllustrationFeedback
+          title="We couldn't find the comments!"
+          message="Something went wrong, we couldn't find the comments for this post."
+          illustration={error}
+        />
+      )}
       {commentsQuery.isSuccess && commentsQuery.data && (
         <>
           {commentsQuery.data.length > 0 ? (
@@ -74,7 +84,7 @@ export const PostComments = ({ postId }: Props) => {
                   <div className="flex justify-between items-center">
                     <div>
                       <Text className="font-semibold">{`${comment.Author.name} ${comment.Author.surname}`}</Text>
-                      <Text variant="body2">
+                      <Text variant="small">
                         {formatDistance(
                           new Date(comment.createdAt),
                           new Date()
@@ -94,14 +104,19 @@ export const PostComments = ({ postId }: Props) => {
                     )}
                   </div>
 
-                  <Text variant="body2" className="mt-2">
+                  <Text variant="body" className="mt-2">
                     {comment.message}
                   </Text>
+                  <Divider className="my-4" />
                 </div>
               </div>
             ))
           ) : (
-            <p>There are no comments yet</p>
+            <IllustrationFeedback
+              message="Be the first to comment!"
+              illustration={connection}
+              illustrationStyles="w-1/2 sm:w-1/3"
+            />
           )}
         </>
       )}

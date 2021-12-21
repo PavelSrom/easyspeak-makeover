@@ -8,7 +8,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
-import { TooltipRenderProps, BeaconRenderProps } from 'react-joyride'
+import { TooltipRenderProps } from 'react-joyride'
 import { Button, Text } from 'ui'
 import { ONBOARDING_STEPS } from 'utils/onboarding-steps'
 import { useLayout } from './page-layout'

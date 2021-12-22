@@ -39,7 +39,7 @@ export const ONBOARDING_STEPS: Step[] = [
   {
     target: '.onboarding-6',
     title: 'The calendar',
-    content: `Now you're seeting the Meetings page where you can see upcoming
+    content: `Now you're seeing the Meetings page where you can see upcoming
       meetings, browse this calendar either by month or by a specific day to
       see what meetings are being held or have held in the past.`,
   },

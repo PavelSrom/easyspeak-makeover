@@ -5,8 +5,8 @@ describe('API endpoints without authentication', () => {
       url: '/api/pathways',
       failOnStatusCode: false,
     }).then(resp => {
-      // Status code 403: Forbidden
-      expect(resp.status).to.eq(403)
+      // Status code 200: OK
+      expect(resp.status).to.eq(200)
     })
   })
   it('getClubRoles', () => {
@@ -65,8 +65,8 @@ describe('API endpoints without authentication', () => {
       url: '/api/auth/check-user',
       failOnStatusCode: false,
     }).then(resp => {
-      // Status code 403: Forbidden
-      expect(resp.status).to.eq(403)
+      // Status code 400: Bad request
+      expect(resp.status).to.eq(400)
     })
   })
   it('authSignup', () => {
@@ -75,8 +75,8 @@ describe('API endpoints without authentication', () => {
       url: '/api/auth/signup',
       failOnStatusCode: false,
     }).then(resp => {
-      // Status code 403: Forbidden
-      expect(resp.status).to.eq(403)
+      // Status code 400: Bad request
+      expect(resp.status).to.eq(400)
     })
   })
   it('changePassword', () => {
@@ -95,8 +95,8 @@ describe('API endpoints without authentication', () => {
       url: '/api/auth/delete',
       failOnStatusCode: false,
     }).then(resp => {
-      // Status code 403: Forbidden
-      expect(resp.status).to.eq(403)
+      // Status code 400: Bad request
+      expect(resp.status).to.eq(400)
     })
   })
   it('getAllPosts', () => {

@@ -27,6 +27,34 @@ describe('API endpoints with authentication', () => {
             })
     })
 
+    it('getAllPathways', () => {
+        cy.setCookie('next-auth.session-token', cookie.value)
+        cy.request({
+            method: 'GET',
+            url: '/api/pathways',
+            headers: {
+                'next-auth.session-token': cookie.value,
+            },
+            failOnStatusCode: false,
+        }).then(resp => {
+            expect(resp.status).to.eq(200)
+        })
+    })
+
+    it('getClubRoles', () => {
+        cy.setCookie('next-auth.session-token', cookie.value)
+        cy.request({
+            method: 'GET',
+            url: '/api/club-roles',
+            headers: {
+                'next-auth.session-token': cookie.value,
+            },
+            failOnStatusCode: false,
+        }).then(resp => {
+            expect(resp.status).to.eq(200)
+        })
+    })
+
     it('getMeetingRoles', () => {
         cy.setCookie('next-auth.session-token', cookie.value)
         cy.request({

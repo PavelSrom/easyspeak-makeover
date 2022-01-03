@@ -26,6 +26,11 @@ import { PushPin } from '@mui/icons-material'
 import { LoadingPostItem } from 'ui/feedback/loading-post-item'
 import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
 import error from 'public/feedback-illustrations/error.svg'
+import { withAuth } from 'utils/with-auth'
+
+export const getServerSideProps = withAuth(async ({ session }) => ({
+  props: { session },
+}))
 
 const PostDetail: CustomNextPage = () => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null)

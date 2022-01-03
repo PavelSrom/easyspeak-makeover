@@ -8,7 +8,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
-import { TooltipRenderProps, BeaconRenderProps } from 'react-joyride'
+import { TooltipRenderProps } from 'react-joyride'
 import { Button, Text } from 'ui'
 import { ONBOARDING_STEPS } from 'utils/onboarding-steps'
 import { useLayout } from './page-layout'
@@ -42,19 +42,32 @@ export const OnboardingProvider = ({
         <Text variant="caption">
           Step {index + 1} of {ONBOARDING_STEPS.length}
         </Text>
-        <Button
-          color="secondary"
-          onClick={() => {
-            if (index === ONBOARDING_STEPS.length - 1) {
-              // onboarding finished => save to local storage
+        <div className="space-x-2">
+          <Button
+            variant="text"
+            color="secondary"
+            onClick={() => {
+              setStepIndex(0)
+              setRun(false)
               localStorage.setItem('member-onboarded', 'true')
-            }
+            }}
+          >
+            Skip
+          </Button>
+          <Button
+            color="secondary"
+            onClick={() => {
+              if (index === ONBOARDING_STEPS.length - 1) {
+                // onboarding finished => save to local storage
+                localStorage.setItem('member-onboarded', 'true')
+              }
 
-            setStepIndex(prev => prev + 1)
-          }}
-        >
-          {index === ONBOARDING_STEPS.length - 1 ? 'Finish' : 'Next'}
-        </Button>
+              setStepIndex(prev => prev + 1)
+            }}
+          >
+            {index === ONBOARDING_STEPS.length - 1 ? 'Finish' : 'Next'}
+          </Button>
+        </div>
       </div>
     </div>
   ))
@@ -69,15 +82,11 @@ export const OnboardingProvider = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepIndex])
 
-  // find out if user already went through onboarding
+  // remount joyride on each tab or page change
   useEffect(() => {
     const onboarding = localStorage.getItem('member-onboarded')
 
     setRun(onboarding !== 'true')
-  }, [])
-
-  // remount joyride on each tab or page change
-  useEffect(() => {
     setShown(false)
 
     const timeout = setTimeout(() => {

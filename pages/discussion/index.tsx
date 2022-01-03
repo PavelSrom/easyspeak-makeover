@@ -17,6 +17,11 @@ import error from 'public/feedback-illustrations/error.svg'
 import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
 import { useAuth } from 'contexts/auth'
 import no_pinned_post from 'public/feedback-illustrations/no_pinned_post.svg'
+import { withAuth } from 'utils/with-auth'
+
+export const getServerSideProps = withAuth(async ({ session }) => ({
+  props: { session },
+}))
 
 const Discussion: CustomNextPage = () => {
   const [newPostDialogOpen, setNewPostDialogOpen] = useState<boolean>(false)

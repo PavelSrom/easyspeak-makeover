@@ -1,3 +1,8 @@
+/**
+ * Inspiration for code and partial implementation taken from Ben Awad:
+ * https://github.com/benawad/dogehouse/blob/staging/kibbeh/src/shared-hooks/useTypeSafeMutation.ts
+ */
+
 /* eslint-disable no-restricted-imports */
 import { requests } from 'backend'
 import { useMutation, UseMutationOptions } from 'react-query'

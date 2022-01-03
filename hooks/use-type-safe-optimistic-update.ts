@@ -1,3 +1,8 @@
+/**
+ * Inspiration for code and partial implementation taken from Ben Awad:
+ * https://github.com/benawad/dogehouse/blob/staging/kibbeh/src/shared-hooks/useTypeSafeUpdateQuery.ts
+ */
+
 import { requests } from 'backend'
 import { useCallback } from 'react'
 import { Unpromisify } from 'types/helpers'

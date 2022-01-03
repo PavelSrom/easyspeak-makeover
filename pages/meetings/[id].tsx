@@ -7,6 +7,11 @@ import { useRouter } from 'next/router'
 import { CustomNextPage } from 'types/helpers'
 import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
 import error from 'public/feedback-illustrations/error.svg'
+import { withAuth } from 'utils/with-auth'
+
+export const getServerSideProps = withAuth(async ({ session }) => ({
+  props: { session },
+}))
 
 const Meeting: CustomNextPage = () => {
   const router = useRouter()

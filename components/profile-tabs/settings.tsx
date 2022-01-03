@@ -19,6 +19,9 @@ export const ProfileSettings = () => {
   const { enqueueSnackbar } = useSnackbar()
   const [notifsEmail, setNotifsEmail] = useState(profile?.receiveEmail)
   const [notifsPhone, setNotifsPhone] = useState(profile?.receiveNotifs)
+  const [memberOnboarded, setMemberOnboarded] = useState(
+    () => localStorage.getItem('member-onboarded') === 'true'
+  )
 
   const { mutateAsync: changePassword, isLoading: isChangingPassword } =
     useTypeSafeMutation('changePassword', {
@@ -86,6 +89,22 @@ export const ProfileSettings = () => {
             onChange={e => setNotifsPhone(e.target.checked)}
           />
         </div>
+      </Paper>
+
+      <Paper className="p-4 mt-4">
+        <Text variant="h1_light">Other options</Text>
+        <Button
+          variant="outlined"
+          className="mt-4"
+          disabled={!memberOnboarded}
+          onClick={() => {
+            localStorage.setItem('member-onboarded', 'false')
+            setMemberOnboarded(false)
+            enqueueSnackbar('Onboarding reset', { variant: 'success' })
+          }}
+        >
+          Reset onboarding
+        </Button>
       </Paper>
     </>
   )

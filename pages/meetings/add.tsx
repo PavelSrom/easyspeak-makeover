@@ -26,6 +26,11 @@ import {
 } from 'utils/payload-validations'
 import { Help } from '@mui/icons-material'
 import { theme } from 'styles/theme'
+import { withAuth } from 'utils/with-auth'
+
+export const getServerSideProps = withAuth(async ({ session }) => ({
+  props: { session },
+}))
 
 const AddMeeting: CustomNextPage = () => {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false)

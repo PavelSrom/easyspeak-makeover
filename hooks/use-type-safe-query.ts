@@ -1,3 +1,8 @@
+/**
+ * Inspiration for code and partial implementation taken from Ben Awad:
+ * https://github.com/benawad/dogehouse/blob/staging/kibbeh/src/shared-hooks/useTypeSafeQuery.ts
+ */
+
 /* eslint-disable no-restricted-imports */
 import { requests } from 'backend'
 import { UseQueryOptions, useQuery } from 'react-query'

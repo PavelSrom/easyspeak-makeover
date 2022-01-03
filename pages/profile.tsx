@@ -4,6 +4,11 @@ import { ProfileInfo } from 'components/profile-tabs/info'
 import { ProfileSettings } from 'components/profile-tabs/settings'
 import { useLayout } from 'contexts/page-layout'
 import { CustomNextPage } from 'types/helpers'
+import { withAuth } from 'utils/with-auth'
+
+export const getServerSideProps = withAuth(async ({ session }) => ({
+  props: { session },
+}))
 
 const Profile: CustomNextPage = () => {
   const { activeTab } = useLayout()

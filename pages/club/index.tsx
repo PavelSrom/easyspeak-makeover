@@ -4,6 +4,11 @@ import { ClubInfo } from 'components/club/club-info'
 import { ClubMembers } from 'components/club/club-members'
 import { useLayout } from 'contexts/page-layout'
 import { CustomNextPage } from 'types/helpers'
+import { withAuth } from 'utils/with-auth'
+
+export const getServerSideProps = withAuth(async ({ session }) => ({
+  props: { session },
+}))
 
 const Club: CustomNextPage = () => {
   const { activeTab } = useLayout()

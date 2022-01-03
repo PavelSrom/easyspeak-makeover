@@ -48,7 +48,6 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@testing-library/react": "^12.1.2",
     "@types/bcryptjs": "^2.4.2",
     "@types/jest": "^27.0.3",
     "@types/node": "16.11.10",

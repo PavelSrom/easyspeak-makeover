@@ -17,6 +17,7 @@ This is a progressive web application developed for a Bachelor project for the t
 - `backend` - handlers for API endpoints
 - `components` - independent "chunks" of UI for easier maintenance and development
 - `contexts` - any custom global or local contexts for various purposes
+- `cypress` - end-to-end tests with Cypress
 - `hooks` - custom, reusable API and synchronous hooks
 - `pages` - application pages, the way Next.js structures them
 - `prisma` - Prisma's database schema

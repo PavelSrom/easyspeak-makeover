@@ -18,7 +18,12 @@ import { useState } from 'react'
 import { useSnackbar } from 'notistack'
 import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
 import error from 'public/feedback-illustrations/error.svg'
-import { theme } from '../../../styles/theme'
+import { withAuth } from 'utils/with-auth'
+import { theme } from 'styles/theme'
+
+export const getServerSideProps = withAuth(async ({ session }) => ({
+  props: { session },
+}))
 
 const ClubMember: CustomNextPage = () => {
   const [roleDialogOpen, setRoleDialogOpen] = useState<boolean>(false)

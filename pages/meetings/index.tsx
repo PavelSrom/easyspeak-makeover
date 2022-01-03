@@ -18,6 +18,11 @@ import { useRouter } from 'next/router'
 import { useAuth } from 'contexts/auth'
 import { useOnboarding } from 'contexts/onboarding'
 import { MeetingsList } from 'components/meetings-list'
+import { withAuth } from 'utils/with-auth'
+
+export const getServerSideProps = withAuth(async ({ session }) => ({
+  props: { session },
+}))
 
 const Meetings: CustomNextPage = () => {
   const [rangeIsChanged, setRangeIsChanged] = useState<boolean>(false)

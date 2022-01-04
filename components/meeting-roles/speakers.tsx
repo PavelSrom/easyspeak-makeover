@@ -15,8 +15,6 @@ export const AgendaSpeakers = () => {
       </Text>
     )
 
-  console.log(speakers)
-
   return (
     <>
       {speakers.map(speaker => (

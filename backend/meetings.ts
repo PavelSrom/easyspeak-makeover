@@ -378,13 +378,24 @@ export const memberAssignRoleHandler = async (
         },
       })
 
+      const updatedAttendance = await prisma.attendance.update({
+        where: { id: targetRole.id },
+        data: {
+          Member: { connect: { id: session.user.profileId } },
+          roleStatus: isRequestForSpeech ? 'PENDING' : 'CONFIRMED',
+        },
+        include: {
+          Member: { select: { name: true, surname: true } },
+        },
+      })
+
       // send notification to meeting manager to approve it
       await prisma.notification.create({
         data: {
           Receiver: { connect: { id: targetRole.Meeting.managerId } },
           title: 'Request for a speech',
-          message: `${targetRole.Member?.name} ${
-            targetRole.Member?.surname
+          message: `${updatedAttendance.Member?.name} ${
+            updatedAttendance.Member?.surname
           } has requested a speech on ${format(
             new Date(targetRole.Meeting.timeStart),
             'dd.MM.yyyy'
@@ -392,14 +403,6 @@ export const memberAssignRoleHandler = async (
         },
       })
     }
-
-    await prisma.attendance.update({
-      where: { id: targetRole.id },
-      data: {
-        Member: { connect: { id: session.user.profileId } },
-        roleStatus: isRequestForSpeech ? 'PENDING' : 'CONFIRMED',
-      },
-    })
 
     return res.json({ message: 'Role assigned' })
   } catch ({ message }) {
@@ -503,7 +506,6 @@ export const adminAssignRoleHandler = async (
     })
 
     if (memberId !== session.user.profileId) {
-      console.log('send notification')
       await prisma.notification.create({
         data: {
           Receiver: { connect: { id: memberId } },

@@ -9,9 +9,9 @@ import { useRouter } from 'next/router'
 import { createContext, useContext, useMemo } from 'react'
 import { AgendaFullDTO, MemberSchemaDTO } from 'types/api'
 import { IllustrationFeedback } from 'ui/feedback/illustration-feedback'
+import error from 'public/feedback-illustrations/error.svg'
 import { useAuth } from './auth'
 import { useOnboarding } from './onboarding'
-import error from 'public/feedback-illustrations/error.svg'
 
 type ContextProps = {
   meetingId: string

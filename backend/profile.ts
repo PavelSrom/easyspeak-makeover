@@ -53,7 +53,7 @@ export const getUserActivityHandler = async (
 ) => {
   try {
     const meetingsQuery = prisma.meeting.findMany({
-      where: { clubId: session.user.clubId },
+      where: { clubId: session.user.clubId, timeStart: { gte: new Date() } },
       orderBy: { timeStart: 'asc' },
       take: 3,
       select: {
